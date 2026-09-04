@@ -1,6 +1,6 @@
 # Claude Code environment: skills + MCP servers
 
-This repository carries a Claude Code setup: **9 skills** under `.claude/skills/`
+This repository carries a Claude Code setup: **10 skills** under `.claude/skills/`
 and the **21st.dev MCP server** in `.mcp.json`. Everything here is project-scoped,
 so it loads automatically for anyone who opens this repo in Claude Code.
 
@@ -79,14 +79,26 @@ installed here:
 `fix` assumes a `gh`-style PR workflow and a repo `CLAUDE.md`; it was written for
 Motion's contributor loop, so review its steps before pointing it at this repo.
 
-If what you actually wanted was Motion's *animation* documentation available to
-Claude, that is a different thing from these skills — say so and it can be added
-as a proper reference skill instead.
+### Written for this repo
+
+| Skill | What it covers |
+| --- | --- |
+| `motion` | Reference for the Motion animation library itself (v13.2.0) — the React API, the vanilla JS API, transitions and springs, performance, and migration from Framer Motion |
+
+`motion` is a reference skill, not a vendored one: its API surface was extracted
+from the v13.2.0 source (entry points, exported symbols, option types, and the
+repo's own bundle-size budgets) rather than written from memory. `SKILL.md` holds
+the mental model and the common recipes; the detail lives in `references/` and is
+read only when a task needs it.
+
+To refresh it against a newer Motion, re-derive from the tag rather than editing
+by hand — the export surface is the source of truth.
 
 ## Layout
 
 ```
-.claude/skills/     9 skills
+.claude/skills/     10 skills
 .mcp.json           21st.dev MCP server (key via ${TWENTYFIRST_API_KEY})
 .env.example        template for the key
+CLAUDE.md           repo conventions
 ```

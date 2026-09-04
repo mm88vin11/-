@@ -101,4 +101,5 @@ by hand — the export surface is the source of truth.
 .mcp.json           21st.dev MCP server (key via ${TWENTYFIRST_API_KEY})
 .env.example        template for the key
 CLAUDE.md           repo conventions
+site/               the БАЗА landing page — see site/README.md
 ```

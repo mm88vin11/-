@@ -15,3 +15,7 @@ summary addressed to the user, not to the artifacts.
 - `.mcp.json` — project-scoped MCP servers. This repository is public, so secrets
   are injected through `${ENV_VAR}` placeholders and never committed. `.env.example`
   lists the variables that need to be set.
+- `site/` — the БАЗА landing page. `baza.html` is the built single-file
+  deliverable; `component.dc.html` is its source and `build/bundle.py` re-packs
+  one into the other. Page copy is Russian because the site is; the build
+  scripts and their comments are English like the rest of the repo.

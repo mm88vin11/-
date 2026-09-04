@@ -10,34 +10,61 @@ site/
   component.dc.html  the source: dc-runtime template + Component logic
   og.jpg             1200×630 link preview, upload to <site>/og.jpg
   build/bundle.py    re-packs component.dc.html into baza.html
+  build/set-lead.py  points the form at Telegram or your own handler
+  build/worker.js    Cloudflare Worker that keeps the bot token off the client
   build/genmap.mjs   regenerates the pre-projected world map
   build/mapdata.json the map paths that genmap.mjs produced
 ```
 
-## Before publishing — three fields to fill in
+## Before publishing — where the leads go
 
-Open `component.dc.html` and find `LEAD` near the top of `class Component`.
-**Until one of these is set, the form only stores the lead in the visitor's
-browser and offers to forward it to Telegram by hand.**
+**Until this is set, the form only stores the lead in the visitor's browser
+and offers to forward it to Telegram by hand.** One command does the whole
+setup; it writes `baza.local.html`, and that configured file is the one you
+publish (it is gitignored — a live token must not reach a public repo).
 
-```js
-LEAD = { endpoint: '', tgToken: '', tgChat: '', tgUser: 'lllbaza' };
+```bash
+# Telegram, no backend. Open the bot in Telegram and send it any message
+# first, then run this — it finds the chat id itself and sends a test message.
+python3 build/set-lead.py --token 1234567890:AA…
+
+# Your own handler (CRM, Make, n8n, the worker below). Nothing on the client.
+python3 build/set-lead.py --endpoint https://relay.example.workers.dev
+
+python3 build/set-lead.py --check    # what is the current file pointed at?
 ```
 
-| Field | What it does |
-| --- | --- |
-| `endpoint` | Your own handler (CRM, Make, n8n, a serverless function). Receives `POST application/json` with the object `leadPayload()` builds. Tried first. |
-| `tgToken` + `tgChat` | Direct Telegram Bot API send, for when there is no backend at all. Tried if `endpoint` is missing or fails. |
-| `tgUser` | The account behind the "just write to us" buttons. |
+Rotating a token is the same command again. `--chat` overrides the discovered
+chat id, `--user` changes the account behind the "just write to us" buttons.
 
-The Telegram token is readable by anyone who opens the page source. Use a bot
-that can only post into one chat, and never give it admin rights anywhere.
+### About hiding the token
 
-Leads are written to `localStorage` **before** the network call and removed only
-after a confirmed delivery. Anything undelivered is retried on the visitor's
-next visit, so a dead webhook loses nothing.
+`set-lead.py` does not write the token into the page as a string — it stores
+it XOR'd, so a scanner grepping pages for `<digits>:AA…` finds nothing. That
+is the whole benefit, and it is worth having: those scanners are the thing
+that actually steals client-side bot tokens. It does **not** hide anything
+from a person who opens the console.
 
-Analytics sits next to it:
+If that matters, deploy **`build/worker.js`** — a Cloudflare Worker that holds
+the token as a secret and relays the lead. Deployment steps are in the file's
+header; it takes about three minutes on the free plan. Then:
+
+```bash
+python3 build/set-lead.py --endpoint https://<name>.workers.dev
+```
+
+and the token is off the client entirely. After that, rotating it means
+changing one secret in the Cloudflare dashboard — the published page does not
+change and does not need rebuilding.
+
+Whichever route: use a bot that exists only for this, and never give it admin
+rights anywhere. `/revoke` in @BotFather invalidates a leaked token instantly.
+
+Leads are written to `localStorage` **before** the network call and removed
+only after a confirmed delivery. Anything undelivered is retried on the
+visitor's next visit, so a dead webhook loses nothing.
+
+Analytics sits next to it in `component.dc.html`:
 
 ```js
 ANALYTICS = { ym: 0, ga: '' };   // Yandex.Metrika counter id / GA4 id
@@ -73,7 +100,7 @@ manifest), re-packs `component.dc.html` into it, converts the logo PNGs to
 lossless WebP, patches the loader and injects the static `<head>`.
 
 ```bash
-python3 build/bundle.py baza.html        # SRC at the top of the file
+python3 build/bundle.py                  # baza.html in place
 node build/genmap.mjs                    # only when the city list changes
 ```
 

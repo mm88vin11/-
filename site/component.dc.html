@@ -1330,6 +1330,32 @@ class Component extends DCLogic {
   //              отдельного бота, который умеет только писать в один чат.
   LEAD = { endpoint: '', tgToken: '', tgChat: '', tgUser: 'lllbaza' };
 
+  // Если бэкенда нет и токен всё-таки лежит на клиенте, строкой его хранить
+  // нельзя: сканеры круглосуточно обходят сайты и ищут в исходниках шаблон
+  // вида 1234567890:AA… — найденный токен угоняют за минуты. Здесь искать
+  // нечего: TGX — это XOR с TGK, склеенный обратно только в памяти вкладки.
+  // От сканеров это спасает, от человека с консолью — нет. Настоящая защита
+  // одна: endpoint выше, за которым токен вообще не приезжает в браузер
+  // (готовый обработчик — build/worker.js).
+  // Оба поля заполняет build/set-lead.py, руками их трогать не нужно.
+  TGX = ''; TGK = '';
+
+  tgSecret() {
+    if (this._tg !== undefined) return this._tg;
+    this._tg = '';
+    try {
+      if (this.TGX && this.TGK) {
+        const raw = atob(this.TGX);
+        let out = '';
+        for (let i = 0; i < raw.length; i++) {
+          out += String.fromCharCode(raw.charCodeAt(i) ^ this.TGK.charCodeAt(i % this.TGK.length));
+        }
+        this._tg = out;
+      }
+    } catch (e) { this._tg = ''; }
+    return this._tg;
+  }
+
   // ═══ АНАЛИТИКА ════════════════════════════════════════════════════════
   // Поставьте номер счётчика — цели поедут сами: quiz_started,
   // quiz_completed, pricing_viewed, entry_clicked, form_step1, form_step2,
@@ -1593,9 +1619,10 @@ class Component extends DCLogic {
     const L = this.LEAD || {};
     const steps = [];
     if (L.endpoint) steps.push(() => this.leadPost(L.endpoint, p));
-    if (L.tgToken && L.tgChat) {
+    const tok = L.tgToken || this.tgSecret();
+    if (tok && L.tgChat) {
       steps.push(() => this.leadPost(
-        'https://api.telegram.org/bot' + L.tgToken + '/sendMessage',
+        'https://api.telegram.org/bot' + tok + '/sendMessage',
         { chat_id: L.tgChat, text: this.leadText(p), disable_web_page_preview: true }
       ));
     }
@@ -1612,7 +1639,7 @@ class Component extends DCLogic {
     const q = this.leadRead();
     if (!q.length) return;
     const L = this.LEAD || {};
-    if (!L.endpoint && !(L.tgToken && L.tgChat)) return;
+    if (!L.endpoint && !((L.tgToken || this.tgSecret()) && L.tgChat)) return;
     q.forEach((p) => {
       if (!p || !p.id) return;
       this.leadSend(p).then((ok) => { if (ok) this.leadDrop(p.id); });

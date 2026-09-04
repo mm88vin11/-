@@ -6,3 +6,10 @@
 
 # Node
 node_modules/
+
+# The build configured with a live bot token — set-lead.py writes it, and it
+# is the file you publish. It must never reach this public repository.
+site/baza.local.html
+
+# Python
+__pycache__/

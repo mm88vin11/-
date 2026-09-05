@@ -366,12 +366,22 @@
   img { -webkit-user-drag: none; -khtml-user-drag: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
   [data-sw] { position: relative; overflow: hidden; isolation: isolate; -webkit-tap-highlight-color: transparent;
     transition: border-color 260ms cubic-bezier(.16,.84,.24,1), box-shadow 260ms cubic-bezier(.16,.84,.24,1), background-color 220ms ease, color 220ms ease !important; }
-  [data-sw]::before { content: ''; position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 0; pointer-events: none; opacity: 0; transition: opacity 220ms ease; }
+  /* Наведение на любую кнопку: заливка наезжает слева до конца, кружок со
+     стрелкой уходит к левому краю, подпись встаёт справа от него. Ход считает
+     sweepGeo и кладёт в --swa/--swl. Уходя, заливка гаснет и отскакивает. */
+  [data-sw]::before { content: ''; position: absolute; left: 0; right: 0; top: 0; bottom: 0; z-index: 0; pointer-events: none;
+    opacity: 0; transform: translate3d(-100.5%, 0, 0);
+    transition: transform 0s linear 250ms, opacity 190ms ease; }
   [data-sw] > * { position: relative; z-index: 1; }
-  [data-sw="dark"]::before { background: rgba(10,10,10,0.05); }
-  [data-sw="light"]::before { background: rgba(242,235,221,0.055); }
-  [data-sw][data-on]::before { opacity: 1; }
-  [data-sw]:not([data-on])::before { transition: opacity 160ms ease; }
+  [data-sw="dark"]::before { background: #0a0a0a; }
+  [data-sw="light"]::before { background: #f2ebdd; }
+  [data-sw][data-on]::before { opacity: 1; transform: translate3d(0, 0, 0);
+    transition: transform 560ms cubic-bezier(.16,.84,.24,1), opacity 150ms ease; }
+  [data-sw="dark"][data-on] { color: #f2ebdd !important; }
+  [data-sw="light"][data-on] { color: #0a0a0a !important; }
+  [data-sw="dark"][data-on] [data-swa] { background: #f2ebdd !important; color: #0a0a0a !important; }
+  [data-sw="light"][data-on] [data-swa] { background: #0a0a0a !important; color: #f2ebdd !important; }
+  [data-swa] { transition: transform 340ms cubic-bezier(.16,.84,.24,1), background 300ms ease, color 300ms ease; }
   [data-ar], [data-swa], [data-swl] { transition: transform 340ms cubic-bezier(.16,.84,.24,1); }
   [data-on] [data-ar="1"] { transform: translateX(-4px); }
   [data-on] [data-ar="out"] { transform: translate(2.5px, -2.5px); }
@@ -410,13 +420,13 @@
         <span style="{{ podDivStyle }}"></span>
         <nav ref="{{ socRef }}" style="{{ socStyle }}" aria-label="Соцсети">
           <a href="https://t.me/lllbaza" target="_blank" rel="noopener" aria-label="Telegram" title="Telegram — @lllbaza" style="{{ socialStyle }}" style-hover="background: #0a0a0a; color: #f2ebdd; transform: scale(1.07);">
-            <svg sc-camel-view-box="-4.7 -4.9 33.5 33.5" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M9.42 15.18l-.4 5.58c.57 0 .82-.24 1.12-.53l2.68-2.57 5.56 4.07c1.02.57 1.75.27 2.02-.93L23.99 3.6c.33-1.5-.54-2.09-1.53-1.72L1.18 9.6C-.28 10.16-.26 10.97.93 11.34l5.32 1.65 12.35-7.73c.58-.39 1.11-.18.67.21z"></path></svg>
+            <svg sc-camel-view-box="-1.457 -3.284 29.964 29.964" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M9.42 15.18l-.4 5.58c.57 0 .82-.24 1.12-.53l2.68-2.57 5.56 4.07c1.02.57 1.75.27 2.02-.93L23.99 3.6c.33-1.5-.54-2.09-1.53-1.72L1.18 9.6C-.28 10.16-.26 10.97.93 11.34l5.32 1.65 12.35-7.73c.58-.39 1.11-.18.67.21z"></path></svg>
           </a>
           <a href="https://vk.com/lllbaza" target="_blank" rel="noopener" aria-label="ВКонтакте" title="ВКонтакте — lllbaza" style="{{ socialStyle }}" style-hover="background: #0a0a0a; color: #f2ebdd; transform: scale(1.07);">
-            <svg sc-camel-view-box="3.05 2.7 17.9 17.9" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.785 16.241s.288-.032.436-.194c.136-.148.132-.427.132-.427s-.02-1.304.575-1.496c.588-.19 1.341 1.26 2.14 1.818.605.422 1.064.33 1.064.33l2.137-.03s1.118-.071.588-.964c-.043-.073-.308-.661-1.588-1.87-1.34-1.264-1.16-1.059.453-3.246.983-1.332 1.376-2.145 1.253-2.493-.117-.332-.84-.244-.84-.244l-2.406.015s-.178-.025-.31.056c-.13.079-.212.263-.212.263s-.382 1.03-.89 1.907c-1.07 1.85-1.499 1.948-1.674 1.832-.407-.267-.305-1.075-.305-1.648 0-1.793.267-2.54-.521-2.733-.262-.065-.454-.107-1.123-.114-.858-.009-1.585.003-1.996.208-.274.136-.485.44-.356.457.159.022.519.099.71.363.246.341.237 1.107.237 1.107s.142 2.11-.33 2.371c-.325.18-.77-.187-1.725-1.865-.489-.859-.858-1.81-.858-1.81s-.072-.176-.2-.271c-.155-.115-.372-.151-.372-.151l-2.286.015s-.343.01-.469.161c-.112.135-.009.412-.009.412s1.79 4.258 3.817 6.403c1.858 1.967 3.968 1.838 3.968 1.838z"></path></svg>
+            <svg sc-camel-view-box="2.438 1.827 19.576 19.576" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.785 16.241s.288-.032.436-.194c.136-.148.132-.427.132-.427s-.02-1.304.575-1.496c.588-.19 1.341 1.26 2.14 1.818.605.422 1.064.33 1.064.33l2.137-.03s1.118-.071.588-.964c-.043-.073-.308-.661-1.588-1.87-1.34-1.264-1.16-1.059.453-3.246.983-1.332 1.376-2.145 1.253-2.493-.117-.332-.84-.244-.84-.244l-2.406.015s-.178-.025-.31.056c-.13.079-.212.263-.212.263s-.382 1.03-.89 1.907c-1.07 1.85-1.499 1.948-1.674 1.832-.407-.267-.305-1.075-.305-1.648 0-1.793.267-2.54-.521-2.733-.262-.065-.454-.107-1.123-.114-.858-.009-1.585.003-1.996.208-.274.136-.485.44-.356.457.159.022.519.099.71.363.246.341.237 1.107.237 1.107s.142 2.11-.33 2.371c-.325.18-.77-.187-1.725-1.865-.489-.859-.858-1.81-.858-1.81s-.072-.176-.2-.271c-.155-.115-.372-.151-.372-.151l-2.286.015s-.343.01-.469.161c-.112.135-.009.412-.009.412s1.79 4.258 3.817 6.403c1.858 1.967 3.968 1.838 3.968 1.838z"></path></svg>
           </a>
           <a href="https://www.tiktok.com/@lllbaza" target="_blank" rel="noopener" aria-label="TikTok" title="TikTok — @lllbaza" style="{{ socialStyle }}" style-hover="background: #0a0a0a; color: #f2ebdd; transform: scale(1.07);">
-            <svg sc-camel-view-box="-2.1 -2.1 28.2 28.2" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"></path></svg>
+            <svg sc-camel-view-box="-2.802 -2.108 29.136 29.136" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"></path></svg>
           </a>
         </nav>
       </div>
@@ -501,13 +511,13 @@
       </a>
       <div style="{{ menuSocStyle }}">
         <a href="https://t.me/lllbaza" target="_blank" rel="noopener" aria-label="Telegram" style="{{ menuSocLinkStyle }}">
-          <svg sc-camel-view-box="-4.7 -4.9 33.5 33.5" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M9.42 15.18l-.4 5.58c.57 0 .82-.24 1.12-.53l2.68-2.57 5.56 4.07c1.02.57 1.75.27 2.02-.93L23.99 3.6c.33-1.5-.54-2.09-1.53-1.72L1.18 9.6C-.28 10.16-.26 10.97.93 11.34l5.32 1.65 12.35-7.73c.58-.39 1.11-.18.67.21z"></path></svg>
+          <svg sc-camel-view-box="-1.457 -3.284 29.964 29.964" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M9.42 15.18l-.4 5.58c.57 0 .82-.24 1.12-.53l2.68-2.57 5.56 4.07c1.02.57 1.75.27 2.02-.93L23.99 3.6c.33-1.5-.54-2.09-1.53-1.72L1.18 9.6C-.28 10.16-.26 10.97.93 11.34l5.32 1.65 12.35-7.73c.58-.39 1.11-.18.67.21z"></path></svg>
         </a>
         <a href="https://vk.com/lllbaza" target="_blank" rel="noopener" aria-label="ВКонтакте" style="{{ menuSocLinkStyle }}">
-          <svg sc-camel-view-box="3.05 2.7 17.9 17.9" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.785 16.241s.288-.032.436-.194c.136-.148.132-.427.132-.427s-.02-1.304.575-1.496c.588-.19 1.341 1.26 2.14 1.818.605.422 1.064.33 1.064.33l2.137-.03s1.118-.071.588-.964c-.043-.073-.308-.661-1.588-1.87-1.34-1.264-1.16-1.059.453-3.246.983-1.332 1.376-2.145 1.253-2.493-.117-.332-.84-.244-.84-.244l-2.406.015s-.178-.025-.31.056c-.13.079-.212.263-.212.263s-.382 1.03-.89 1.907c-1.07 1.85-1.499 1.948-1.674 1.832-.407-.267-.305-1.075-.305-1.648 0-1.793.267-2.54-.521-2.733-.262-.065-.454-.107-1.123-.114-.858-.009-1.585.003-1.996.208-.274.136-.485.44-.356.457.159.022.519.099.71.363.246.341.237 1.107.237 1.107s.142 2.11-.33 2.371c-.325.18-.77-.187-1.725-1.865-.489-.859-.858-1.81-.858-1.81s-.072-.176-.2-.271c-.155-.115-.372-.151-.372-.151l-2.286.015s-.343.01-.469.161c-.112.135-.009.412-.009.412s1.79 4.258 3.817 6.403c1.858 1.967 3.968 1.838 3.968 1.838z"></path></svg>
+          <svg sc-camel-view-box="2.438 1.827 19.576 19.576" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.785 16.241s.288-.032.436-.194c.136-.148.132-.427.132-.427s-.02-1.304.575-1.496c.588-.19 1.341 1.26 2.14 1.818.605.422 1.064.33 1.064.33l2.137-.03s1.118-.071.588-.964c-.043-.073-.308-.661-1.588-1.87-1.34-1.264-1.16-1.059.453-3.246.983-1.332 1.376-2.145 1.253-2.493-.117-.332-.84-.244-.84-.244l-2.406.015s-.178-.025-.31.056c-.13.079-.212.263-.212.263s-.382 1.03-.89 1.907c-1.07 1.85-1.499 1.948-1.674 1.832-.407-.267-.305-1.075-.305-1.648 0-1.793.267-2.54-.521-2.733-.262-.065-.454-.107-1.123-.114-.858-.009-1.585.003-1.996.208-.274.136-.485.44-.356.457.159.022.519.099.71.363.246.341.237 1.107.237 1.107s.142 2.11-.33 2.371c-.325.18-.77-.187-1.725-1.865-.489-.859-.858-1.81-.858-1.81s-.072-.176-.2-.271c-.155-.115-.372-.151-.372-.151l-2.286.015s-.343.01-.469.161c-.112.135-.009.412-.009.412s1.79 4.258 3.817 6.403c1.858 1.967 3.968 1.838 3.968 1.838z"></path></svg>
         </a>
         <a href="https://www.tiktok.com/@lllbaza" target="_blank" rel="noopener" aria-label="TikTok" style="{{ menuSocLinkStyle }}">
-          <svg sc-camel-view-box="-2.1 -2.1 28.2 28.2" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"></path></svg>
+          <svg sc-camel-view-box="-2.802 -2.108 29.136 29.136" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"></path></svg>
         </a>
       </div>
     </div>
@@ -553,7 +563,6 @@
       </div>
     </div>
     <div style="{{ introMsgStyle }}">
-      <span ref="{{ introMsgRef }}" style="{{ introMsgInnerStyle }}">Секунда — и начнём.</span>
       <span style="{{ introRailStyle }}"><span ref="{{ introBarRef }}" style="{{ introBarStyle }}"></span></span>
     </div>
   </div>
@@ -1234,7 +1243,7 @@
               </button>
 
               <a href="https://t.me/lllbaza" target="_blank" rel="noopener" data-press="1" data-sw="dark" sc-camel-on-click="{{ tgWrite }}" style="{{ altTgStyle }}" style-hover="border-color: #0a0a0a;">
-                <span style="flex: 0 0 auto; display: flex;"><svg sc-camel-view-box="-4.7 -4.9 33.5 33.5" width="18" height="18" fill="currentColor" aria-hidden="true" style="display: block;"><path d="M9.42 15.18l-.4 5.58c.57 0 .82-.24 1.12-.53l2.68-2.57 5.56 4.07c1.02.57 1.75.27 2.02-.93L23.99 3.6c.33-1.5-.54-2.09-1.53-1.72L1.18 9.6C-.28 10.16-.26 10.97.93 11.34l5.32 1.65 12.35-7.73c.58-.39 1.11-.18.67.21z"></path></svg></span>
+                <span style="flex: 0 0 auto; display: flex;"><svg sc-camel-view-box="-1.457 -3.284 29.964 29.964" width="18" height="18" fill="currentColor" aria-hidden="true" style="display: block;"><path d="M9.42 15.18l-.4 5.58c.57 0 .82-.24 1.12-.53l2.68-2.57 5.56 4.07c1.02.57 1.75.27 2.02-.93L23.99 3.6c.33-1.5-.54-2.09-1.53-1.72L1.18 9.6C-.28 10.16-.26 10.97.93 11.34l5.32 1.65 12.35-7.73c.58-.39 1.11-.18.67.21z"></path></svg></span>
                 <span>Не хочу форму — напишу в Telegram</span>
                 <svg data-ar="out" sc-camel-view-box="0 0 24 24" width="15" height="15" style="flex: 0 0 auto; margin-left: auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
               </a>
@@ -1258,16 +1267,16 @@
             </div>
             <p style="margin: clamp(20px, 2.6vh, 28px) 0 0; max-width: 46ch; font-size: clamp(16px, 1.5vw, 18px); line-height: 1.6; color: rgba(10,10,10,0.62); text-wrap: pretty;">{{ sentText }}</p>
             <a href="https://t.me/lllbaza" target="_blank" rel="noopener" data-press="1" data-sw="dark" sc-camel-on-click="{{ tgWrite }}" style="{{ sentFallbackStyle }}" style-hover="border-color: #0a0a0a;">
-              <span style="flex: 0 0 auto; display: flex;"><svg sc-camel-view-box="-4.7 -4.9 33.5 33.5" width="18" height="18" fill="currentColor" aria-hidden="true" style="display: block;"><path d="M9.42 15.18l-.4 5.58c.57 0 .82-.24 1.12-.53l2.68-2.57 5.56 4.07c1.02.57 1.75.27 2.02-.93L23.99 3.6c.33-1.5-.54-2.09-1.53-1.72L1.18 9.6C-.28 10.16-.26 10.97.93 11.34l5.32 1.65 12.35-7.73c.58-.39 1.11-.18.67.21z"></path></svg></span>
+              <span style="flex: 0 0 auto; display: flex;"><svg sc-camel-view-box="-1.457 -3.284 29.964 29.964" width="18" height="18" fill="currentColor" aria-hidden="true" style="display: block;"><path d="M9.42 15.18l-.4 5.58c.57 0 .82-.24 1.12-.53l2.68-2.57 5.56 4.07c1.02.57 1.75.27 2.02-.93L23.99 3.6c.33-1.5-.54-2.09-1.53-1.72L1.18 9.6C-.28 10.16-.26 10.97.93 11.34l5.32 1.65 12.35-7.73c.58-.39 1.11-.18.67.21z"></path></svg></span>
               <span>Продублировать в Telegram</span>
             </a>
             <div style="height: 1px; margin: clamp(22px, 2.8vh, 30px) 0; background: linear-gradient(90deg, rgba(10,10,10,0.28), rgba(10,10,10,0));"></div>
             <div style="font-size: clamp(22px, 2.4vw, 30px); line-height: 1.05; letter-spacing: -0.035em; font-weight: 600;">Пока мы читаем —</div>
             <p style="margin: 12px 0 0; max-width: 46ch; font-size: clamp(16px, 1.5vw, 18px); line-height: 1.6; color: rgba(10,10,10,0.5); text-wrap: pretty;">посмотрите на нас вблизи. Там видно, как мы работаем на самом деле.</p>
             <div style="display: flex; flex-direction: column; gap: 8px; margin-top: clamp(20px, 2.6vh, 26px);">
-              <a href="https://t.me/lllbaza" target="_blank" rel="noopener" data-sw="dark" data-press="1" style="{{ inlineCtaStyle }}" style-hover="border-color: #0a0a0a;"><span style="flex: 0 0 auto; display: flex;"><svg sc-camel-view-box="-4.7 -4.9 33.5 33.5" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M9.42 15.18l-.4 5.58c.57 0 .82-.24 1.12-.53l2.68-2.57 5.56 4.07c1.02.57 1.75.27 2.02-.93L23.99 3.6c.33-1.5-.54-2.09-1.53-1.72L1.18 9.6C-.28 10.16-.26 10.97.93 11.34l5.32 1.65 12.35-7.73c.58-.39 1.11-.18.67.21z"></path></svg></span><span style="display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-width: 0;"><span>Telegram</span><span style="{{ inlineNoteStyle }}">новости, эксклюзив, розыгрыши</span></span><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
-              <a href="https://vk.com/lllbaza" target="_blank" rel="noopener" data-sw="dark" data-press="1" style="{{ inlineCtaStyle }}" style-hover="border-color: #0a0a0a;"><span style="flex: 0 0 auto; display: flex;"><svg sc-camel-view-box="3.05 2.7 17.9 17.9" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.785 16.241s.288-.032.436-.194c.136-.148.132-.427.132-.427s-.02-1.304.575-1.496c.588-.19 1.341 1.26 2.14 1.818.605.422 1.064.33 1.064.33l2.137-.03s1.118-.071.588-.964c-.043-.073-.308-.661-1.588-1.87-1.34-1.264-1.16-1.059.453-3.246.983-1.332 1.376-2.145 1.253-2.493-.117-.332-.84-.244-.84-.244l-2.406.015s-.178-.025-.31.056c-.13.079-.212.263-.212.263s-.382 1.03-.89 1.907c-1.07 1.85-1.499 1.948-1.674 1.832-.407-.267-.305-1.075-.305-1.648 0-1.793.267-2.54-.521-2.733-.262-.065-.454-.107-1.123-.114-.858-.009-1.585.003-1.996.208-.274.136-.485.44-.356.457.159.022.519.099.71.363.246.341.237 1.107.237 1.107s.142 2.11-.33 2.371c-.325.18-.77-.187-1.725-1.865-.489-.859-.858-1.81-.858-1.81s-.072-.176-.2-.271c-.155-.115-.372-.151-.372-.151l-2.286.015s-.343.01-.469.161c-.112.135-.009.412-.009.412s1.79 4.258 3.817 6.403c1.858 1.967 3.968 1.838 3.968 1.838z"></path></svg></span><span style="display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-width: 0;"><span>ВКонтакте</span><span style="{{ inlineNoteStyle }}">то же самое, если вам туда удобнее</span></span><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
-              <a href="https://www.tiktok.com/@lllbaza" target="_blank" rel="noopener" data-sw="dark" data-press="1" style="{{ inlineCtaStyle }}" style-hover="border-color: #0a0a0a;"><span style="flex: 0 0 auto; display: flex;"><svg sc-camel-view-box="-2.1 -2.1 28.2 28.2" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"></path></svg></span><span style="display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-width: 0;"><span>TikTok</span><span style="{{ inlineNoteStyle }}">работа изнутри и немного юмора</span></span><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
+              <a href="https://t.me/lllbaza" target="_blank" rel="noopener" data-sw="dark" data-press="1" style="{{ inlineCtaStyle }}" style-hover="border-color: #0a0a0a;"><span style="flex: 0 0 auto; display: flex;"><svg sc-camel-view-box="-1.457 -3.284 29.964 29.964" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M9.42 15.18l-.4 5.58c.57 0 .82-.24 1.12-.53l2.68-2.57 5.56 4.07c1.02.57 1.75.27 2.02-.93L23.99 3.6c.33-1.5-.54-2.09-1.53-1.72L1.18 9.6C-.28 10.16-.26 10.97.93 11.34l5.32 1.65 12.35-7.73c.58-.39 1.11-.18.67.21z"></path></svg></span><span style="display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-width: 0;"><span>Telegram</span><span style="{{ inlineNoteStyle }}">новости, эксклюзив, розыгрыши</span></span><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
+              <a href="https://vk.com/lllbaza" target="_blank" rel="noopener" data-sw="dark" data-press="1" style="{{ inlineCtaStyle }}" style-hover="border-color: #0a0a0a;"><span style="flex: 0 0 auto; display: flex;"><svg sc-camel-view-box="2.438 1.827 19.576 19.576" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.785 16.241s.288-.032.436-.194c.136-.148.132-.427.132-.427s-.02-1.304.575-1.496c.588-.19 1.341 1.26 2.14 1.818.605.422 1.064.33 1.064.33l2.137-.03s1.118-.071.588-.964c-.043-.073-.308-.661-1.588-1.87-1.34-1.264-1.16-1.059.453-3.246.983-1.332 1.376-2.145 1.253-2.493-.117-.332-.84-.244-.84-.244l-2.406.015s-.178-.025-.31.056c-.13.079-.212.263-.212.263s-.382 1.03-.89 1.907c-1.07 1.85-1.499 1.948-1.674 1.832-.407-.267-.305-1.075-.305-1.648 0-1.793.267-2.54-.521-2.733-.262-.065-.454-.107-1.123-.114-.858-.009-1.585.003-1.996.208-.274.136-.485.44-.356.457.159.022.519.099.71.363.246.341.237 1.107.237 1.107s.142 2.11-.33 2.371c-.325.18-.77-.187-1.725-1.865-.489-.859-.858-1.81-.858-1.81s-.072-.176-.2-.271c-.155-.115-.372-.151-.372-.151l-2.286.015s-.343.01-.469.161c-.112.135-.009.412-.009.412s1.79 4.258 3.817 6.403c1.858 1.967 3.968 1.838 3.968 1.838z"></path></svg></span><span style="display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-width: 0;"><span>ВКонтакте</span><span style="{{ inlineNoteStyle }}">то же самое, если вам туда удобнее</span></span><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
+              <a href="https://www.tiktok.com/@lllbaza" target="_blank" rel="noopener" data-sw="dark" data-press="1" style="{{ inlineCtaStyle }}" style-hover="border-color: #0a0a0a;"><span style="flex: 0 0 auto; display: flex;"><svg sc-camel-view-box="-2.802 -2.108 29.136 29.136" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"></path></svg></span><span style="display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-width: 0;"><span>TikTok</span><span style="{{ inlineNoteStyle }}">работа изнутри и немного юмора</span></span><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
             </div>
           </div>
         </div>
@@ -1287,9 +1296,9 @@
         </div>
 
         <div data-reveal="1" data-rd="100" data-rdist="22" style="{{ footSocRowStyle }}">
-          <a href="https://t.me/lllbaza" target="_blank" rel="noopener" data-sw="light" data-press="1" style="{{ footSocCard }}" style-hover="border-color: rgba(242,235,221,0.34);"><span style="{{ footSocCardTop }}"><span style="{{ footSocIco }}"><svg sc-camel-view-box="-4.7 -4.9 33.5 33.5" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M9.42 15.18l-.4 5.58c.57 0 .82-.24 1.12-.53l2.68-2.57 5.56 4.07c1.02.57 1.75.27 2.02-.93L23.99 3.6c.33-1.5-.54-2.09-1.53-1.72L1.18 9.6C-.28 10.16-.26 10.97.93 11.34l5.32 1.65 12.35-7.73c.58-.39 1.11-.18.67.21z"></path></svg></span><span>Telegram</span><span style="{{ footSocArrow }}"><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></span><span style="{{ footSocNote }}">Новости, эксклюзивный контент, розыгрыши и здоровые шутки.</span></a>
-          <a href="https://vk.com/lllbaza" target="_blank" rel="noopener" data-sw="light" data-press="1" style="{{ footSocCard }}" style-hover="border-color: rgba(242,235,221,0.34);"><span style="{{ footSocCardTop }}"><span style="{{ footSocIco }}"><svg sc-camel-view-box="3.05 2.7 17.9 17.9" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.785 16.241s.288-.032.436-.194c.136-.148.132-.427.132-.427s-.02-1.304.575-1.496c.588-.19 1.341 1.26 2.14 1.818.605.422 1.064.33 1.064.33l2.137-.03s1.118-.071.588-.964c-.043-.073-.308-.661-1.588-1.87-1.34-1.264-1.16-1.059.453-3.246.983-1.332 1.376-2.145 1.253-2.493-.117-.332-.84-.244-.84-.244l-2.406.015s-.178-.025-.31.056c-.13.079-.212.263-.212.263s-.382 1.03-.89 1.907c-1.07 1.85-1.499 1.948-1.674 1.832-.407-.267-.305-1.075-.305-1.648 0-1.793.267-2.54-.521-2.733-.262-.065-.454-.107-1.123-.114-.858-.009-1.585.003-1.996.208-.274.136-.485.44-.356.457.159.022.519.099.71.363.246.341.237 1.107.237 1.107s.142 2.11-.33 2.371c-.325.18-.77-.187-1.725-1.865-.489-.859-.858-1.81-.858-1.81s-.072-.176-.2-.271c-.155-.115-.372-.151-.372-.151l-2.286.015s-.343.01-.469.161c-.112.135-.009.412-.009.412s1.79 4.258 3.817 6.403c1.858 1.967 3.968 1.838 3.968 1.838z"></path></svg></span><span>ВКонтакте</span><span style="{{ footSocArrow }}"><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></span><span style="{{ footSocNote }}">То же самое — для тех, кому привычнее ВК.</span></a>
-          <a href="https://www.tiktok.com/@lllbaza" target="_blank" rel="noopener" data-sw="light" data-press="1" style="{{ footSocCard }}" style-hover="border-color: rgba(242,235,221,0.34);"><span style="{{ footSocCardTop }}"><span style="{{ footSocIco }}"><svg sc-camel-view-box="-2.1 -2.1 28.2 28.2" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"></path></svg></span><span>TikTok</span><span style="{{ footSocArrow }}"><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></span><span style="{{ footSocNote }}">Работа изнутри, юмор и то, ради чего к нам приходят.</span></a>
+          <a href="https://t.me/lllbaza" target="_blank" rel="noopener" data-sw="light" data-press="1" style="{{ footSocCard }}" style-hover="border-color: rgba(242,235,221,0.34);"><span style="{{ footSocCardTop }}"><span style="{{ footSocIco }}"><svg sc-camel-view-box="-1.457 -3.284 29.964 29.964" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M9.42 15.18l-.4 5.58c.57 0 .82-.24 1.12-.53l2.68-2.57 5.56 4.07c1.02.57 1.75.27 2.02-.93L23.99 3.6c.33-1.5-.54-2.09-1.53-1.72L1.18 9.6C-.28 10.16-.26 10.97.93 11.34l5.32 1.65 12.35-7.73c.58-.39 1.11-.18.67.21z"></path></svg></span><span>Telegram</span><span style="{{ footSocArrow }}"><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></span><span style="{{ footSocNote }}">Новости, эксклюзивный контент, розыгрыши и здоровые шутки.</span></a>
+          <a href="https://vk.com/lllbaza" target="_blank" rel="noopener" data-sw="light" data-press="1" style="{{ footSocCard }}" style-hover="border-color: rgba(242,235,221,0.34);"><span style="{{ footSocCardTop }}"><span style="{{ footSocIco }}"><svg sc-camel-view-box="2.438 1.827 19.576 19.576" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.785 16.241s.288-.032.436-.194c.136-.148.132-.427.132-.427s-.02-1.304.575-1.496c.588-.19 1.341 1.26 2.14 1.818.605.422 1.064.33 1.064.33l2.137-.03s1.118-.071.588-.964c-.043-.073-.308-.661-1.588-1.87-1.34-1.264-1.16-1.059.453-3.246.983-1.332 1.376-2.145 1.253-2.493-.117-.332-.84-.244-.84-.244l-2.406.015s-.178-.025-.31.056c-.13.079-.212.263-.212.263s-.382 1.03-.89 1.907c-1.07 1.85-1.499 1.948-1.674 1.832-.407-.267-.305-1.075-.305-1.648 0-1.793.267-2.54-.521-2.733-.262-.065-.454-.107-1.123-.114-.858-.009-1.585.003-1.996.208-.274.136-.485.44-.356.457.159.022.519.099.71.363.246.341.237 1.107.237 1.107s.142 2.11-.33 2.371c-.325.18-.77-.187-1.725-1.865-.489-.859-.858-1.81-.858-1.81s-.072-.176-.2-.271c-.155-.115-.372-.151-.372-.151l-2.286.015s-.343.01-.469.161c-.112.135-.009.412-.009.412s1.79 4.258 3.817 6.403c1.858 1.967 3.968 1.838 3.968 1.838z"></path></svg></span><span>ВКонтакте</span><span style="{{ footSocArrow }}"><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></span><span style="{{ footSocNote }}">То же самое — для тех, кому привычнее ВК.</span></a>
+          <a href="https://www.tiktok.com/@lllbaza" target="_blank" rel="noopener" data-sw="light" data-press="1" style="{{ footSocCard }}" style-hover="border-color: rgba(242,235,221,0.34);"><span style="{{ footSocCardTop }}"><span style="{{ footSocIco }}"><svg sc-camel-view-box="-2.802 -2.108 29.136 29.136" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"></path></svg></span><span>TikTok</span><span style="{{ footSocArrow }}"><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></span><span style="{{ footSocNote }}">Работа изнутри, юмор и то, ради чего к нам приходят.</span></a>
         </div>
 
         <div data-reveal="1" data-rd="150" data-rdist="22" style="{{ footLegalStyle }}">
@@ -2365,7 +2374,6 @@ class Component extends DCLogic {
       this.geoDirty = 1; this.revDirty = 1; this.lastYs = null;
       this.geoGen = (this.geoGen || 0) + 1;
       this.runW = 0;
-      if (this.introMsgEl) { this.introMsgEl.__w = 0; this.sizeIntroMsg(); }
       if (this.parNodes) for (const el of this.parNodes) el.__py = null;
       this.forceUpdate();
     };
@@ -3288,7 +3296,6 @@ class Component extends DCLogic {
 
   measure(silent) {
     const quiet = silent || !this.state.landed;
-    if (!this.state.landed) this.sizeIntroMsg();
     if (this.rowEl && this.podEl && this.ctaPodEl) {
       if (this.navPodEl) this.navW = Math.round(this.navPodEl.offsetWidth);
       const m = { row: Math.round(this.rowEl.clientWidth), left: Math.round(this.podEl.offsetWidth), right: Math.round(this.ctaPodEl.offsetWidth) };
@@ -3467,20 +3474,6 @@ class Component extends DCLogic {
   }
 
   // подпись загрузки ровно в ширину логотипа
-  sizeIntroMsg() {
-    const el = this.introMsgEl, w = this.introLogoW || 0;
-    if (!el || !w) return;
-    const prev = el.style.transform;
-    el.style.transform = 'none';
-    const nat = el.scrollWidth || el.offsetWidth;
-    el.style.transform = prev;
-    if (!nat) return;
-    el.__w = nat;
-    const k = Math.max(0.24, Math.min(1.6, w / nat));
-    const t = 'scale(' + k.toFixed(4) + ')';
-    if (el.__t !== t) { el.__t = t; el.style.transform = t; }
-  }
-
   // тяжёлые библиотеки карты подключаем только когда первый экран уже отдан
   // всё, что можно не делать до посадки, делаем после неё
   afterLand() {
@@ -4426,7 +4419,7 @@ class Component extends DCLogic {
     const narrow = st.narrow;
     const hover = st.hover;
     const vw = window.innerWidth, vh = window.innerHeight;
-    const bigW = Math.min(vw * 0.66, 620);
+    const bigW = Math.min(vw * 0.5, 460);
     this.introLogoW = bigW;
     const flip = this.flip || { cx: vw / 2, cy: vh / 2, lw: 110, lh: 44 };
     const dx = flip.cx - vw / 2;
@@ -5522,29 +5515,32 @@ class Component extends DCLogic {
         boxShadow: hover ? '0 18px 40px rgba(0,0,0,0.5)' : '0 10px 26px rgba(0,0,0,0.34)',
         transition: 'box-shadow ' + (hover ? '460ms' : '320ms') + ' ' + HE + ', height 640ms ' + HE
       },
+      // Наведение: чёрная заливка наезжает слева, кружок со стрелкой уходит
+      // к левому краю, подпись встаёт справа от него. Ход обеих частей уже
+      // считает measurePair — здесь он наконец используется целиком.
       ctaFillStyle: {
         position: 'absolute', left: '-2px', right: '-2px', top: '-2px', bottom: '-2px', zIndex: 0, pointerEvents: 'none',
-        background: 'linear-gradient(90deg, rgba(10,10,10,0) 0%, rgba(10,10,10,0.085) 30%, rgba(10,10,10,0.085) 100%)',
+        background: '#0a0a0a',
         opacity: hover ? 1 : 0,
         transform: hover ? 'translate3d(0,0,0)' : 'translate3d(-100.5%,0,0)',
         transition: hover
-          ? 'transform 640ms cubic-bezier(.16,.84,.24,1), opacity 260ms ease 40ms'
-          : 'transform 0s linear 240ms, opacity 200ms ease'
+          ? 'transform 640ms cubic-bezier(.16,.84,.24,1), opacity 200ms ease'
+          : 'transform 0s linear 260ms, opacity 220ms ease'
       },
       ctaFill2Style: { display: 'none' },
       ctaLabelStyle: {
         position: 'relative', zIndex: 1, display: 'inline-block',
         fontSize: (narrow ? 10.5 : 12) + 'px', fontWeight: 600, letterSpacing: narrow ? '0.06em' : '0.09em', textTransform: 'uppercase', whiteSpace: 'nowrap',
-        color: '#0a0a0a',
-        transform: 'translateX(' + (hover ? 3 : 0) + 'px)',
-        transition: 'transform 620ms cubic-bezier(.16,.84,.2,1)'
+        color: hover ? CREAM : '#0a0a0a',
+        transform: 'translateX(' + (hover ? st.labelTravel : 0) + 'px)',
+        transition: 'transform 620ms cubic-bezier(.16,.84,.2,1), color 260ms ease'
       },
       ctaDiscStyle: {
         position: 'relative', zIndex: 1, display: 'flex', alignItems: 'center',
         width: disc + 'px', height: disc + 'px', borderRadius: '999px', overflow: 'hidden', flex: '0 0 auto',
-        background: '#0a0a0a', color: CREAM,
-        transform: hover ? 'translateX(-3px) scale(1.06)' : 'translateX(0) scale(1)',
-        transition: 'transform 620ms cubic-bezier(.16,.84,.2,1)'
+        background: hover ? CREAM : '#0a0a0a', color: hover ? '#0a0a0a' : CREAM,
+        transform: 'translateX(' + (hover ? st.discTravel : 0) + 'px)',
+        transition: 'transform 620ms cubic-bezier(.16,.84,.2,1), background 300ms ease, color 300ms ease'
       },
       ctaArrowTrackStyle: {
         display: 'flex', alignItems: 'center', gap: '14px', flex: '0 0 auto',
@@ -7403,7 +7399,12 @@ class Component extends DCLogic {
       introStyle: {
         position: 'fixed', inset: 0, zIndex: 30,
         backgroundColor: '#0a0a0a',
-        backgroundImage: 'radial-gradient(60% 60% at 22% 8%, rgba(242,235,221,0.05), rgba(242,235,221,0) 68%), radial-gradient(56% 56% at 86% 94%, rgba(242,235,221,0.032), rgba(242,235,221,0) 68%)',
+        backgroundImage: 'radial-gradient(78% 62% at 50% 38%, rgba(10,10,10,0.28) 0%, rgba(10,10,10,0.72) 62%, rgba(10,10,10,0.92) 100%), '
+          + 'radial-gradient(60% 60% at 22% 8%, rgba(242,235,221,0.05), rgba(242,235,221,0) 68%), '
+          + 'radial-gradient(56% 56% at 86% 94%, rgba(242,235,221,0.032), rgba(242,235,221,0) 68%), '
+          + 'url(assets/haze/d.webp)',
+        backgroundSize: 'auto, auto, auto, cover',
+        backgroundPosition: 'center, center, center, center',
         opacity: st.landed ? 0 : 1,
         visibility: st.landed ? 'hidden' : 'visible',
         pointerEvents: st.landed ? 'none' : 'auto',
@@ -7469,17 +7470,6 @@ class Component extends DCLogic {
         gap: narrow ? '18px' : '24px', padding: '0 14px', pointerEvents: 'none',
         opacity: st.ready ? 0 : 1,
         transition: 'opacity 420ms cubic-bezier(.16,.84,.24,1)'
-      },
-      introMsgRef: this._imR || (this._imR = (el) => {
-        if (!el) return;
-        this.introMsgEl = el;
-        requestAnimationFrame(() => this.sizeIntroMsg());
-      }),
-      introMsgInnerStyle: {
-        display: 'block', whiteSpace: 'nowrap', transformOrigin: '50% 50%',
-        animation: 'lb-msg 460ms cubic-bezier(.16,.84,.24,1) 180ms both',
-        fontSize: '40px', lineHeight: 1.05, fontWeight: 500, letterSpacing: '-0.035em',
-        color: 'rgba(242,235,221,0.4)', willChange: 'transform'
       },
       introRailStyle: {
         display: 'block', width: 'min(190px, 42vw)', height: '2px', borderRadius: '999px',

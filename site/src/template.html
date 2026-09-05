@@ -878,7 +878,7 @@
               </sc-for>
             </div>
 
-            <a href="#brief" sc-camel-on-click="{{ goBrief }}" data-sw="light" data-press="1" style="{{ fSheetCtaStyle }}" style-hover="border-color: rgba(242,235,221,0.44);">
+            <a href="#brief" data-reveal="1" data-rdist="16" data-rd="80" sc-camel-on-click="{{ goBrief }}" data-sw="light" data-press="1" style="{{ fSheetCtaStyle }}" style-hover="border-color: rgba(242,235,221,0.44);">
               <span>{{ fSheetCtaText }}</span>
               <svg data-ar="1" sc-camel-view-box="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M12.5 6.5l5.5 5.5-5.5 5.5"></path></svg>
             </a>
@@ -1210,7 +1210,7 @@
             <div ref="{{ stepsWrapRef }}" style="{{ stepsWrapStyle }}">
             <div ref="{{ step1Ref }}" style="{{ step1Style }}">
               <div style="{{ panelStyle }}">
-              <div style="position: relative;">
+              <div data-reveal="1" data-rdist="0" data-rd="0" style="position: relative;">
                 <div style="{{ fg.a.head }}"><span style="{{ fg.a.num }}">{{ fg.a.numText }}</span><span>Что нужно сделать</span><span style="{{ fg.a.hint }}">можно несколько</span></div>
                 <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
                   <sc-for list="{{ q1 }}" as="o" hint-placeholder-count="5">
@@ -1219,7 +1219,7 @@
                 </div>
               </div>
 
-              <div style="position: relative;">
+              <div data-reveal="1" data-rdist="0" data-rd="90" style="position: relative;">
                 <div style="{{ fg.b.head }}"><span style="{{ fg.b.num }}">{{ fg.b.numText }}</span><span>Когда стартуем</span></div>
                 <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
                   <sc-for list="{{ whens }}" as="o" hint-placeholder-count="3">
@@ -1228,7 +1228,7 @@
                 </div>
               </div>
 
-              <div style="position: relative;">
+              <div data-reveal="1" data-rdist="0" data-rd="180" style="position: relative;">
                 <div style="{{ fg.c.head }}"><span style="{{ fg.c.num }}">{{ fg.c.numText }}</span><span>Ориентир по бюджету</span></div>
                 <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
                   <sc-for list="{{ budgets }}" as="o" hint-placeholder-count="5">
@@ -1237,7 +1237,7 @@
                 </div>
               </div>
 
-              <div style="position: relative;">
+              <div data-reveal="1" data-rdist="0" data-rd="270" style="position: relative;">
                 <div style="{{ fg.d.head }}"><span style="{{ fg.d.num }}">{{ fg.d.numText }}</span><span>Что забирает больше всего сил</span><span style="{{ fg.d.hint }}">можно несколько</span></div>
                 <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
                   <sc-for list="{{ pains }}" as="o" hint-placeholder-count="4">
@@ -3236,7 +3236,9 @@ class Component extends DCLogic {
         continue;
       }
       this.seen.add(n);
-      const dist = parseFloat(n.dataset.rdist || 0) || 34;
+      // rdist="0" — проявление без сдвига: там, где высота блока измеряется
+      // (шаги формы), любой transform попадёт в замер и даст скачок
+      const dist = n.dataset.rdist == null ? 34 : (parseFloat(n.dataset.rdist) || 0);
       n.style.opacity = '0';
       n.style.transform = 'translate3d(0,' + dist + 'px,0)';
       n.style.filter = 'blur(10px)';

@@ -377,10 +377,13 @@
   [data-sw="light"]::before { background: #f2ebdd; }
   [data-sw][data-on]::before { opacity: 1; transform: translate3d(0, 0, 0);
     transition: transform 560ms cubic-bezier(.16,.84,.24,1), opacity 150ms ease; }
-  [data-sw="dark"][data-on] { color: #f2ebdd !important; }
-  [data-sw="light"][data-on] { color: #0a0a0a !important; }
-  [data-sw="dark"][data-on] [data-swa] { background: #f2ebdd !important; color: #0a0a0a !important; }
-  [data-sw="light"][data-on] [data-swa] { background: #0a0a0a !important; color: #f2ebdd !important; }
+  /* Потомки со своим color не наследуют инверсию — красим и их, иначе
+     подпись остаётся цветом заливки и пропадает. Кружок со стрелкой
+     переопределяется следом, поэтому он остаётся контрастным. */
+  [data-sw="dark"][data-on], [data-sw="dark"][data-on] * { color: #f2ebdd !important; }
+  [data-sw="light"][data-on], [data-sw="light"][data-on] * { color: #0a0a0a !important; }
+  [data-sw="dark"][data-on] [data-swa], [data-sw="dark"][data-on] [data-swa] * { background: #f2ebdd; color: #0a0a0a !important; }
+  [data-sw="light"][data-on] [data-swa], [data-sw="light"][data-on] [data-swa] * { background: #0a0a0a; color: #f2ebdd !important; }
   [data-swa] { transition: transform 340ms cubic-bezier(.16,.84,.24,1), background 300ms ease, color 300ms ease; }
   [data-ar], [data-swa], [data-swl] { transition: transform 340ms cubic-bezier(.16,.84,.24,1); }
   [data-on] [data-ar="1"] { transform: translateX(-4px); }
@@ -665,9 +668,43 @@
     </section>
 
     <section style="width: 100%; padding: 0 clamp(18px, 3.2vw, 44px); max-width: 1320px; margin: 0 auto; box-sizing: border-box;">
-      <p data-scan="1" style="margin: 22px 0 0; max-width: 27ch; font-size: clamp(21px, 2.6vw, 38px); line-height: 1.18; letter-spacing: -0.03em; font-weight: 500; text-wrap: pretty; color: transparent; -webkit-text-fill-color: transparent; -webkit-background-clip: text; background-clip: text; background-image: linear-gradient(102deg, #f2ebdd -14%, rgba(242,235,221,0.5) 14%);">Агентство продаёт часы и присылает менеджера. Фрилансер пропадает через месяц после сдачи. Мы остаёмся.</p>
+      <div data-reveal="1" data-rdist="26" style="{{ hireWrapStyle }}">
+        <div style="{{ hireHeadStyle }}">
+          <span style="{{ hireCapStyle }}">кто это делает</span>
+          <span style="{{ hireNoteStyle }}">Четыре способа закрыть одну и ту же задачу. Выберите — покажем, во что обходится каждый.</span>
+        </div>
 
-      <p data-words="1" data-wd="140" style="margin: 20px 0 0; max-width: 50ch; font-size: clamp(15px, 1.5vw, 19px); line-height: 1.55; letter-spacing: -0.005em; font-weight: 500; color: rgba(242,235,221,0.5); text-wrap: pretty;">Свой отдел разработки — без зарплат, налогов и поиска людей. Считайте сами: один senior-разработчик в штате — от 400 000 ₽ в месяц со всеми расходами. И он один.</p>
+        <div data-hscroll="1" style="{{ hireTabsStyle }}">
+          <sc-for list="{{ hireOpts }}" as="o" hint-placeholder-count="4">
+            <button type="button" data-press="1" data-sw="light" sc-camel-on-click="{{ o.pick }}" style="{{ o.tab }}">
+              <span style="{{ o.tabName }}">{{ o.name }}</span>
+              <span style="{{ o.tabCost }}">{{ o.cost }}</span>
+            </button>
+          </sc-for>
+        </div>
+
+        <div style="{{ hireCardStyle }}">
+          <div style="{{ hireSumStyle }}">
+            <span style="{{ hireSumCostStyle }}">{{ hireCost }}</span>
+            <span style="{{ hireSumUnitStyle }}">{{ hireUnit }}</span>
+            <div style="{{ hireSumLineStyle }}">{{ hireLine }}</div>
+          </div>
+          <div style="{{ hireColsStyle }}">
+            <div style="{{ hireColStyle }}">
+              <span style="{{ hireColCapStyle }}">что получаете</span>
+              <sc-for list="{{ hirePros }}" as="x" hint-placeholder-count="2">
+                <span style="{{ hireProRowStyle }}"><span style="{{ hireProDotStyle }}"></span><span>{{ x }}</span></span>
+              </sc-for>
+            </div>
+            <div style="{{ hireColStyle }}">
+              <span style="{{ hireColCapStyle }}">чем платите</span>
+              <sc-for list="{{ hireCons }}" as="x" hint-placeholder-count="3">
+                <span style="{{ hireConRowStyle }}"><span style="{{ hireConDotStyle }}"></span><span>{{ x }}</span></span>
+              </sc-for>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <section id="services" style="{{ fSecStyle }}">
@@ -1427,7 +1464,7 @@
 class Component extends DCLogic {
   state = {
     fill: 0, ready: false, joined: false, flying: false, logoIn: false, landed: false, revealed: false,
-    hintOn: true, narrow: false, mid: false, cookieDone: true, hc: '', ci: 5, legal: '', pick: -1,
+    hintOn: true, narrow: false, mid: false, cookieDone: true, hc: '', ci: 5, legal: '', pick: -1, hire: 0,
     scrolled: false, menu: false, hover: false, discTravel: -134, labelTravel: 28, briefIn: false,
     sym: [], wants: [], step: 1, q1: [], when: '', pain: [], budget: '', name: '', msg: '', digits: '', sent: false, err: '', agree: false, sendOk: 0, sending: false,
     jump: false, hb: '', b1d: -120, b1l: 26, b2d: -120, b2l: 26, pause: false,
@@ -1520,6 +1557,28 @@ class Component extends DCLogic {
             'Развиваем продукт, а не закрываем тикеты',
             'Отвечаем за согласованные показатели'],
       cta: 'Обсудить сопровождение' }
+  ];
+
+  // Четыре способа закрыть одну задачу. Цифры — то, во что каждый обходится
+  // в месяц со всеми расходами; минусы у себя названы так же прямо, как у
+  // остальных, иначе это не сравнение, а реклама.
+  HIRE = [
+    { k: 'staff', name: 'Свой отдел', cost: 'от 400 000 ₽', unit: 'в месяц, один человек',
+      line: 'Один senior в штате со всеми налогами и расходами. Дизайн, код, аналитика и поддержка — на нём одном.',
+      pros: ['Человек занят только вами', 'Знает продукт изнутри'],
+      cons: ['Найти такого — два-три месяца', 'Отпуск или увольнение останавливают всё', 'Одному не закрыть дизайн, код и аналитику разом'] },
+    { k: 'agency', name: 'Агентство', cost: 'от 250 000 ₽', unit: 'в месяц, за часы',
+      line: 'Людей много, но между вами и работой стоит менеджер, а счёт приходит за отработанные часы.',
+      pros: ['Команда на потоке', 'Есть кому передать задачу'],
+      cons: ['Платите за часы, а не за результат', 'Общаетесь с менеджером, а не с теми, кто делает', 'Отчёт по задачам, а не по деньгам'] },
+    { k: 'solo', name: 'Фрилансер', cost: 'от 80 000 ₽', unit: 'за проект',
+      line: 'Дешевле всех на старте. Дороже всех через полгода, когда сайт надо менять, а автора уже не найти.',
+      pros: ['Быстрый старт', 'Самая низкая цена входа'],
+      cons: ['Через месяц после сдачи перестаёт отвечать', 'Код читает только он', 'Поддержки нет — только новый подрядчик'] },
+    { k: 'baza', name: 'БАЗА', cost: 'от 25 000 ₽', unit: 'за разбор, дальше — по объёму',
+      line: 'Начинаем с разбора за три дня: сначала считаем, где течёт, и только потом беремся за работу.',
+      pros: ['Команда без зарплат, налогов и найма', 'Остаёмся после запуска, а не пропадаем', 'Отвечаем за цифры, а не за закрытые задачи'],
+      cons: ['Не возьмёмся «просто сверстать по макету»', 'Сначала разбор — сразу в разработку не пойдём'] }
   ];
 
   NOFIT = [
@@ -5662,6 +5721,101 @@ class Component extends DCLogic {
       meterNumStyle: {
         fontSize: 'clamp(46px, 5.2vw, 72px)', fontWeight: 600, letterSpacing: '-0.055em', lineHeight: 0.8,
         color: cnt ? CREAM : 'rgba(242,235,221,0.28)', transition: 'color 520ms ease'
+      },
+
+      // ─── кто это делает: сравнение четырёх вариантов ────────────────
+      hireWrapStyle: {
+        display: 'flex', flexDirection: 'column', gap: narrow ? '16px' : '20px',
+        marginTop: 'clamp(26px, 3.4vh, 40px)'
+      },
+      hireHeadStyle: { display: 'flex', alignItems: 'baseline', flexWrap: 'wrap', gap: narrow ? '8px' : '16px' },
+      hireCapStyle: {
+        flex: '0 0 auto', fontSize: '11px', fontWeight: 700, letterSpacing: '0.18em',
+        textTransform: 'uppercase', color: 'rgba(242,235,221,0.38)'
+      },
+      hireNoteStyle: {
+        fontSize: narrow ? '13px' : '14px', lineHeight: 1.5, fontWeight: 500,
+        color: 'rgba(242,235,221,0.5)', textWrap: 'pretty'
+      },
+      hireTabsStyle: {
+        display: 'grid', gridTemplateColumns: narrow ? 'repeat(2, minmax(0, 1fr))' : 'repeat(4, minmax(0, 1fr))',
+        gap: narrow ? '8px' : '10px'
+      },
+      hireOpts: this.HIRE.map((h, i) => {
+        const on = i === st.hire;
+        return {
+          name: h.name, cost: h.cost,
+          pick: () => { if (i !== this.state.hire) { this.setState({ hire: i }); this.track('hire_compare', { who: h.k }); } },
+          tab: {
+            position: 'relative', overflow: 'hidden', boxSizing: 'border-box',
+            display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '5px',
+            padding: narrow ? '12px 13px' : '14px 16px', minWidth: 0,
+            borderRadius: narrow ? '16px' : '18px', cursor: 'pointer', textAlign: 'left',
+            border: '1px solid ' + (on ? 'rgba(242,235,221,0.5)' : 'rgba(242,235,221,0.12)'),
+            background: on ? 'rgba(242,235,221,0.08)' : 'rgba(242,235,221,0.02)',
+            color: 'inherit', font: 'inherit',
+            transition: 'border-color 380ms ease, background 380ms ease'
+          },
+          tabName: {
+            fontSize: narrow ? '14px' : 'clamp(14px, 1.2vw, 17px)', fontWeight: 600,
+            letterSpacing: '-0.02em', lineHeight: 1.15, whiteSpace: 'nowrap',
+            color: on ? CREAM : 'rgba(242,235,221,0.66)', transition: 'color 380ms ease'
+          },
+          tabCost: {
+            fontSize: narrow ? '11.5px' : '12.5px', fontWeight: 500, lineHeight: 1.2, whiteSpace: 'nowrap',
+            color: on ? 'rgba(242,235,221,0.6)' : 'rgba(242,235,221,0.3)', transition: 'color 380ms ease'
+          }
+        };
+      }),
+      hireCardStyle: {
+        display: 'grid', gridTemplateColumns: narrow ? 'minmax(0, 1fr)' : 'minmax(0, 0.85fr) minmax(0, 2fr)',
+        gap: narrow ? '18px' : 'clamp(20px, 2.4vw, 38px)',
+        padding: narrow ? '20px' : 'clamp(22px, 2vw, 30px)',
+        borderRadius: narrow ? '22px' : '26px',
+        border: '1px solid rgba(242,235,221,0.12)',
+        background: 'linear-gradient(168deg, #171717 0%, #101010 60%, #0c0c0c 100%)'
+      },
+      hireSumStyle: { display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 },
+      hireSumCostStyle: {
+        fontSize: narrow ? '26px' : 'clamp(26px, 2.4vw, 36px)', fontWeight: 600,
+        letterSpacing: '-0.035em', lineHeight: 1.04, color: CREAM
+      },
+      hireSumUnitStyle: { fontSize: '13px', fontWeight: 500, color: 'rgba(242,235,221,0.5)' },
+      hireSumLineStyle: {
+        marginTop: '8px', fontSize: narrow ? '13.5px' : '14px', lineHeight: 1.5,
+        fontWeight: 500, color: 'rgba(242,235,221,0.62)', textWrap: 'pretty'
+      },
+      hireCost: this.HIRE[st.hire].cost,
+      hireUnit: this.HIRE[st.hire].unit,
+      hireLine: this.HIRE[st.hire].line,
+      hirePros: this.HIRE[st.hire].pros,
+      hireCons: this.HIRE[st.hire].cons,
+      hireColsStyle: {
+        display: 'grid', gridTemplateColumns: narrow ? 'minmax(0, 1fr)' : 'repeat(2, minmax(0, 1fr))',
+        gap: narrow ? '18px' : '10px 26px', minWidth: 0
+      },
+      hireColStyle: { display: 'flex', flexDirection: 'column', gap: '10px', minWidth: 0 },
+      hireColCapStyle: {
+        fontSize: '11px', fontWeight: 700, letterSpacing: '0.18em',
+        textTransform: 'uppercase', color: 'rgba(242,235,221,0.34)'
+      },
+      hireProRowStyle: {
+        display: 'flex', alignItems: 'flex-start', gap: '10px', minWidth: 0,
+        fontSize: narrow ? '13.5px' : '14px', lineHeight: 1.45, fontWeight: 500,
+        color: 'rgba(242,235,221,0.86)', textWrap: 'pretty'
+      },
+      hireConRowStyle: {
+        display: 'flex', alignItems: 'flex-start', gap: '10px', minWidth: 0,
+        fontSize: narrow ? '13.5px' : '14px', lineHeight: 1.45, fontWeight: 500,
+        color: 'rgba(242,235,221,0.52)', textWrap: 'pretty'
+      },
+      hireProDotStyle: {
+        flex: '0 0 auto', width: '6px', height: '6px', marginTop: '8px',
+        borderRadius: '999px', background: CREAM
+      },
+      hireConDotStyle: {
+        flex: '0 0 auto', width: '6px', height: '1.5px', marginTop: '10px',
+        borderRadius: '999px', background: 'rgba(242,235,221,0.34)'
       },
 
       // ═══ ЦЕНА: шкала из четырёх и одна рекомендация ═══════════════════

@@ -7,12 +7,26 @@ are untouched, so the file can be pasted back into the builder as-is.
 `AUDIT.md` is the audit that produced the current state: what was broken, what changed,
 what was deliberately left alone, and how it was verified.
 
-## Previewing it locally
+`bundle.js` rebuilds the standalone file you can open by double-clicking.
 
-The page loads React and Babel from unpkg at runtime and resolves its images by UUID
-through the builder runtime, so it does not open straight from disk. To preview, unbundle
-the builder's `.html` export (manifest → assets, template → page), rewrite the UUID
-references to the extracted paths, and serve the directory over HTTP.
+## Getting a file that opens
+
+`index.html` on its own does **not** open in a browser — it needs the builder runtime,
+React, and its images resolved by UUID. To get a standalone page, fold it back into a
+builder export:
+
+```bash
+node site/bundle.js path/to/original-export.html baza-site.html
+```
+
+The export carries the unpacker and every asset inline; the script swaps only the page
+payload and leaves the rest untouched, so the result opens straight from disk exactly
+like the original. It verifies the payload round-trips before writing, and it escapes
+`</` in the payload — without that the HTML parser closes the `<script>` tag at the
+first `</script>` inside the page and the unpacker dies on truncated JSON.
+
+Rendering still fetches Babel from unpkg at runtime, so the first open needs a network
+connection. That is true of the builder's own export too.
 
 ## Editing
 

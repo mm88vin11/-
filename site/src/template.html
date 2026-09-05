@@ -1180,7 +1180,7 @@
               </div>
 
               <div style="position: relative;">
-                <div style="{{ fg.c.head }}"><span style="{{ fg.c.num }}">{{ fg.c.numText }}</span><span>Ориентир по бюджету</span><span style="{{ fg.c.hint }}">чтобы не гадать</span></div>
+                <div style="{{ fg.c.head }}"><span style="{{ fg.c.num }}">{{ fg.c.numText }}</span><span>Ориентир по бюджету</span></div>
                 <div style="display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px;">
                   <sc-for list="{{ budgets }}" as="o" hint-placeholder-count="5">
                     <button type="button" data-press="1" data-sw="dark" sc-camel-on-click="{{ o.pick }}" style="{{ o.style }}" style-hover="border-color: rgba(10,10,10,0.42);"><span style="{{ o.boxStyle }}"><svg sc-camel-view-box="0 0 24 24" width="11" height="11" style="{{ o.checkStyle }}" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"></path></svg></span><span>{{ o.label }}</span></button>
@@ -3463,22 +3463,19 @@ class Component extends DCLogic {
     if (this.lastStepH !== h) { this.lastStepH = h; w.style.height = h + 'px'; this.fitForm(h); }
   }
 
-  // форма обязана попадать в экран целиком: считаем натуральную высоту и мягко уменьшаем
+  // Высота обёртки идёт только от содержимого текущего шага.
+  // Раньше в расчёт входил window.innerHeight, а он на телефоне меняется
+  // вместе с адресной строкой — форма ужималась прямо во время прокрутки.
+  // Масштабирование карточки убрано совсем: бриф читают, а не разглядывают.
   fitForm(stepH) {
     const fit = this.formFitEl, card = this.formCardEl;
     if (!fit || !card || !this.state.landed) return;
-    const nr = this.state.narrow;
-    const room = Math.max(300, (window.innerHeight || 800) - (nr ? 74 : 96));
     let nat = card.offsetHeight;
     const w = this.stepsWrapEl;
     if (stepH != null && w) nat += stepH - w.offsetHeight;
     if (nat < 60) return;
-    const k = Math.max(0.66, Math.min(1, room / nat));
-    if (Math.abs((card.__k == null ? 1 : card.__k) - k) > 0.003) {
-      card.__k = k;
-      card.style.transform = k > 0.999 ? 'none' : 'scale(' + k.toFixed(4) + ')';
-    }
-    const hv = Math.ceil(nat * k) + 'px';
+    if (card.__k != null) { card.__k = null; card.style.transform = 'none'; }
+    const hv = Math.ceil(nat) + 'px';
     if (fit.__h !== hv) { fit.__h = hv; fit.style.height = hv; }
   }
 
@@ -6519,7 +6516,7 @@ class Component extends DCLogic {
         flex: '0 0 auto', width: '100%', transformOrigin: '50% 0',
         display: 'grid', gridTemplateColumns: 'minmax(0, 1fr)', alignItems: 'stretch',
         padding: narrow ? '16px 15px 18px' : 'clamp(22px, 2.6vw, 36px)', color: INK,
-        minHeight: narrow ? 'calc(100svh - 118px)' : 0,
+        minHeight: 0,
         borderRadius: narrow ? '26px' : '32px', border: '1px solid rgba(242,235,221,0.5)',
         backgroundColor: '#f2ebdd',
         backgroundImage: 'linear-gradient(168deg, #f7f2e8 0%, #f2ebdd 52%, #ece3cf 100%)',

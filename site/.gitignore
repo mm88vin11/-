@@ -1,2 +1,4 @@
 dist/
+dist-single/
+*.zip
 src/.tpl_line

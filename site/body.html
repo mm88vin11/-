@@ -358,7 +358,18 @@
   a { color: #f2ebdd; text-decoration: none; -webkit-tap-highlight-color: transparent; }
   a:hover { color: #f2ebdd; }
   a:focus { outline: none; }
-  a:focus-visible { outline: 1px solid rgba(242,235,221,0.8); outline-offset: 3px; }
+  /* Семнадцать кнопок гасят обводку через outline: none в инлайне, и с
+     клавиатуры по сайту было не пройти — фокус ехал вслепую. Кольцо рисуем
+     тенью: её инлайновый outline не перебьёт. Внутри кремовой формы кольцо
+     тёмное, иначе оно сливается с подложкой. */
+  a:focus-visible, button:focus-visible, [role="button"]:focus-visible,
+  input:focus-visible, [tabindex]:focus-visible {
+    outline: none !important;
+    box-shadow: 0 0 0 2px #0a0a0a, 0 0 0 4px rgba(242,235,221,0.9) !important;
+  }
+  #brief :focus-visible, [data-fld]:focus-visible {
+    box-shadow: 0 0 0 2px #f2ebdd, 0 0 0 4px rgba(10,10,10,0.75) !important;
+  }
   ::selection { background: #f2ebdd; color: #0a0a0a; }
   input::placeholder { color: rgba(242,235,221,0.5); }
   ::-webkit-scrollbar { width: 0; height: 0; display: none; }
@@ -449,8 +460,11 @@
      переопределяется следом, поэтому он остаётся контрастным. */
   [data-sw="dark"][data-on], [data-sw="dark"][data-on] * { color: #f2ebdd !important; }
   [data-sw="light"][data-on], [data-sw="light"][data-on] * { color: #0a0a0a !important; }
-  [data-sw="dark"][data-on] [data-swa], [data-sw="dark"][data-on] [data-swa] * { background: #f2ebdd; color: #0a0a0a !important; }
-  [data-sw="light"][data-on] [data-swa], [data-sw="light"][data-on] [data-swa] * { background: #0a0a0a; color: #f2ebdd !important; }
+  /* Фон кружка задан инлайном, поэтому без !important правило не срабатывало:
+     на наведении кружок оставался тёмным на тёмной заливке и попросту
+     пропадал — видно было одну стрелку, висящую в пустоте. */
+  [data-sw="dark"][data-on] [data-swa], [data-sw="dark"][data-on] [data-swa] * { background: #f2ebdd !important; color: #0a0a0a !important; }
+  [data-sw="light"][data-on] [data-swa], [data-sw="light"][data-on] [data-swa] * { background: #0a0a0a !important; color: #f2ebdd !important; }
   [data-swa] { transition: transform 340ms var(--ez), background 300ms ease, color 300ms ease; }
   /* Подпись раньше переезжала через всю кнопку вслед за кружком: ход был
      длинный, на быстром курсоре обрывался на полпути и кнопка «шаталась».
@@ -483,7 +497,8 @@
   /* Карточки: подъём вместо перекраски. Тень и рамка идут вместе, поэтому
      плитка отрывается от фона целиком, а не «мигает» контуром. */
   [data-lift] { -webkit-tap-highlight-color: transparent; will-change: transform;
-    transition: transform 420ms var(--ez), border-color 300ms ease, box-shadow 420ms var(--ez) !important; }
+    transition: transform 420ms var(--ez), border-color 300ms ease, box-shadow 420ms var(--ez),
+      background-color 300ms ease, color 300ms ease !important; }
   [data-lift][data-on] { transform: translate3d(0, -3px, 0); }
   [data-lift="cream"][data-on] { border-color: rgba(242,235,221,0.4) !important; box-shadow: 0 18px 44px rgba(0,0,0,0.42) !important; }
   [data-lift="ink"][data-on] { border-color: rgba(10,10,10,0.34) !important; box-shadow: 0 16px 34px rgba(10,10,10,0.13) !important; }
@@ -519,13 +534,13 @@
         </a>
         <span style="{{ podDivStyle }}"></span>
         <nav ref="{{ socRef }}" style="{{ socStyle }}" aria-label="Соцсети">
-          <a href="https://t.me/lllbaza" target="_blank" rel="noopener" aria-label="Telegram" title="Telegram — @lllbaza" style="{{ socialStyle }}" style-hover="background: #0a0a0a; color: #f2ebdd; transform: scale(1.07);">
+          <a href="https://t.me/lllbaza" target="_blank" rel="noopener" aria-label="Telegram" title="Telegram — @lllbaza" style="{{ socialStyle }}" style-hover="background: #f2ebdd; border-color: #f2ebdd; color: #0a0a0a; transform: scale(1.07);">
             <svg sc-camel-view-box="-1.457 -3.284 29.964 29.964" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M9.42 15.18l-.4 5.58c.57 0 .82-.24 1.12-.53l2.68-2.57 5.56 4.07c1.02.57 1.75.27 2.02-.93L23.99 3.6c.33-1.5-.54-2.09-1.53-1.72L1.18 9.6C-.28 10.16-.26 10.97.93 11.34l5.32 1.65 12.35-7.73c.58-.39 1.11-.18.67.21z"></path></svg>
           </a>
-          <a href="https://vk.com/lllbaza" target="_blank" rel="noopener" aria-label="ВКонтакте" title="ВКонтакте — lllbaza" style="{{ socialStyle }}" style-hover="background: #0a0a0a; color: #f2ebdd; transform: scale(1.07);">
+          <a href="https://vk.com/lllbaza" target="_blank" rel="noopener" aria-label="ВКонтакте" title="ВКонтакте — lllbaza" style="{{ socialStyle }}" style-hover="background: #f2ebdd; border-color: #f2ebdd; color: #0a0a0a; transform: scale(1.07);">
             <svg sc-camel-view-box="2.438 1.827 19.576 19.576" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.785 16.241s.288-.032.436-.194c.136-.148.132-.427.132-.427s-.02-1.304.575-1.496c.588-.19 1.341 1.26 2.14 1.818.605.422 1.064.33 1.064.33l2.137-.03s1.118-.071.588-.964c-.043-.073-.308-.661-1.588-1.87-1.34-1.264-1.16-1.059.453-3.246.983-1.332 1.376-2.145 1.253-2.493-.117-.332-.84-.244-.84-.244l-2.406.015s-.178-.025-.31.056c-.13.079-.212.263-.212.263s-.382 1.03-.89 1.907c-1.07 1.85-1.499 1.948-1.674 1.832-.407-.267-.305-1.075-.305-1.648 0-1.793.267-2.54-.521-2.733-.262-.065-.454-.107-1.123-.114-.858-.009-1.585.003-1.996.208-.274.136-.485.44-.356.457.159.022.519.099.71.363.246.341.237 1.107.237 1.107s.142 2.11-.33 2.371c-.325.18-.77-.187-1.725-1.865-.489-.859-.858-1.81-.858-1.81s-.072-.176-.2-.271c-.155-.115-.372-.151-.372-.151l-2.286.015s-.343.01-.469.161c-.112.135-.009.412-.009.412s1.79 4.258 3.817 6.403c1.858 1.967 3.968 1.838 3.968 1.838z"></path></svg>
           </a>
-          <a href="https://www.tiktok.com/@lllbaza" target="_blank" rel="noopener" aria-label="TikTok" title="TikTok — @lllbaza" style="{{ socialStyle }}" style-hover="background: #0a0a0a; color: #f2ebdd; transform: scale(1.07);">
+          <a href="https://www.tiktok.com/@lllbaza" target="_blank" rel="noopener" aria-label="TikTok" title="TikTok — @lllbaza" style="{{ socialStyle }}" style-hover="background: #f2ebdd; border-color: #f2ebdd; color: #0a0a0a; transform: scale(1.07);">
             <svg sc-camel-view-box="-2.802 -2.108 29.136 29.136" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"></path></svg>
           </a>
         </nav>
@@ -766,41 +781,62 @@
     </section>
 
     <section style="width: 100%; padding: 0 clamp(18px, 3.2vw, 44px); max-width: 1320px; margin: 0 auto; box-sizing: border-box;">
+      <!-- Блок про сравнение показывал за раз один вариант из четырёх — то
+           есть сравнивать было нечем. Теперь на экране все четыре сразу: у
+           каждого видно, за что он берёт деньги и каков баланс «получаете /
+           платите», а раскрывается только подробное содержимое. -->
       <div data-reveal="1" data-rdist="26" style="{{ hireWrapStyle }}">
         <div style="{{ hireHeadStyle }}">
           <span style="{{ hireCapStyle }}">кто это делает</span>
-          <span style="{{ hireNoteStyle }}">Четыре способа закрыть одну и ту же задачу. Выберите — покажем, чем платите за каждый.</span>
+          <span style="{{ hireNoteStyle }}">Четыре способа закрыть одну и ту же задачу. Раскройте любой — увидите, что получаете и чем за это платите.</span>
         </div>
 
-        <div data-hscroll="1" style="{{ hireTabsStyle }}">
+        <div style="{{ hireListStyle }}">
           <sc-for list="{{ hireOpts }}" as="o" hint-placeholder-count="4">
-            <button type="button" data-press="1" data-sw="light" sc-camel-on-click="{{ o.pick }}" style="{{ o.tab }}">
-              <span style="{{ o.tabName }}">{{ o.name }}</span>
-              <span style="{{ o.tabCost }}">{{ o.cost }}</span>
-            </button>
+            <div style="{{ o.item }}">
+              <button type="button" data-press="1" data-hov="{{ o.hov }}" aria-expanded="{{ o.expanded }}" sc-camel-on-click="{{ o.pick }}" style="{{ o.head }}">
+                <span style="{{ o.edge }}" aria-hidden="true"></span>
+                <span style="{{ o.nameCol }}">
+                  <span style="{{ o.name }}">{{ o.nameText }}</span>
+                  <span style="{{ o.unit }}">{{ o.unitText }}</span>
+                </span>
+                <span style="{{ o.cost }}">{{ o.costText }}</span>
+                <span style="{{ o.tally }}" aria-label="{{ o.tallyAria }}">
+                  <sc-for list="{{ o.pips }}" as="pip" hint-placeholder-count="5">
+                    <span style="{{ pip.style }}"></span>
+                  </sc-for>
+                </span>
+                <span style="{{ o.chev }}" aria-hidden="true">
+                  <svg sc-camel-view-box="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6.5 9.5l5.5 5.5 5.5-5.5"></path></svg>
+                </span>
+              </button>
+
+              <div style="{{ o.bodyWrap }}">
+                <div style="{{ o.body }}">
+                  <div style="{{ o.lineStyle }}">{{ o.lineText }}</div>
+                  <div style="{{ o.cols }}">
+                    <div style="{{ o.col }}">
+                      <span style="{{ o.capA }}">что получаете</span>
+                      <sc-for list="{{ o.pros }}" as="x" hint-placeholder-count="3">
+                        <span style="{{ x.row }}"><span style="{{ x.dot }}"></span><span>{{ x.text }}</span></span>
+                      </sc-for>
+                    </div>
+                    <div style="{{ o.col }}">
+                      <span style="{{ o.capB }}">чем платите</span>
+                      <sc-for list="{{ o.cons }}" as="x" hint-placeholder-count="3">
+                        <span style="{{ x.row }}"><span style="{{ x.dot }}"></span><span>{{ x.text }}</span></span>
+                      </sc-for>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
           </sc-for>
         </div>
 
-        <div style="{{ hireCardStyle }}">
-          <div style="{{ hireSumStyle }}">
-            <span style="{{ hireSumCostStyle }}">{{ hireCost }}</span>
-            <span style="{{ hireSumUnitStyle }}">{{ hireUnit }}</span>
-            <div style="{{ hireSumLineStyle }}">{{ hireLine }}</div>
-          </div>
-          <div style="{{ hireColsStyle }}">
-            <div style="{{ hireColStyle }}">
-              <span style="{{ hireColCapStyle }}">что получаете</span>
-              <sc-for list="{{ hirePros }}" as="x" hint-placeholder-count="2">
-                <span style="{{ hireProRowStyle }}"><span style="{{ hireProDotStyle }}"></span><span>{{ x }}</span></span>
-              </sc-for>
-            </div>
-            <div style="{{ hireColStyle }}">
-              <span style="{{ hireColCapStyle }}">чем платите</span>
-              <sc-for list="{{ hireCons }}" as="x" hint-placeholder-count="3">
-                <span style="{{ hireConRowStyle }}"><span style="{{ hireConDotStyle }}"></span><span>{{ x }}</span></span>
-              </sc-for>
-            </div>
-          </div>
+        <div style="{{ hireLegendStyle }}">
+          <span style="{{ hireLegendPipOn }}"></span><span>что получаете</span>
+          <span style="{{ hireLegendPipOff }}"></span><span>чем платите</span>
         </div>
       </div>
     </section>
@@ -1038,7 +1074,7 @@
           <span style="{{ ladderRailStyle }}" aria-hidden="true"></span>
           <span style="{{ ladderFillStyle }}" aria-hidden="true"></span>
           <sc-for list="{{ rungs }}" as="r" hint-placeholder-count="4">
-            <button type="button" data-press="1" data-hov="{{ r.hov }}" sc-camel-aria-pressed="{{ r.pressed }}" sc-camel-on-click="{{ r.pick }}" style="{{ r.row }}">
+            <button type="button" data-press="1" data-hov="{{ r.hov }}" aria-pressed="{{ r.pressed }}" sc-camel-on-click="{{ r.pick }}" style="{{ r.row }}">
               <span style="{{ r.dot }}"><span style="{{ r.dotIn }}"></span></span>
               <span style="{{ r.headCol }}">
                 <span style="{{ r.short }}">{{ r.shortText }}</span>
@@ -1512,9 +1548,9 @@
             <div style="font-size: clamp(22px, 2.4vw, 30px); line-height: 1.05; letter-spacing: -0.035em; font-weight: 600;">Пока мы читаем —</div>
             <p style="margin: 12px 0 0; max-width: 46ch; font-size: clamp(16px, 1.5vw, 18px); line-height: 1.6; color: rgba(10,10,10,0.5); text-wrap: pretty;">посмотрите на нас вблизи. Там видно, как мы работаем на самом деле.</p>
             <div style="display: flex; flex-direction: column; gap: 8px; margin-top: clamp(20px, 2.6vh, 26px);">
-              <a href="https://t.me/lllbaza" target="_blank" rel="noopener" data-sw="dark" data-press="1" style="{{ inlineCtaStyle }}" style-hover="border-color: #0a0a0a;"><span style="flex: 0 0 auto; display: flex;"><svg sc-camel-view-box="-1.457 -3.284 29.964 29.964" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M9.42 15.18l-.4 5.58c.57 0 .82-.24 1.12-.53l2.68-2.57 5.56 4.07c1.02.57 1.75.27 2.02-.93L23.99 3.6c.33-1.5-.54-2.09-1.53-1.72L1.18 9.6C-.28 10.16-.26 10.97.93 11.34l5.32 1.65 12.35-7.73c.58-.39 1.11-.18.67.21z"></path></svg></span><span style="display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-width: 0;"><span>Telegram</span><span style="{{ inlineNoteStyle }}">новости, эксклюзив, розыгрыши</span></span><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
-              <a href="https://vk.com/lllbaza" target="_blank" rel="noopener" data-sw="dark" data-press="1" style="{{ inlineCtaStyle }}" style-hover="border-color: #0a0a0a;"><span style="flex: 0 0 auto; display: flex;"><svg sc-camel-view-box="2.438 1.827 19.576 19.576" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.785 16.241s.288-.032.436-.194c.136-.148.132-.427.132-.427s-.02-1.304.575-1.496c.588-.19 1.341 1.26 2.14 1.818.605.422 1.064.33 1.064.33l2.137-.03s1.118-.071.588-.964c-.043-.073-.308-.661-1.588-1.87-1.34-1.264-1.16-1.059.453-3.246.983-1.332 1.376-2.145 1.253-2.493-.117-.332-.84-.244-.84-.244l-2.406.015s-.178-.025-.31.056c-.13.079-.212.263-.212.263s-.382 1.03-.89 1.907c-1.07 1.85-1.499 1.948-1.674 1.832-.407-.267-.305-1.075-.305-1.648 0-1.793.267-2.54-.521-2.733-.262-.065-.454-.107-1.123-.114-.858-.009-1.585.003-1.996.208-.274.136-.485.44-.356.457.159.022.519.099.71.363.246.341.237 1.107.237 1.107s.142 2.11-.33 2.371c-.325.18-.77-.187-1.725-1.865-.489-.859-.858-1.81-.858-1.81s-.072-.176-.2-.271c-.155-.115-.372-.151-.372-.151l-2.286.015s-.343.01-.469.161c-.112.135-.009.412-.009.412s1.79 4.258 3.817 6.403c1.858 1.967 3.968 1.838 3.968 1.838z"></path></svg></span><span style="display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-width: 0;"><span>ВКонтакте</span><span style="{{ inlineNoteStyle }}">то же самое, если вам туда удобнее</span></span><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
-              <a href="https://www.tiktok.com/@lllbaza" target="_blank" rel="noopener" data-sw="dark" data-press="1" style="{{ inlineCtaStyle }}" style-hover="border-color: #0a0a0a;"><span style="flex: 0 0 auto; display: flex;"><svg sc-camel-view-box="-2.802 -2.108 29.136 29.136" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"></path></svg></span><span style="display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-width: 0;"><span>TikTok</span><span style="{{ inlineNoteStyle }}">работа изнутри и немного юмора</span></span><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
+              <a href="https://t.me/lllbaza" target="_blank" rel="noopener" data-lift="ink" data-press="1" style="{{ inlineCtaStyle }}"><span style="flex: 0 0 auto; display: flex;"><svg sc-camel-view-box="-1.457 -3.284 29.964 29.964" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M9.42 15.18l-.4 5.58c.57 0 .82-.24 1.12-.53l2.68-2.57 5.56 4.07c1.02.57 1.75.27 2.02-.93L23.99 3.6c.33-1.5-.54-2.09-1.53-1.72L1.18 9.6C-.28 10.16-.26 10.97.93 11.34l5.32 1.65 12.35-7.73c.58-.39 1.11-.18.67.21z"></path></svg></span><span style="display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-width: 0;"><span>Telegram</span><span style="{{ inlineNoteStyle }}">новости, эксклюзив, розыгрыши</span></span><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
+              <a href="https://vk.com/lllbaza" target="_blank" rel="noopener" data-lift="ink" data-press="1" style="{{ inlineCtaStyle }}"><span style="flex: 0 0 auto; display: flex;"><svg sc-camel-view-box="2.438 1.827 19.576 19.576" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.785 16.241s.288-.032.436-.194c.136-.148.132-.427.132-.427s-.02-1.304.575-1.496c.588-.19 1.341 1.26 2.14 1.818.605.422 1.064.33 1.064.33l2.137-.03s1.118-.071.588-.964c-.043-.073-.308-.661-1.588-1.87-1.34-1.264-1.16-1.059.453-3.246.983-1.332 1.376-2.145 1.253-2.493-.117-.332-.84-.244-.84-.244l-2.406.015s-.178-.025-.31.056c-.13.079-.212.263-.212.263s-.382 1.03-.89 1.907c-1.07 1.85-1.499 1.948-1.674 1.832-.407-.267-.305-1.075-.305-1.648 0-1.793.267-2.54-.521-2.733-.262-.065-.454-.107-1.123-.114-.858-.009-1.585.003-1.996.208-.274.136-.485.44-.356.457.159.022.519.099.71.363.246.341.237 1.107.237 1.107s.142 2.11-.33 2.371c-.325.18-.77-.187-1.725-1.865-.489-.859-.858-1.81-.858-1.81s-.072-.176-.2-.271c-.155-.115-.372-.151-.372-.151l-2.286.015s-.343.01-.469.161c-.112.135-.009.412-.009.412s1.79 4.258 3.817 6.403c1.858 1.967 3.968 1.838 3.968 1.838z"></path></svg></span><span style="display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-width: 0;"><span>ВКонтакте</span><span style="{{ inlineNoteStyle }}">то же самое, если вам туда удобнее</span></span><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
+              <a href="https://www.tiktok.com/@lllbaza" target="_blank" rel="noopener" data-lift="ink" data-press="1" style="{{ inlineCtaStyle }}"><span style="flex: 0 0 auto; display: flex;"><svg sc-camel-view-box="-2.802 -2.108 29.136 29.136" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"></path></svg></span><span style="display: flex; flex-direction: column; gap: 2px; flex: 1 1 auto; min-width: 0;"><span>TikTok</span><span style="{{ inlineNoteStyle }}">работа изнутри и немного юмора</span></span><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></a>
             </div>
           </div>
         </div>
@@ -1534,9 +1570,9 @@
         </div>
 
         <div data-reveal="1" data-rd="100" data-rdist="22" style="{{ footSocRowStyle }}">
-          <a href="https://t.me/lllbaza" target="_blank" rel="noopener" data-sw="light" data-press="1" style="{{ footSocCard }}" style-hover="border-color: rgba(242,235,221,0.34);"><span style="{{ footSocCardTop }}"><span style="{{ footSocIco }}"><svg sc-camel-view-box="-1.457 -3.284 29.964 29.964" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M9.42 15.18l-.4 5.58c.57 0 .82-.24 1.12-.53l2.68-2.57 5.56 4.07c1.02.57 1.75.27 2.02-.93L23.99 3.6c.33-1.5-.54-2.09-1.53-1.72L1.18 9.6C-.28 10.16-.26 10.97.93 11.34l5.32 1.65 12.35-7.73c.58-.39 1.11-.18.67.21z"></path></svg></span><span>Telegram</span><span style="{{ footSocArrow }}"><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></span><span style="{{ footSocNote }}">Новости, эксклюзивный контент, розыгрыши и здоровые шутки.</span></a>
-          <a href="https://vk.com/lllbaza" target="_blank" rel="noopener" data-sw="light" data-press="1" style="{{ footSocCard }}" style-hover="border-color: rgba(242,235,221,0.34);"><span style="{{ footSocCardTop }}"><span style="{{ footSocIco }}"><svg sc-camel-view-box="2.438 1.827 19.576 19.576" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.785 16.241s.288-.032.436-.194c.136-.148.132-.427.132-.427s-.02-1.304.575-1.496c.588-.19 1.341 1.26 2.14 1.818.605.422 1.064.33 1.064.33l2.137-.03s1.118-.071.588-.964c-.043-.073-.308-.661-1.588-1.87-1.34-1.264-1.16-1.059.453-3.246.983-1.332 1.376-2.145 1.253-2.493-.117-.332-.84-.244-.84-.244l-2.406.015s-.178-.025-.31.056c-.13.079-.212.263-.212.263s-.382 1.03-.89 1.907c-1.07 1.85-1.499 1.948-1.674 1.832-.407-.267-.305-1.075-.305-1.648 0-1.793.267-2.54-.521-2.733-.262-.065-.454-.107-1.123-.114-.858-.009-1.585.003-1.996.208-.274.136-.485.44-.356.457.159.022.519.099.71.363.246.341.237 1.107.237 1.107s.142 2.11-.33 2.371c-.325.18-.77-.187-1.725-1.865-.489-.859-.858-1.81-.858-1.81s-.072-.176-.2-.271c-.155-.115-.372-.151-.372-.151l-2.286.015s-.343.01-.469.161c-.112.135-.009.412-.009.412s1.79 4.258 3.817 6.403c1.858 1.967 3.968 1.838 3.968 1.838z"></path></svg></span><span>ВКонтакте</span><span style="{{ footSocArrow }}"><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></span><span style="{{ footSocNote }}">То же самое — для тех, кому привычнее ВК.</span></a>
-          <a href="https://www.tiktok.com/@lllbaza" target="_blank" rel="noopener" data-sw="light" data-press="1" style="{{ footSocCard }}" style-hover="border-color: rgba(242,235,221,0.34);"><span style="{{ footSocCardTop }}"><span style="{{ footSocIco }}"><svg sc-camel-view-box="-2.802 -2.108 29.136 29.136" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"></path></svg></span><span>TikTok</span><span style="{{ footSocArrow }}"><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></span><span style="{{ footSocNote }}">Работа изнутри, юмор и то, ради чего к нам приходят.</span></a>
+          <a href="https://t.me/lllbaza" target="_blank" rel="noopener" data-lift="cream" data-press="1" style="{{ footSocCard }}"><span style="{{ footSocCardTop }}"><span style="{{ footSocIco }}"><svg sc-camel-view-box="-1.457 -3.284 29.964 29.964" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M9.42 15.18l-.4 5.58c.57 0 .82-.24 1.12-.53l2.68-2.57 5.56 4.07c1.02.57 1.75.27 2.02-.93L23.99 3.6c.33-1.5-.54-2.09-1.53-1.72L1.18 9.6C-.28 10.16-.26 10.97.93 11.34l5.32 1.65 12.35-7.73c.58-.39 1.11-.18.67.21z"></path></svg></span><span>Telegram</span><span style="{{ footSocArrow }}"><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></span><span style="{{ footSocNote }}">Новости, эксклюзивный контент, розыгрыши и здоровые шутки.</span></a>
+          <a href="https://vk.com/lllbaza" target="_blank" rel="noopener" data-lift="cream" data-press="1" style="{{ footSocCard }}"><span style="{{ footSocCardTop }}"><span style="{{ footSocIco }}"><svg sc-camel-view-box="2.438 1.827 19.576 19.576" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.785 16.241s.288-.032.436-.194c.136-.148.132-.427.132-.427s-.02-1.304.575-1.496c.588-.19 1.341 1.26 2.14 1.818.605.422 1.064.33 1.064.33l2.137-.03s1.118-.071.588-.964c-.043-.073-.308-.661-1.588-1.87-1.34-1.264-1.16-1.059.453-3.246.983-1.332 1.376-2.145 1.253-2.493-.117-.332-.84-.244-.84-.244l-2.406.015s-.178-.025-.31.056c-.13.079-.212.263-.212.263s-.382 1.03-.89 1.907c-1.07 1.85-1.499 1.948-1.674 1.832-.407-.267-.305-1.075-.305-1.648 0-1.793.267-2.54-.521-2.733-.262-.065-.454-.107-1.123-.114-.858-.009-1.585.003-1.996.208-.274.136-.485.44-.356.457.159.022.519.099.71.363.246.341.237 1.107.237 1.107s.142 2.11-.33 2.371c-.325.18-.77-.187-1.725-1.865-.489-.859-.858-1.81-.858-1.81s-.072-.176-.2-.271c-.155-.115-.372-.151-.372-.151l-2.286.015s-.343.01-.469.161c-.112.135-.009.412-.009.412s1.79 4.258 3.817 6.403c1.858 1.967 3.968 1.838 3.968 1.838z"></path></svg></span><span>ВКонтакте</span><span style="{{ footSocArrow }}"><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></span><span style="{{ footSocNote }}">То же самое — для тех, кому привычнее ВК.</span></a>
+          <a href="https://www.tiktok.com/@lllbaza" target="_blank" rel="noopener" data-lift="cream" data-press="1" style="{{ footSocCard }}"><span style="{{ footSocCardTop }}"><span style="{{ footSocIco }}"><svg sc-camel-view-box="-2.802 -2.108 29.136 29.136" width="19" height="19" fill="currentColor" aria-hidden="true" style="display: block; flex: 0 0 auto;"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"></path></svg></span><span>TikTok</span><span style="{{ footSocArrow }}"><svg data-ar="out" sc-camel-view-box="0 0 24 24" width="16" height="16" style="flex: 0 0 auto;" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg></span></span><span style="{{ footSocNote }}">Работа изнутри, юмор и то, ради чего к нам приходят.</span></a>
         </div>
 
         <div data-reveal="1" data-rd="150" data-rdist="22" style="{{ footLegalStyle }}">
@@ -6226,9 +6262,13 @@ class Component extends DCLogic {
         position: 'relative', zIndex: 2, overflow: 'hidden', display: 'inline-flex', alignItems: 'center', flex: '0 0 auto',
         gap: gap + 'px', height: H + 'px', padding: '0 ' + padR + 'px 0 ' + (padL + 2) + 'px', cursor: 'pointer',
         borderRadius: '999px', border: 'none', outline: 'none',
-        backgroundColor: CREAM,
+        // В покое фон кнопки становится цветом заливки: сглаженный край
+        // накладки иначе просвечивает кремовым волоском по всему контуру.
+        // Подмена ждёт, пока заливка доедет, — ход от этого не меняется.
+        backgroundColor: hover ? '#0a0a0a' : CREAM,
         boxShadow: hover ? '0 18px 40px rgba(0,0,0,0.5)' : '0 10px 26px rgba(0,0,0,0.34)',
-        transition: 'box-shadow ' + (hover ? '460ms' : '320ms') + ' ' + HE + ', height 640ms ' + HE
+        transition: 'box-shadow ' + (hover ? '460ms' : '320ms') + ' ' + HE
+          + ', background-color 1ms linear ' + (hover ? '660ms' : '0ms') + ', height 640ms ' + HE
       },
       // Наведение: чёрная заливка наезжает слева, кружок со стрелкой уходит
       // к левому краю, подпись встаёт справа от него. Ход обеих частей уже
@@ -6354,7 +6394,7 @@ class Component extends DCLogic {
 
       // ─── кто это делает: сравнение четырёх вариантов ────────────────
       hireWrapStyle: {
-        display: 'flex', flexDirection: 'column', gap: narrow ? '16px' : '20px',
+        display: 'flex', flexDirection: 'column', gap: narrow ? '14px' : '16px',
         marginTop: 'clamp(26px, 3.4vh, 40px)'
       },
       hireHeadStyle: { display: 'flex', alignItems: 'baseline', flexWrap: 'wrap', gap: narrow ? '8px' : '16px' },
@@ -6366,85 +6406,139 @@ class Component extends DCLogic {
         fontSize: narrow ? '13px' : '14px', lineHeight: 1.5, fontWeight: 500,
         color: 'rgba(242,235,221,0.5)', textWrap: 'pretty'
       },
-      hireTabsStyle: {
-        display: 'grid', gridTemplateColumns: narrow ? 'repeat(2, minmax(0, 1fr))' : 'repeat(4, minmax(0, 1fr))',
-        gap: narrow ? '8px' : '10px'
+      hireListStyle: {
+        display: 'flex', flexDirection: 'column', minWidth: 0,
+        borderRadius: narrow ? '20px' : '24px', overflow: 'hidden',
+        border: '1px solid rgba(242,235,221,0.12)',
+        background: 'linear-gradient(168deg, #171717 0%, #101010 62%, #0c0c0c 100%)'
       },
       hireOpts: this.HIRE.map((h, i) => {
         const on = i === st.hire;
+        const us = h.k === 'baza';
+        // Столбик отметок — это ровно то, что написано в самих списках:
+        // сколько строк в «что получаете» и сколько в «чем платите».
+        // Никакой выдуманной оценки, только баланс, который и так виден
+        // при раскрытии, но здесь читается сразу по всем четырём.
+        const pip = (fill) => ({
+          style: {
+            flex: '0 0 auto', width: fill ? '7px' : '9px', height: fill ? '7px' : '2px',
+            borderRadius: '999px',
+            background: fill
+              ? (on ? CREAM : 'rgba(242,235,221,0.5)')
+              : 'rgba(242,235,221,' + (on ? 0.34 : 0.2) + ')',
+            transition: 'background 380ms ease'
+          }
+        });
+        const bullet = (text, good) => ({
+          text: text,
+          row: {
+            display: 'flex', alignItems: 'flex-start', gap: '10px', minWidth: 0,
+            fontSize: narrow ? '13.5px' : '14px', lineHeight: 1.45, fontWeight: 500,
+            color: good ? 'rgba(242,235,221,0.86)' : 'rgba(242,235,221,0.54)', textWrap: 'pretty'
+          },
+          dot: good
+            ? { flex: '0 0 auto', width: '6px', height: '6px', marginTop: '8px', borderRadius: '999px', background: CREAM }
+            : { flex: '0 0 auto', width: '7px', height: '1.5px', marginTop: '10px', borderRadius: '999px', background: 'rgba(242,235,221,0.36)' }
+        });
         return {
-          name: h.name, cost: h.cost,
+          nameText: h.name, costText: h.cost, unitText: h.unit, lineText: h.line,
+          expanded: on ? 'true' : 'false',
+          hov: on ? 'creamOn' : 'cream',
+          tallyAria: h.pros.length + ' за, ' + h.cons.length + ' против',
+          pips: h.pros.map(() => pip(true)).concat(h.cons.map(() => pip(false))),
+          pros: h.pros.map((x) => bullet(x, true)),
+          cons: h.cons.map((x) => bullet(x, false)),
           pick: () => { if (i !== this.state.hire) { this.setState({ hire: i }); this.track('hire_compare', { who: h.k }); } },
-          tab: {
-            position: 'relative', overflow: 'hidden', boxSizing: 'border-box',
-            display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '5px',
-            padding: narrow ? '12px 13px' : '14px 16px', minWidth: 0,
-            borderRadius: narrow ? '16px' : '18px', cursor: 'pointer', textAlign: 'left',
-            border: '1px solid ' + (on ? 'rgba(242,235,221,0.5)' : 'rgba(242,235,221,0.12)'),
-            background: on ? 'rgba(242,235,221,0.08)' : 'rgba(242,235,221,0.02)',
-            color: 'inherit', font: 'inherit',
-            transition: 'border-color 380ms ease, background 380ms ease'
+          item: {
+            position: 'relative', display: 'flex', flexDirection: 'column', minWidth: 0,
+            borderTop: i ? '1px solid rgba(242,235,221,0.09)' : 'none',
+            background: on ? 'rgba(242,235,221,0.045)' : 'transparent',
+            transition: 'background 420ms ease'
           },
-          tabName: {
-            fontSize: narrow ? '14px' : 'clamp(14px, 1.2vw, 17px)', fontWeight: 600,
-            letterSpacing: '-0.02em', lineHeight: 1.15, whiteSpace: 'nowrap',
-            color: on ? CREAM : 'rgba(242,235,221,0.66)', transition: 'color 380ms ease'
+          head: {
+            position: 'relative', display: 'grid', alignItems: 'center', width: '100%', boxSizing: 'border-box',
+            gridTemplateColumns: narrow ? '3px minmax(0, 1fr) 24px' : '3px minmax(0, 1fr) auto auto 24px',
+            gap: narrow ? '8px 12px' : '10px clamp(14px, 1.6vw, 28px)',
+            padding: narrow ? '15px 16px 15px 0' : 'clamp(16px, 1.5vw, 21px) clamp(20px, 1.8vw, 26px) clamp(16px, 1.5vw, 21px) 0',
+            border: 'none', background: 'none', color: 'inherit', font: 'inherit',
+            textAlign: 'left', cursor: 'pointer'
           },
-          tabCost: {
-            fontSize: narrow ? '11.5px' : '12.5px', fontWeight: 500, lineHeight: 1.2, whiteSpace: 'nowrap',
-            color: on ? 'rgba(242,235,221,0.6)' : 'rgba(242,235,221,0.3)', transition: 'color 380ms ease'
+          // БАЗА — это мы; отмечаем её кромкой, а не отдельным цветом карточки
+          edge: {
+            alignSelf: 'stretch', width: '3px', borderRadius: '0 999px 999px 0',
+            background: us ? (on ? CREAM : 'rgba(242,235,221,0.45)') : (on ? 'rgba(242,235,221,0.4)' : 'transparent'),
+            transition: 'background 380ms ease'
+          },
+          nameCol: { display: 'flex', flexDirection: 'column', gap: '3px', minWidth: 0 },
+          name: {
+            fontSize: narrow ? '16px' : 'clamp(17px, 1.6vw, 23px)', lineHeight: 1.1,
+            letterSpacing: '-0.03em', fontWeight: 600,
+            color: on ? CREAM : 'rgba(242,235,221,0.72)', transition: 'color 380ms ease'
+          },
+          unit: {
+            fontSize: narrow ? '12px' : '13px', lineHeight: 1.35, fontWeight: 500,
+            color: on ? 'rgba(242,235,221,0.58)' : 'rgba(242,235,221,0.32)',
+            textWrap: 'pretty', transition: 'color 380ms ease'
+          },
+          cost: {
+            gridColumn: narrow ? '2 / 3' : 'auto', justifySelf: narrow ? 'start' : 'end',
+            minWidth: narrow ? '0' : '168px', textAlign: narrow ? 'left' : 'right',
+            fontSize: narrow ? '13.5px' : 'clamp(14px, 1.25vw, 17px)', fontWeight: 600,
+            letterSpacing: '-0.024em', lineHeight: 1.2,
+            color: on ? CREAM : 'rgba(242,235,221,0.5)', transition: 'color 380ms ease'
+          },
+          tally: {
+            display: narrow ? 'none' : 'flex', alignItems: 'center', gap: '5px',
+            justifySelf: 'end', flex: '0 0 auto'
+          },
+          chev: {
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            justifySelf: 'end', flex: '0 0 auto', width: '24px', height: '24px',
+            color: on ? 'rgba(242,235,221,0.7)' : 'rgba(242,235,221,0.3)',
+            transform: on ? 'rotate(180deg)' : 'rotate(0deg)',
+            transition: 'transform 520ms ' + EZ + ', color 380ms ease'
+          },
+          // height: auto не анимируется, поэтому раскрытие идёт по max-height
+          bodyWrap: {
+            overflow: 'hidden',
+            maxHeight: on ? (narrow ? '760px' : '420px') : '0px', opacity: on ? 1 : 0,
+            transition: 'max-height 560ms ' + EZ + ', opacity 360ms ease' + (on ? ' 120ms' : '')
+          },
+          body: {
+            display: 'flex', flexDirection: 'column', gap: narrow ? '14px' : '18px',
+            padding: narrow ? '0 16px 20px 14px' : '0 clamp(20px, 1.8vw, 26px) clamp(20px, 1.8vw, 26px) 17px'
+          },
+          lineStyle: {
+            maxWidth: '68ch', fontSize: narrow ? '13.5px' : '14.5px', lineHeight: 1.5,
+            fontWeight: 500, color: 'rgba(242,235,221,0.62)', textWrap: 'pretty'
+          },
+          cols: {
+            display: 'grid', gridTemplateColumns: narrow ? 'minmax(0, 1fr)' : 'repeat(2, minmax(0, 1fr))',
+            gap: narrow ? '16px' : '10px clamp(20px, 2.4vw, 38px)', minWidth: 0
+          },
+          col: { display: 'flex', flexDirection: 'column', gap: '10px', minWidth: 0 },
+          capA: {
+            fontSize: '11px', fontWeight: 700, letterSpacing: '0.18em',
+            textTransform: 'uppercase', color: 'rgba(242,235,221,0.34)'
+          },
+          capB: {
+            fontSize: '11px', fontWeight: 700, letterSpacing: '0.18em',
+            textTransform: 'uppercase', color: 'rgba(242,235,221,0.34)'
           }
         };
       }),
-      hireCardStyle: {
-        display: 'grid', gridTemplateColumns: narrow ? 'minmax(0, 1fr)' : 'minmax(0, 0.85fr) minmax(0, 2fr)',
-        gap: narrow ? '18px' : 'clamp(20px, 2.4vw, 38px)',
-        padding: narrow ? '20px' : 'clamp(22px, 2vw, 30px)',
-        borderRadius: narrow ? '22px' : '26px',
-        border: '1px solid rgba(242,235,221,0.12)',
-        background: 'linear-gradient(168deg, #171717 0%, #101010 60%, #0c0c0c 100%)'
+      hireLegendStyle: {
+        display: narrow ? 'none' : 'flex', alignItems: 'center', gap: '8px',
+        paddingLeft: '4px', fontSize: '11px', fontWeight: 600, letterSpacing: '0.04em',
+        color: 'rgba(242,235,221,0.3)'
       },
-      hireSumStyle: { display: 'flex', flexDirection: 'column', gap: '6px', minWidth: 0 },
-      hireSumCostStyle: {
-        fontSize: narrow ? '26px' : 'clamp(26px, 2.4vw, 36px)', fontWeight: 600,
-        letterSpacing: '-0.035em', lineHeight: 1.04, color: CREAM
+      hireLegendPipOn: {
+        flex: '0 0 auto', width: '7px', height: '7px', borderRadius: '999px',
+        background: 'rgba(242,235,221,0.5)', marginRight: '-2px'
       },
-      hireSumUnitStyle: { fontSize: '13px', fontWeight: 500, color: 'rgba(242,235,221,0.5)' },
-      hireSumLineStyle: {
-        marginTop: '8px', fontSize: narrow ? '13.5px' : '14px', lineHeight: 1.5,
-        fontWeight: 500, color: 'rgba(242,235,221,0.62)', textWrap: 'pretty'
-      },
-      hireCost: this.HIRE[st.hire].cost,
-      hireUnit: this.HIRE[st.hire].unit,
-      hireLine: this.HIRE[st.hire].line,
-      hirePros: this.HIRE[st.hire].pros,
-      hireCons: this.HIRE[st.hire].cons,
-      hireColsStyle: {
-        display: 'grid', gridTemplateColumns: narrow ? 'minmax(0, 1fr)' : 'repeat(2, minmax(0, 1fr))',
-        gap: narrow ? '18px' : '10px 26px', minWidth: 0
-      },
-      hireColStyle: { display: 'flex', flexDirection: 'column', gap: '10px', minWidth: 0 },
-      hireColCapStyle: {
-        fontSize: '11px', fontWeight: 700, letterSpacing: '0.18em',
-        textTransform: 'uppercase', color: 'rgba(242,235,221,0.34)'
-      },
-      hireProRowStyle: {
-        display: 'flex', alignItems: 'flex-start', gap: '10px', minWidth: 0,
-        fontSize: narrow ? '13.5px' : '14px', lineHeight: 1.45, fontWeight: 500,
-        color: 'rgba(242,235,221,0.86)', textWrap: 'pretty'
-      },
-      hireConRowStyle: {
-        display: 'flex', alignItems: 'flex-start', gap: '10px', minWidth: 0,
-        fontSize: narrow ? '13.5px' : '14px', lineHeight: 1.45, fontWeight: 500,
-        color: 'rgba(242,235,221,0.52)', textWrap: 'pretty'
-      },
-      hireProDotStyle: {
-        flex: '0 0 auto', width: '6px', height: '6px', marginTop: '8px',
-        borderRadius: '999px', background: CREAM
-      },
-      hireConDotStyle: {
-        flex: '0 0 auto', width: '6px', height: '1.5px', marginTop: '10px',
-        borderRadius: '999px', background: 'rgba(242,235,221,0.34)'
+      hireLegendPipOff: {
+        flex: '0 0 auto', width: '9px', height: '2px', borderRadius: '999px',
+        background: 'rgba(242,235,221,0.22)', marginLeft: '10px', marginRight: '-2px'
       },
 
       goFix: this._gfx || (this._gfx = (e) => this.goFix(e)),
@@ -6705,6 +6799,7 @@ class Component extends DCLogic {
       },
       calcLureDiscStyle: {
         display: 'flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 auto',
+        alignSelf: narrow ? 'flex-end' : 'auto',
         width: narrow ? '52px' : '62px', height: narrow ? '52px' : '62px', borderRadius: '999px',
         background: '#0a0a0a', color: CREAM
       },

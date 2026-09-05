@@ -346,6 +346,7 @@
   @keyframes lb-ping { 0% { transform: scale(0.4); opacity: 0.85; } 65% { opacity: 0; } 100% { transform: scale(2.4); opacity: 0; } }
   @keyframes lb-spark { 0% { opacity: 0; transform: rotate(var(--a)) translateX(7px) scaleX(0.3); } 26% { opacity: 1; } 100% { opacity: 0; transform: rotate(var(--a)) translateX(34px) scaleX(1); } }
   @keyframes lb-heart { 0% { transform: translate(-50%,-50%) scale(0.35) rotate(-10deg); opacity: 0; } 18% { transform: translate(-50%,-50%) scale(1.16) rotate(-10deg); opacity: 1; } 42% { transform: translate(-50%,-64%) scale(1) rotate(-10deg); opacity: 1; } 100% { transform: translate(-50%,-210%) scale(0.86) rotate(-10deg); opacity: 0; } }
+  @keyframes lb-hint { 0%, 100% { transform: translateY(3px); } 50% { transform: translateY(-3px); } }
   @keyframes lb-caret { 0%, 44% { opacity: 1; } 50%, 94% { opacity: 0; } 100% { opacity: 1; } }
   section[id], [id^="legal-"] { scroll-margin-top: clamp(96px, 13vh, 132px); }
   image-slot:not([data-filled]) { opacity: 0; transition: opacity 240ms ease; }
@@ -741,10 +742,23 @@
                       <div style="{{ f.plateNum }}">{{ f.plateNumText }}</div>
                     </div>
                     <div style="position: absolute; inset: 0; z-index: 1;">
-                      <image-slot id="{{ f.slot }}" shape="rect" placeholder="{{ f.ph }}"></image-slot>
+                      <sc-if value="{{ f.hasVideo }}" hint-placeholder-val="{{ false }}">
+                        <video src="{{ f.video }}" sc-camel-auto-play="{{ true }}" muted loop
+                               sc-camel-plays-inline="{{ true }}" preload="metadata"
+                               aria-hidden="true" style="{{ fVideoStyle }}"></video>
+                      </sc-if>
+                      <sc-if value="{{ f.noVideo }}" hint-placeholder-val="{{ true }}">
+                        <image-slot id="{{ f.slot }}" shape="rect" placeholder="{{ f.ph }}"></image-slot>
+                      </sc-if>
                     </div>
                   </div>
                   <div style="{{ fScrimStyle }}"></div>
+                  <div style="{{ f.hint }}" aria-hidden="true">
+                    <span style="{{ fHintArrowStyle }}">
+                      <svg sc-camel-view-box="0 0 24 24" width="17" height="17" aria-hidden="true"><path d="M12 19V6M6.5 11.5L12 6l5.5 5.5" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                    </span>
+                    <span style="{{ fHintTextStyle }}">Листайте — здесь пять запусков</span>
+                  </div>
                   <div sc-camel-on-double-click="{{ f.dbl }}" sc-camel-on-pointer-down="{{ fDragDown }}" sc-camel-on-pointer-move="{{ fDragMove }}" sc-camel-on-pointer-up="{{ fDragUp }}" sc-camel-on-pointer-cancel="{{ fDragUp }}" style="{{ fHitStyle }}"></div>
                   <span style="{{ f.burst }}">
                     <svg sc-camel-view-box="0 0 24 24" width="112" height="112" fill="#f2ebdd" aria-hidden="true"><path d="M12 20.4C12 20.4 4 15.2 4 9.7C4 7.1 6.1 5.2 8.6 5.2C10.1 5.2 11.4 6 12 7.1C12.6 6 13.9 5.2 15.4 5.2C17.9 5.2 20 7.1 20 9.7C20 15.2 12 20.4 12 20.4Z"></path></svg>
@@ -755,13 +769,11 @@
                     <span style="{{ fTagStyle }}">{{ f.tag }}</span>
                   </div>
                   <div style="{{ f.cap }}">
-                    <div style="{{ fSvcStyle }}">{{ f.svc }}</div>
                     <div style="{{ fTitleStyle }}">{{ f.title }}</div>
                     <div style="{{ f.deltaWrap }}">
                       <span style="{{ f.wasStyle }}"><span style="{{ fDeltaCapStyle }}">было</span>{{ f.was }}</span>
                       <span style="{{ f.nowStyle }}"><span style="{{ fDeltaCapStyle }}">стало</span>{{ f.now }}</span>
                     </div>
-                    <div style="{{ fNoteStyle }}">{{ f.note }}</div>
                     <button type="button" sc-camel-on-click="{{ f.open }}" style="{{ f.quoteStyle }}" style-hover="border-color: rgba(242,235,221,0.44);">
                       <span style="{{ f.qAva }}">{{ f.qIni }}</span>
                       <span style="{{ fQuoteTextStyle }}">{{ f.quote }}</span>
@@ -1695,6 +1707,11 @@ class Component extends DCLogic {
   // ——— лента: направление × кейс × слова владельца
   // ph — подпись пустого слота. Перетащите в него реальный скриншот работы:
   // он сохранится и заменит подпись. Пять первых карточек — реальные кейсы.
+  //
+  // Видео: положите файл в src/assets/feed/, добавьте его в src/resources.json
+  // ("feed/имя.mp4": "assets/feed/имя.mp4") и укажите здесь video: 'feed/имя.mp4'.
+  // Оно встанет вместо слота и будет проигрываться, пока карточка активна —
+  // без звука, по кругу, ровно в тех же свайпах. Вертикальное, 9:16.
   FEEDD = [
     { k: 'a', svc: 'Создание сайтов', slot: 'wk-1', ph: 'первый экран сайта бренда', tag: 'Бренд одежды · сайт',
       title: 'Сайт, который не догнать',
@@ -2175,6 +2192,7 @@ class Component extends DCLogic {
   fN() { return this.FEEDD.length; }
 
   fJump(i, anim) {
+    if (i > 0 && this.state.hintOn) this.setState({ hintOn: false });
     const el = this.fViewEl;
     if (!el) return;
     const k = Math.max(0, Math.min(this.fN() - 1, i));
@@ -7063,9 +7081,13 @@ class Component extends DCLogic {
         flex: '0 0 auto', height: 'clamp(560px, 76vh, 780px)'
       },
       fStageStyle: (narrow || this.mob) ? {
-        position: 'absolute', inset: 0, boxSizing: 'border-box',
+        position: 'absolute', boxSizing: 'border-box',
+        left: '12px', right: '12px',
+        top: 'calc(96px + env(safe-area-inset-top, 0px))',
+        bottom: 'calc(118px + env(safe-area-inset-bottom, 0px))',
         overflow: 'hidden', isolation: 'isolate',
-        borderRadius: 0, border: 'none', background: '#0a0a0a'
+        borderRadius: '26px', border: '1px solid rgba(242,235,221,0.14)', background: '#0a0a0a',
+        boxShadow: '0 30px 70px rgba(0,0,0,0.6)'
       } : {
         position: 'relative', boxSizing: 'border-box', overflow: 'hidden', isolation: 'isolate',
         flex: '0 0 auto', minWidth: 0, minHeight: 0, width: 'auto', height: '100%',
@@ -7081,6 +7103,22 @@ class Component extends DCLogic {
         position: 'relative', height: '100%', overflow: 'hidden',
         scrollSnapAlign: 'start', scrollSnapStop: 'always'
       },
+      // Первую карточку легко принять за картинку — подсказка живёт до
+      // первого пролистывания и больше не возвращается.
+      fHintArrowStyle: {
+        display: 'flex', alignItems: 'center', justifyContent: 'center', flex: '0 0 auto',
+        width: '28px', height: '28px', borderRadius: '999px',
+        background: 'rgba(242,235,221,0.14)', color: CREAM,
+        animation: 'lb-hint 1.9s cubic-bezier(.4,0,.5,1) infinite'
+      },
+      fHintTextStyle: {
+        fontSize: '12px', fontWeight: 600, letterSpacing: '-0.005em',
+        color: 'rgba(242,235,221,0.9)', whiteSpace: 'nowrap'
+      },
+      fVideoStyle: {
+        position: 'absolute', inset: 0, width: '100%', height: '100%',
+        objectFit: 'cover', display: 'block'
+      },
       fScrimStyle: {
         position: 'absolute', inset: 0, zIndex: 1, pointerEvents: 'none',
         background: 'linear-gradient(to top, rgba(10,10,10,0.96) 0%, rgba(10,10,10,0.8) 28%, rgba(10,10,10,0.1) 62%, rgba(10,10,10,0.6) 100%)'
@@ -7095,7 +7133,7 @@ class Component extends DCLogic {
       fTopStyle: {
         position: 'absolute', zIndex: 3, pointerEvents: 'none',
         left: 'clamp(14px, 1.4vw, 18px)', right: 'clamp(12px, 1.2vw, 16px)',
-        top: (narrow || this.mob) ? 'calc(112px + env(safe-area-inset-top, 0px))' : 'clamp(13px, 1.4vh, 18px)',
+        top: 'clamp(13px, 1.4vh, 18px)',
         display: 'flex', alignItems: 'center', gap: '9px'
       },
       fAvaStyle: {
@@ -7135,7 +7173,7 @@ class Component extends DCLogic {
       fChipsStyle: { display: narrow ? 'flex' : 'none', flexWrap: 'wrap', gap: '7px', paddingTop: '2px' },
       fRailStyle: {
         position: 'absolute', zIndex: 4, right: 'clamp(6px, 0.7vw, 10px)',
-        bottom: (narrow || this.mob) ? 'calc(62px + env(safe-area-inset-bottom, 0px))' : 'clamp(14px, 1.8vh, 20px)',
+        bottom: 'clamp(14px, 1.8vh, 20px)',
         display: 'flex', flexDirection: 'column', alignItems: 'center', gap: narrow ? '8px' : '10px'
       },
       fRailBtnStyle: {
@@ -7319,6 +7357,19 @@ class Component extends DCLogic {
         return {
           slot: it.slot, ph: it.ph, tag: it.tag, svc: it.svc, title: it.title, note: it.note,
           was: it.was, now: it.now,
+          video: it.video ? this.rsrc(it.video) : '',
+          hasVideo: !!it.video && on,
+          noVideo: !it.video,
+          hint: {
+            position: 'absolute', zIndex: 4, left: '50%', top: '38%',
+            display: (i === 0 && st.hintOn) ? 'flex' : 'none',
+            alignItems: 'center', gap: '10px', padding: '8px 14px 8px 8px',
+            borderRadius: '999px', pointerEvents: 'none',
+            border: '1px solid rgba(242,235,221,0.16)', background: 'rgba(10,10,10,0.72)',
+            transform: 'translate(-50%, -50%)',
+            opacity: (i === 0 && st.hintOn) ? 1 : 0,
+            transition: 'opacity 420ms ease'
+          },
           deltaWrap: {
             display: it.was ? 'flex' : 'none', flexWrap: 'wrap', alignItems: 'center', gap: '6px',
             opacity: on ? 1 : 0, transition: 'opacity 520ms ' + EZ
@@ -7374,7 +7425,7 @@ class Component extends DCLogic {
           },
           cap: {
             position: 'absolute', zIndex: 3, left: 'clamp(14px, 1.4vw, 18px)', right: narrow ? '64px' : '66px',
-            bottom: (narrow || this.mob) ? 'calc(62px + env(safe-area-inset-bottom, 0px))' : 'clamp(14px, 1.8vh, 20px)',
+            bottom: 'clamp(14px, 1.8vh, 20px)',
             display: 'flex', flexDirection: 'column', gap: '8px',
             opacity: on ? 1 : 0.4,
             transform: on ? 'translateY(0)' : 'translateY(10px)',

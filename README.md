@@ -94,9 +94,25 @@ read only when a task needs it.
 To refresh it against a newer Motion, re-derive from the tag rather than editing
 by hand — the export surface is the source of truth.
 
+## The site
+
+`index.html` is the lllbaza.ru landing page: one self-contained file with the
+runtime, the component script and every asset (the hero frame sequences,
+logos and background haze) inlined as data URIs. Open it straight from disk —
+it needs no server and makes no network requests.
+
+Three things drive the page:
+
+| Piece | Where | What it does |
+| --- | --- | --- |
+| Hero frame sequence | `step()` / `feedTick()` in the `text/x-dc` script | Scroll scrubs a 132-frame laptop sequence. The scroll holds on one key frame — the one where the laptop stands whole in the frame and the screen reads — and nowhere else; `keyF` picks that frame per device, because the desktop camera keeps pushing into the screen after it. |
+| Immersive feed | `#services` + `feedTick()` | On phones the section is taller than the screen: the card scales up into a full-bleed TikTok as you scroll in, takes over the swipes while you are inside it, and folds back out at the end. Site chrome (header, metrics bar, progress) fades out for the duration. |
+| Price fork + calculator | `#pricing` and the brief form | The pricing section explains the fork — save on your own product, or do it the way the leaders do — without listing prices. The numbers live in the form instead: pick what you need, pick a level, get a range and a term. |
+
 ## Layout
 
 ```
+index.html          the site — single self-contained file
 .claude/skills/     10 skills
 .mcp.json           21st.dev MCP server (key via ${TWENTYFIRST_API_KEY})
 .env.example        template for the key

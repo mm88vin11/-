@@ -94,9 +94,65 @@ read only when a task needs it.
 To refresh it against a newer Motion, re-derive from the tag rather than editing
 by hand — the export surface is the source of truth.
 
+## The БАЗА site
+
+`index.html` at the repo root is the БАЗА landing page — a static, dependency-free
+single page. Open the file directly, or serve the folder:
+
+```bash
+python3 -m http.server 8000   # then http://localhost:8000
+```
+
+It is built as an arcade: nine "worlds", each with its own background, typography,
+scroll behaviour and one thing you can actually play with.
+
+| World | Section | The interaction |
+| --- | --- | --- |
+| 0 | Hero | Parallax starfield + retro grid floor, typewriter pitch, world picker |
+| 1 | О нас | Four Pac-Man ghosts — tick the ones you recognise, the cabinet scores them |
+| 2 | Кто это делает | Fighting-game roster: pick a way to close the task, see what it costs |
+| 3 | Услуги | Mario `?` blocks — hit one, a coin pops and the direction opens |
+| 4 | Цены | A Tetris well that stacks to the level you pick on the fork slider |
+| 5 | Карта маршрута | Swamp with a trail that draws itself as you scroll |
+| 6 | Проекты | Arcade cabinet: swap cartridges, the CRT renders a stylised UI mock |
+| 7 | География | Radar sweep over a schematic world map, 19 cities |
+| 8 | Бриф | A terminal that answers as you fill it in and prices the job live |
+
+Between worlds the transitions are part of the design: a Mario warp pipe, a Tetris
+line clear, a swamp drip. The nav also plays a pixel-block wipe between sections.
+
+### Structure
+
+```
+index.html            markup + SEO + no-JS fallback
+assets/css/fonts.css  self-hosted subsets (no third-party font request)
+assets/css/base.css   tokens, reset, typography, reveal engine
+assets/css/chrome.css header, nav, menu, HUD, level transitions, boot
+assets/css/worlds-a.css  hero · Pac-Man · VS select · Mario
+assets/css/worlds-b.css  Tetris · swamp · cabinet · radar · terminal · credits
+assets/js/data.js     every piece of copy the page renders at runtime
+assets/js/app.js      one rAF loop drives all canvas scenes; the rest is events
+assets/fonts/         Manrope, Unbounded, Pixelify Sans, Russo One, JetBrains Mono
+assets/img/           brand lockups
+```
+
+Notes on how it behaves:
+
+- **No build step, no runtime dependencies.** Plain HTML, CSS and one script.
+- **Fonts are vendored** (cyrillic + latin subsets only) so the page makes no
+  request to Google and renders identically offline.
+- **Every scene pauses off screen** and every animation is transform/opacity only.
+- **`prefers-reduced-motion` is honoured**: animations collapse, nothing is hidden.
+- **Without JavaScript** the boot overlay lifts, the containers the runtime fills
+  are hidden, and a notice with prices and the Telegram contact takes their place.
+- **The brief keeps a local draft** in `localStorage` and hands the assembled lead
+  to Telegram — no endpoint or token is committed to this public repo.
+
 ## Layout
 
 ```
+index.html          the БАЗА landing page
+assets/             its css, js, fonts and images
 .claude/skills/     10 skills
 .mcp.json           21st.dev MCP server (key via ${TWENTYFIRST_API_KEY})
 .env.example        template for the key

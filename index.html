@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+<title>БАЗА — сайты, CRM и боты для бизнеса, который держится на владельце</title>
+<meta name="description" content="Делаем сайты, автоматизацию и ИИ-ботов, чтобы бизнес продавал без вашего участия. Разбор за три дня — 25 000 ₽. Работали с брендами одежды, барбершопами, оптом и доставкой.">
+<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+<meta name="theme-color" content="#0a0a0a">
+<meta name="color-scheme" content="dark">
+<meta name="author" content="БАЗА">
+<link rel="canonical" href="https://lllbaza.ru/">
+
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0a0a'/%3E%3Ctext x='32' y='45' text-anchor='middle' font-family='Helvetica Neue,Helvetica,Arial,sans-serif' font-size='38' font-weight='700' fill='%23f2ebdd'%3E%D0%91%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230a0a0a'/%3E%3Ctext x='32' y='45' text-anchor='middle' font-family='Helvetica Neue,Helvetica,Arial,sans-serif' font-size='38' font-weight='700' fill='%23f2ebdd'%3E%D0%91%3C/text%3E%3C/svg%3E">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="БАЗА">
+<meta property="og:locale" content="ru_RU">
+<meta property="og:url" content="https://lllbaza.ru/">
+<meta property="og:title" content="БАЗА — сайты, CRM и боты для бизнеса, который держится на владельце">
+<meta property="og:description" content="Делаем сайты, автоматизацию и ИИ-ботов, чтобы бизнес продавал без вашего участия. Разбор за три дня — 25 000 ₽.">
+<meta property="og:image" content="https://lllbaza.ru/og.jpg">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preload" href="assets/fonts/manrope-400-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/unbounded-700-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
+
+<link rel="stylesheet" href="assets/css/fonts.css">
+<link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/chrome.css">
+<link rel="stylesheet" href="assets/css/worlds-a.css">
+<link rel="stylesheet" href="assets/css/worlds-b.css">
+
+<script type="application/ld+json">
+{"@context":"https://schema.org","@graph":[
+{"@type":"Organization","@id":"https://lllbaza.ru/#org","name":"БАЗА","alternateName":"ЭТО БАЗА","url":"https://lllbaza.ru","description":"Делаем сайты, автоматизацию и ИИ-ботов, чтобы бизнес продавал без вашего участия.","sameAs":["https://t.me/lllbaza","https://vk.com/lllbaza","https://www.tiktok.com/@lllbaza"]},
+{"@type":"WebSite","@id":"https://lllbaza.ru/#site","url":"https://lllbaza.ru","name":"БАЗА","inLanguage":"ru-RU","publisher":{"@id":"https://lllbaza.ru/#org"}}
+]}
+</script>
+<noscript><style>
+  /* Without JS the boot overlay would never lift and the panels the runtime
+     fills stay empty — so hide both and show a plain, complete fallback. */
+  .boot, .hud, .hud-score, .cursor, .warp, .cookie,
+  #vsPick, #vsStat, #vsPros, #vsCons, #blocks, #marioPanel,
+  #tiers, #forkRows, #carts, #crtScreen, #crtDots, #rev,
+  #hiscoreRow, #qTask, #qWhen, #qPain, #calcLvls, .tetris-board,
+  .term__send, .agree { display: none !important; }
+  .nojs { display: block !important; }
+  [data-rise], .ch { opacity: 1 !important; transform: none !important; }
+  .hero__mark img { clip-path: none !important; }
+  .hero__type { min-height: 0; }
+</style></noscript>
+</head>
+
+<body>
+
+<a class="skip" href="#about">К содержанию</a>
+
+<div class="nojs">
+  <p><b>Включите JavaScript</b> — на этом сайте расчёт бюджета, лента кейсов и бриф
+  считаются прямо в браузере. Или просто напишите нам:
+  <a href="https://t.me/lllbaza">Telegram @lllbaza</a> — отвечаем в течение рабочего дня.
+  Разбор за три дня — 25 000 ₽; сайт — от 250 000 ₽; система под ключ — от 900 000 ₽.</p>
+</div>
+
+<!-- ═══ boot screen ═══════════════════════════════════════════════ -->
+<div class="boot" id="boot" role="status" aria-live="polite">
+  <div class="boot__inner">
+    <img class="boot__logo" src="assets/img/logo-baza-2x.webp" alt="БАЗА" width="942" height="361">
+    <div class="boot__bar"><div class="boot__fill" id="bootFill"></div></div>
+    <div class="boot__txt" id="bootTxt">загружаем картридж…</div>
+  </div>
+</div>
+
+<!-- ═══ chrome ════════════════════════════════════════════════════ -->
+<div class="cursor" id="cursor" aria-hidden="true"><span class="cursor__dot"></span></div>
+<div class="warp" id="warp" aria-hidden="true"></div>
+<div class="warp__label" id="warpLabel" aria-hidden="true"></div>
+<div class="hud" aria-hidden="true"><div class="hud__fill" id="hudFill"></div></div>
+
+<div class="hud-score" id="hudScore" aria-live="polite">
+  <span class="hud-score__coin" aria-hidden="true"></span>
+  <span>очки</span>
+  <span class="hud-score__n" id="scoreN">0</span>
+</div>
+
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<header class="head" id="head">
+  <div class="head__row">
+    <a class="brand" href="#top" data-warp="БАЗА">
+      <img class="brand__mark logo-img" src="assets/img/logo-baza-2x.webp" alt="БАЗА" width="942" height="361">
+      <span class="brand__tag">это база</span>
+    </a>
+
+    <nav class="nav" aria-label="Разделы сайта">
+      <div class="nav__list" id="navList">
+        <span class="nav__ink" id="navInk" aria-hidden="true"></span>
+        <a class="nav__item" href="#about"    data-nav="about"    data-warp="World 1 · Pac-Man"><span>О нас</span><span aria-hidden="true">О нас</span></a>
+        <a class="nav__item" href="#services" data-nav="services" data-warp="World 3 · Услуги"><span>Услуги</span><span aria-hidden="true">Услуги</span></a>
+        <a class="nav__item" href="#pricing"  data-nav="pricing"  data-warp="World 4 · Цены"><span>Цены</span><span aria-hidden="true">Цены</span></a>
+        <a class="nav__item" href="#projects" data-nav="projects" data-warp="World 6 · Кейсы"><span>Проекты</span><span aria-hidden="true">Проекты</span></a>
+        <a class="nav__item" href="#brief"    data-nav="brief"    data-warp="World 8 · Контакты"><span>Контакты</span><span aria-hidden="true">Контакты</span></a>
+      </div>
+    </nav>
+
+    <div class="head__cta">
+      <a class="btn btn--neon btn--hero" href="#brief" data-warp="World 8 · Контакты">
+        <span>Показать, где теряете</span>
+        <span class="btn__ico" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h13.5M12 6.5l6 5.5-6 5.5"/></svg>
+        </span>
+      </a>
+      <button class="burger" id="burger" type="button" aria-label="Меню" aria-expanded="false" aria-controls="menu">
+        <span></span><span></span>
+      </button>
+    </div>
+  </div>
+</header>
+
+<nav class="menu" id="menu" aria-label="Меню сайта">
+  <div class="menu__list">
+    <a class="menu__link" style="--i:0" href="#about">О нас <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M12.5 6.5l5.5 5.5-5.5 5.5"/></svg></a>
+    <a class="menu__link" style="--i:1" href="#services">Услуги <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M12.5 6.5l5.5 5.5-5.5 5.5"/></svg></a>
+    <a class="menu__link" style="--i:2" href="#pricing">Цены <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M12.5 6.5l5.5 5.5-5.5 5.5"/></svg></a>
+    <a class="menu__link" style="--i:3" href="#projects">Проекты <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M12.5 6.5l5.5 5.5-5.5 5.5"/></svg></a>
+    <a class="menu__link" style="--i:4" href="#brief">Контакты <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M12.5 6.5l5.5 5.5-5.5 5.5"/></svg></a>
+  </div>
+  <div class="menu__foot">
+    <a class="btn btn--solid" href="#brief"><span>Обсудить проект</span></a>
+    <a class="btn" href="https://t.me/lllbaza" target="_blank" rel="noopener" style="color:#0a0a0a;border-color:rgba(10,10,10,.2)"><span>Просто написать в Telegram</span></a>
+    <div class="menu__socials">
+      <a class="menu__soc" href="https://t.me/lllbaza" target="_blank" rel="noopener" aria-label="Telegram"><svg viewBox="-1.457 -3.284 29.964 29.964" width="19" height="19" fill="currentColor" aria-hidden="true"><path d="M9.42 15.18l-.4 5.58c.57 0 .82-.24 1.12-.53l2.68-2.57 5.56 4.07c1.02.57 1.75.27 2.02-.93L23.99 3.6c.33-1.5-.54-2.09-1.53-1.72L1.18 9.6C-.28 10.16-.26 10.97.93 11.34l5.32 1.65 12.35-7.73c.58-.39 1.11-.18.67.21z"/></svg></a>
+      <a class="menu__soc" href="https://vk.com/lllbaza" target="_blank" rel="noopener" aria-label="ВКонтакте"><svg viewBox="2.438 1.827 19.576 19.576" width="19" height="19" fill="currentColor" aria-hidden="true"><path d="M12.785 16.241s.288-.032.436-.194c.136-.148.132-.427.132-.427s-.02-1.304.575-1.496c.588-.19 1.341 1.26 2.14 1.818.605.422 1.064.33 1.064.33l2.137-.03s1.118-.071.588-.964c-.043-.073-.308-.661-1.588-1.87-1.34-1.264-1.16-1.059.453-3.246.983-1.332 1.376-2.145 1.253-2.493-.117-.332-.84-.244-.84-.244l-2.406.015s-.178-.025-.31.056c-.13.079-.212.263-.212.263s-.382 1.03-.89 1.907c-1.07 1.85-1.499 1.948-1.674 1.832-.407-.267-.305-1.075-.305-1.648 0-1.793.267-2.54-.521-2.733-.262-.065-.454-.107-1.123-.114-.858-.009-1.585.003-1.996.208-.274.136-.485.44-.356.457.159.022.519.099.71.363.246.341.237 1.107.237 1.107s.142 2.11-.33 2.371c-.325.18-.77-.187-1.725-1.865-.489-.859-.858-1.81-.858-1.81s-.072-.176-.2-.271c-.155-.115-.372-.151-.372-.151l-2.286.015s-.343.01-.469.161c-.112.135-.009.412-.009.412s1.79 4.258 3.817 6.403c1.858 1.967 3.968 1.838 3.968 1.838z"/></svg></a>
+      <a class="menu__soc" href="https://www.tiktok.com/@lllbaza" target="_blank" rel="noopener" aria-label="TikTok"><svg viewBox="-2.802 -2.108 29.136 29.136" width="19" height="19" fill="currentColor" aria-hidden="true"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg></a>
+    </div>
+  </div>
+</nav>
+
+<main id="top">
+
+<!-- ═══ WORLD 0 — HERO / INSERT COIN ══════════════════════════════ -->
+<section class="hero" id="hero" aria-labelledby="heroTitle">
+  <div class="hero__sun" aria-hidden="true"></div>
+  <canvas class="hero__stars" id="heroStars" aria-hidden="true"></canvas>
+  <div class="hero__grid" id="heroGrid" aria-hidden="true"></div>
+  <div class="fx-noise" aria-hidden="true"></div>
+
+  <div class="shell hero__body">
+    <span class="hero__coin"><i aria-hidden="true"></i> insert coin — press ↓</span>
+
+    <div class="hero__mark">
+      <img class="hero__mark-eto" src="assets/img/logo-eto-2x.webp" alt="" width="470" height="180" aria-hidden="true">
+      <img class="hero__mark-baza" src="assets/img/logo-baza-2x.webp" alt="БАЗА" width="942" height="361">
+    </div>
+
+
+    <div class="hero__cta-col">
+    <h1 id="heroTitle">Сайты, CRM, автоматизация и ИИ-боты для бизнеса, который держится на владельце</h1>
+
+    <p class="hero__type" id="heroType" aria-live="off"></p>
+
+    <div class="hero__row">
+      <a class="btn btn--solid" href="#brief" data-warp="World 8 · Контакты"><span>Показать, где теряете</span>
+        <span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h13.5M12 6.5l6 5.5-6 5.5"/></svg></span>
+      </a>
+      <a class="btn" href="#services" data-warp="World 3 · Услуги"><span>Что мы делаем</span></a>
+      <a class="btn" href="https://t.me/lllbaza" target="_blank" rel="noopener"><span>Написать в Telegram</span>
+        <span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg></span>
+      </a>
+    </div>
+
+    <div class="hero__stats">
+      <div class="hero__stat"><b data-count="167" data-pre="+" data-post="%">+167%</b><span>заявок после запуска</span></div>
+      <div class="hero__stat"><b data-count="38" data-pre="−" data-post="%">−38%</b><span>стоимость лида</span></div>
+      <div class="hero__stat"><b data-count="3" data-post=" дня">3 дня</b><span>разбор до старта</span></div>
+      <div class="hero__stat"><b data-count="19" data-post=" городов">19 городов</b><span>от Казани до Долины</span></div>
+    </div>
+    </div>
+    <nav class="worlds" aria-label="Быстрый переход по мирам">
+      <span class="worlds__t">select your world</span>
+      <div class="worlds__rail">
+        <a class="world" href="#about" data-warp="World 1 · Pac-Man" style="--wc:#ffd426">
+          <span class="world__n">01</span><span class="world__ico" aria-hidden="true">👻</span>
+          <span class="world__l">Призраки</span><span class="world__s">что съедает выручку</span>
+        </a>
+        <a class="world" href="#services" data-warp="World 3 · Услуги" style="--wc:#f7c948">
+          <span class="world__n">03</span><span class="world__ico" aria-hidden="true">🍄</span>
+          <span class="world__l">Блоки</span><span class="world__s">что мы делаем</span>
+        </a>
+        <a class="world" href="#pricing" data-warp="World 4 · Цены" style="--wc:#31e0c8">
+          <span class="world__n">04</span><span class="world__ico" aria-hidden="true">🧱</span>
+          <span class="world__l">Стакан</span><span class="world__s">сколько это стоит</span>
+        </a>
+        <a class="world" href="#projects" data-warp="World 6 · Кейсы" style="--wc:#ff2e88">
+          <span class="world__n">06</span><span class="world__ico" aria-hidden="true">🕹</span>
+          <span class="world__l">Картриджи</span><span class="world__s">пять запусков</span>
+        </a>
+      </div>
+    </nav>
+  </div>
+
+  <div class="hero__cue" aria-hidden="true"><i></i><span>scroll</span></div>
+</section>
+
+<!-- seam: scanline wipe into World 1 -->
+<div class="seam" aria-hidden="true">
+  <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+    <defs><linearGradient id="sg1" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a0a0a"/><stop offset="1" stop-color="#05060f"/>
+    </linearGradient></defs>
+    <rect width="1440" height="120" fill="url(#sg1)"/>
+    <g fill="#2b3bff" opacity=".5">
+      <rect y="86" width="1440" height="3"/><rect y="96" width="1440" height="2"/><rect y="104" width="1440" height="1"/>
+    </g>
+  </svg>
+</div>
+
+<!-- ═══ WORLD 1 — PAC-MAN: кто ест ваши заявки ════════════════════ -->
+<section class="stage w-pac" id="about" aria-labelledby="pacTitle">
+  <div class="stage__bg">
+    <canvas class="w-pac__maze" id="pacMaze" aria-hidden="true"></canvas>
+    <div class="w-pac__glow"></div>
+    <div class="fx-noise"></div>
+  </div>
+
+  <div class="pac-runner" id="pacRunner" aria-hidden="true"><div class="pac-runner__body"></div></div>
+
+  <div class="stage__body shell">
+    <div class="w-pac__head">
+      <span class="eyebrow" data-rise>World 1 · призраки</span>
+      <h2 class="h-sec" id="pacTitle" data-split data-rise>Вы не владелец. Вы самый дорогой сотрудник в своей компании.</h2>
+      <p class="lede" data-rise style="--rise-delay:120ms">Четыре призрака доедают выручку, пока вы отвечаете на сообщения. Отметьте тех, кого узнаёте — счёт справа посчитает, во что это обходится.</p>
+    </div>
+
+    <div class="pac-grid">
+      <div class="ghosts" id="ghosts">
+        <button class="ghost" type="button" data-sym="a" style="--g:#ff4d5e" data-rise>
+          <span class="ghost__ico" aria-hidden="true"><i></i><b></b><span class="ghost__eye"></span><span class="ghost__eye"></span></span>
+          <span class="ghost__txt"><b>Заявки теряются</b><span>Директ, почта, мессенджеры. Часть ответов уходит через сутки, часть — никогда.</span></span>
+          <span class="ghost__pill" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+        </button>
+
+        <button class="ghost" type="button" data-sym="b" data-rise style="--g:#ff9ad5;--rise-delay:60ms">
+          <span class="ghost__ico" aria-hidden="true"><i></i><b></b><span class="ghost__eye"></span><span class="ghost__eye"></span></span>
+          <span class="ghost__txt"><b>Сайт стыдно показать</b><span>Вы закрываете вкладку раньше, чем клиент дочитает первый экран.</span></span>
+          <span class="ghost__pill" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+        </button>
+
+        <button class="ghost" type="button" data-sym="c" style="--g:#31e0c8" data-rise>
+          <span class="ghost__ico" aria-hidden="true"><i></i><b></b><span class="ghost__eye"></span><span class="ghost__eye"></span></span>
+          <span class="ghost__txt"><b>Клиенты не ждут</b><span>Пока вы освободитесь — они уже написали тем, кто ответил сразу.</span></span>
+          <span class="ghost__pill" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+        </button>
+
+        <button class="ghost" type="button" data-sym="d" style="--g:#ffa94d" data-rise>
+          <span class="ghost__ico" aria-hidden="true"><i></i><b></b><span class="ghost__eye"></span><span class="ghost__eye"></span></span>
+          <span class="ghost__txt"><b>Всё держится на вас</b><span>Уехали на неделю — продажи уехали вместе с вами. Второй менеджер = второй вы.</span></span>
+          <span class="ghost__pill" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+        </button>
+      </div>
+
+      <div class="pac-score" data-rise style="--rise-delay:140ms">
+        <div class="pac-score__top">
+          <span class="pac-score__lbl">съедено призраков</span>
+          <span class="pac-score__n" id="pacN">0</span>
+        </div>
+        <div class="pac-pellets" id="pacPellets" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
+        <p class="pac-verdict" id="pacVerdict">Ничего? Либо у вас уже всё автоматизировано, либо мы плохо спросили.</p>
+        <div class="pac-costs" id="pacCosts"></div>
+        <a class="btn btn--neon" href="#pricing" id="pacCta" data-warp="World 4 · Цены"><span>Посмотреть, как это чинится</span>
+          <span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M12.5 6.5l5.5 5.5-5.5 5.5"/></svg></span>
+        </a>
+      </div>
+    </div>
+
+    <p class="w-pac__foot" data-rise>Проблема не в вас. Ваш бизнес держится на людях там, где должен держаться на <span class="mark hl-pac">технологиях</span>.</p>
+  </div>
+</section>
+
+<!-- seam: VS flash -->
+<div class="seam" aria-hidden="true">
+  <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+    <defs><linearGradient id="sg2" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#05060f"/><stop offset="1" stop-color="#170608"/>
+    </linearGradient></defs>
+    <rect width="1440" height="120" fill="url(#sg2)"/>
+    <path d="M0,120 L720,44 L1440,120 Z" fill="#ff4d2e" opacity=".16"/>
+  </svg>
+</div>
+
+<!-- ═══ WORLD 2 — VS SELECT: кто это делает ═══════════════════════ -->
+<section class="stage w-vs" aria-labelledby="vsTitle">
+  <div class="stage__bg">
+    <div class="w-vs__rays"></div>
+    <div class="w-vs__flash"></div>
+    <div class="fx-noise"></div>
+  </div>
+
+  <div class="stage__body shell">
+    <div class="vs-head">
+      <span class="eyebrow" data-rise>World 2 · выбор бойца</span>
+      <h2 class="h-sec" id="vsTitle" data-rise>Кто это <em>делает</em></h2>
+      <p class="lede" data-rise style="text-align:center;--rise-delay:100ms">Четыре способа закрыть одну и ту же задачу. Выберите — покажем, чем платите за каждый.</p>
+    </div>
+
+    <div class="vs-pick" id="vsPick" role="tablist" aria-label="Способы закрыть задачу"></div>
+
+    <div class="vs-board">
+      <div class="vs-stat" id="vsStat" data-rise></div>
+      <div class="card" data-rise style="--rise-delay:80ms">
+        <div class="vs-cols">
+          <div class="vs-col"><span class="vs-col__t">что получаете</span><div id="vsPros"></div></div>
+          <div class="vs-col"><span class="vs-col__t">чем платите</span><div id="vsCons"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- seam: warp pipe into World 3 -->
+<div class="seam-pipe" id="seamPipe" aria-hidden="true">
+  <div class="seam-pipe__body">
+    <div class="seam-pipe__hero" id="pipeHero"></div>
+    <div class="seam-pipe__lip"></div>
+    <div class="seam-pipe__shaft"></div>
+  </div>
+</div>
+
+<!-- ═══ WORLD 3 — SUPER MARIO: услуги ═════════════════════════════ -->
+<section class="stage w-mario" id="services" aria-labelledby="marioTitle">
+  <div class="stage__bg">
+    <canvas class="w-mario__clouds" id="marioSky" aria-hidden="true"></canvas>
+  </div>
+
+  <div class="stage__body shell">
+    <div class="mario-head">
+      <span class="eyebrow" data-rise>World 3 · выбей блок</span>
+      <h2 class="h-sec" id="marioTitle" data-rise>Что мы <em>делаем</em></h2>
+      <p class="lede" data-rise style="--rise-delay:100ms">Семь блоков — семь направлений. Бейте по любому: оттуда выпадет монета и то, что вы получаете на руки.</p>
+    </div>
+
+    <div class="blocks" id="blocks" role="tablist" aria-label="Направления работ"></div>
+    <div class="mario-panel" id="marioPanel" data-rise></div>
+  </div>
+
+  <div class="mario-ground">
+    <div class="mario-ground__bricks"></div>
+    <div class="mario-runner" id="marioRunner" aria-hidden="true"><div class="mario-runner__b"></div></div>
+  </div>
+</section>
+
+<!-- seam: tetris line clear -->
+<div class="seam-clear" id="seamClear" aria-hidden="true"><div class="seam-clear__row" id="seamClearRow"></div></div>
+
+<!-- ═══ WORLD 4 — TETRIS: цены ════════════════════════════════════ -->
+<section class="stage w-tetris" id="pricing" aria-labelledby="tetrisTitle">
+  <div class="stage__bg">
+    <div class="w-tetris__field"></div>
+    <div class="fx-noise"></div>
+  </div>
+
+  <div class="stage__body shell">
+    <div class="tetris-head">
+      <span class="eyebrow" data-rise>World 4 · собери свой стакан</span>
+      <h2 class="h-sec" id="tetrisTitle" data-split data-rise>Сколько это <span class="mark hl">стоит</span></h2>
+      <p class="lede" data-rise style="--rise-delay:100ms">Цену мы не прячем — но и не вешаем ценник на то, чего ещё не видели. Вместо прайса здесь вилка: она показывает, что меняется от денег. Точную цифру считает калькулятор ниже — за минуту и без созвона.</p>
+    </div>
+
+    <div class="tetris-wrap">
+      <div class="tetris-board" data-rise>
+        <div class="tetris-board__hud"><span>стакан</span><b id="tetLevel">LV 1</b></div>
+        <div class="tetris-board__well"><canvas id="tetCanvas"></canvas></div>
+        <div class="tetris-board__next"><span>уровень</span><b id="tetName">Экспресс-разбор</b></div>
+      </div>
+
+      <div class="tetris-main">
+        <div class="fork" data-rise style="--rise-delay:80ms">
+          <div class="fork__edges">
+            <div class="fork__edge">
+              <span>нижняя граница</span>
+              <b>Экономить на своём продукте</b>
+              <p>Проверенные решения, готовые механики, без съёмки и уникального кода. Работать будет. Запоминаться — не обязано.</p>
+            </div>
+            <span class="fork__vs" aria-hidden="true">VS</span>
+            <div class="fork__edge">
+              <span>верхняя граница</span>
+              <b>Сделать прям как у топов</b>
+              <p>Своя съёмка, свои механики, тесты и люди, которые остаются после запуска. Тот случай, когда на вас начинают равняться.</p>
+            </div>
+          </div>
+
+          <div class="fork__rail">
+            <div class="fork__track"><div class="fork__fill" id="forkFill"></div></div>
+            <input class="fork__input" id="forkInput" type="range" min="0" max="3" step="1" value="0" aria-label="Ориентир по бюджету">
+            <div class="fork__stops" id="forkStops"></div>
+          </div>
+
+          <div class="fork__out">
+            <div class="fork__sum">
+              <span class="cap" id="forkCap">старт вилки</span>
+              <span class="nm" id="forkName">Сначала понять, где течёт</span>
+              <span class="tm" id="forkTerm">три дня</span>
+              <span class="ct" id="forkCut">Самая честная экономия: вы ещё ничего не строите и не платите за догадки.</span>
+            </div>
+            <div class="fork__rows" id="forkRows"></div>
+          </div>
+        </div>
+
+        <div class="tiers" id="tiers"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- seam: drip into the swamp -->
+<div class="seam-drip" aria-hidden="true">
+  <svg viewBox="0 0 1440 150" preserveAspectRatio="none">
+    <defs><linearGradient id="sg3" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#06070f"/><stop offset="1" stop-color="#0d1a0b"/>
+    </linearGradient></defs>
+    <rect width="1440" height="150" fill="url(#sg3)"/>
+    <path fill="#0d1a0b" d="M0,64 C120,64 140,102 200,102 C260,102 268,58 340,58 C412,58 428,110 500,110 C572,110 580,52 660,52 C740,52 748,116 830,116 C912,116 916,60 1000,60 C1084,60 1090,104 1160,104 C1230,104 1240,56 1320,56 C1400,56 1420,88 1440,88 L1440,150 L0,150 Z"/>
+    <g fill="#8bc34a" opacity=".5">
+      <circle cx="260" cy="126" r="4"><animate attributeName="cy" values="126;150;126" dur="4s" repeatCount="indefinite"/></circle>
+      <circle cx="740" cy="132" r="3"><animate attributeName="cy" values="132;150;132" dur="5.4s" repeatCount="indefinite"/></circle>
+      <circle cx="1180" cy="128" r="3.5"><animate attributeName="cy" values="128;150;128" dur="4.8s" repeatCount="indefinite"/></circle>
+    </g>
+  </svg>
+</div>
+
+<!-- ═══ WORLD 5 — SWAMP: карта маршрута ═══════════════════════════ -->
+<section class="stage w-swamp" aria-labelledby="swampTitle">
+  <div class="stage__bg">
+    <canvas class="w-swamp__hills" id="swampScene" aria-hidden="true"></canvas>
+    <div class="w-swamp__fog"></div>
+    <div class="fx-noise"></div>
+  </div>
+
+  <div class="stage__body shell">
+    <div class="swamp-head">
+      <span class="eyebrow" data-rise>World 5 · болото</span>
+      <h2 class="h-sec" id="swampTitle" data-rise>Карта <em>маршрута</em></h2>
+      <span class="onion" data-rise>🧅 <b>Проекты — как лук.</b> У них есть слои. И да, иногда от них плачут — но только конкуренты.</span>
+      <p class="lede" data-rise style="--rise-delay:120ms">Три привала до того момента, когда бизнес перестаёт держаться на вас. Скролл ведёт по тропе — на каждом привале видно, что остаётся у вас на руках.</p>
+    </div>
+
+    <div class="route" id="route">
+      <div class="route__spine" aria-hidden="true"><span class="route__fill" id="routeFill"></span></div>
+
+      <article class="stop" data-rise>
+        <span class="stop__pin" aria-hidden="true">1</span>
+        <div class="stop__txt">
+          <span class="stop__when">неделя 1</span>
+          <h3 class="stop__t">Вы узнаёте, где теряете деньги</h3>
+          <p class="stop__d">Не спрашиваем «какой сайт хотите». Считаем, сколько заявок не доходит, сколько часов уходит на ручную работу и во что это обходится в месяц. Цифру называем до старта.</p>
+        </div>
+        <div class="stop__out">
+          <span class="stop__cap">на руках у вас</span>
+          <span class="stop__ot">Карта потерь</span>
+          <ul class="stop__list">
+            <li><i aria-hidden="true">✦</i><span>PDF: где течёт и сколько это стоит в месяц</span></li>
+            <li><i aria-hidden="true">✦</i><span>План на первые 30 дней</span></li>
+            <li><i aria-hidden="true">✦</i><span>Час созвона — на любые вопросы</span></li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="stop" data-rise>
+        <span class="stop__pin" aria-hidden="true">2</span>
+        <div class="stop__txt">
+          <span class="stop__when">недели 2–4</span>
+          <h3 class="stop__t">Вы каждую пятницу видите, что изменилось</h3>
+          <p class="stop__d">Не отчёт о процессе — работающая версия, которую можно открыть и потыкать. Если что-то не то, вы говорите это на второй неделе, а не на сдаче.</p>
+        </div>
+        <div class="stop__out">
+          <span class="stop__cap">на руках у вас</span>
+          <span class="stop__ot">Ссылка каждую пятницу</span>
+          <ul class="stop__list">
+            <li><i aria-hidden="true">✦</i><span>Рабочая версия, а не отчёт о процессе</span></li>
+            <li><i aria-hidden="true">✦</i><span>Правки — на второй неделе, а не на сдаче</span></li>
+            <li><i aria-hidden="true">✦</i><span>Видно, что изменилось за неделю</span></li>
+          </ul>
+        </div>
+      </article>
+
+      <article class="stop" data-rise>
+        <span class="stop__pin" aria-hidden="true">3</span>
+        <div class="stop__txt">
+          <span class="stop__when">дальше</span>
+          <h3 class="stop__t">Вы перестаёте быть точкой отказа</h3>
+          <p class="stop__d">Запускаем, обучаем вашу команду, месяц держим руку на пульсе. Если через месяц вы всё ещё разбираете заявки руками — мы плохо сделали работу.</p>
+        </div>
+        <div class="stop__out">
+          <span class="stop__cap">на руках у вас</span>
+          <span class="stop__ot">Команда, которая справляется без вас</span>
+          <ul class="stop__list">
+            <li><i aria-hidden="true">✦</i><span>Обученная команда и записанные регламенты</span></li>
+            <li><i aria-hidden="true">✦</i><span>Месяц поддержки после запуска</span></li>
+            <li><i aria-hidden="true">✦</i><span>Цифры видно без ручной сборки отчётов</span></li>
+          </ul>
+        </div>
+      </article>
+    </div>
+
+    <div class="gains">
+      <div class="gain" data-rise><span class="gain__ico" aria-hidden="true">⏱</span><b>Освободим время</b><span>Рутину забирает система. Вы занимаетесь ростом, а не чатами.</span></div>
+      <div class="gain" data-rise><span class="gain__ico" aria-hidden="true">📈</span><b>Увеличим продажи</b><span>Ни одна заявка не остывает и не теряется по дороге.</span></div>
+      <div class="gain" data-rise><span class="gain__ico" aria-hidden="true">🏝</span><b>Настоящий выходной</b><span>Уехали — бизнес продолжает работать и продавать без вас.</span></div>
+      <div class="gain" data-rise><span class="gain__ico" aria-hidden="true">🥇</span><b>Минус конкуренты</b><span>На вашем фоне их сайт выглядит как позапрошлый сезон.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- seam: swamp → arcade -->
+<div class="seam" aria-hidden="true">
+  <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+    <defs><linearGradient id="sg4" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#0a1408"/><stop offset="1" stop-color="#08050e"/>
+    </linearGradient></defs>
+    <rect width="1440" height="120" fill="url(#sg4)"/>
+    <g fill="#ff2e88" opacity=".22">
+      <rect x="0"    y="92" width="180" height="8" rx="3"/><rect x="220"  y="98" width="120" height="8" rx="3"/>
+      <rect x="400"  y="88" width="240" height="8" rx="3"/><rect x="700"  y="96" width="160" height="8" rx="3"/>
+      <rect x="920"  y="90" width="200" height="8" rx="3"/><rect x="1180" y="98" width="260" height="8" rx="3"/>
+    </g>
+  </svg>
+</div>
+
+<!-- ═══ WORLD 6 — ARCADE CABINET: кейсы ═══════════════════════════ -->
+<section class="stage w-cab" id="projects" aria-labelledby="cabTitle">
+  <div class="stage__bg">
+    <div class="w-cab__glow"></div>
+    <div class="fx-noise"></div>
+  </div>
+
+  <div class="stage__body shell">
+    <div class="cab-head">
+      <span class="eyebrow" data-rise>World 6 · автомат с картриджами</span>
+      <h2 class="h-sec" id="cabTitle" data-split data-rise>Пять <span class="mark hl">запусков</span></h2>
+      <p class="lede" data-rise style="--rise-delay:100ms">Вставьте картридж — на экране будет «было / стало» и слова владельца. Всё это реальные проекты, а не рендеры для портфолио.</p>
+    </div>
+
+    <div class="cab">
+      <div data-rise>
+        <div class="crt">
+          <div class="crt__screen" id="crtScreen" aria-live="polite"></div>
+          <div class="crt__deck">
+            <div class="crt__dots" id="crtDots" role="tablist" aria-label="Кейсы"></div>
+            <div class="crt__nav">
+              <button class="crt__btn" type="button" id="crtPrev" aria-label="Предыдущий кейс"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+              <button class="crt__btn" type="button" id="crtNext" aria-label="Следующий кейс"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+            </div>
+          </div>
+        </div>
+        <div class="rev" id="rev"></div>
+      </div>
+
+      <div class="carts" id="carts" role="tablist" aria-label="Картриджи" data-rise style="--rise-delay:80ms"></div>
+    </div>
+
+    <div class="hiscore" data-rise>
+      <div class="hiscore__t"><span style="color:var(--coin)">HIGH SCORES · рост показателей клиентов</span><span>средние метрики за первые 3 месяца после запуска</span></div>
+      <div class="hiscore__belt"><div class="hiscore__row" id="hiscoreRow"></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ WORLD 7 — RADAR: география ════════════════════════════════ -->
+<section class="stage w-geo" aria-labelledby="geoTitle">
+  <div class="stage__bg">
+    <div class="w-geo__scan"></div>
+    <div class="fx-noise"></div>
+  </div>
+
+  <div class="stage__body shell">
+    <div class="geo-head">
+      <span class="eyebrow" data-rise>World 7 · радар</span>
+      <h2 class="h-sec" id="geoTitle" data-rise>Откуда пришли те, кто <span class="mark hl">уже решился</span></h2>
+      <p class="lede" data-rise style="--rise-delay:100ms">От Казани до Кремниевой долины — те же проекты, что на экране выше, только на карте. Наведите или нажмите на точку.</p>
+    </div>
+
+    <div class="geo-wrap" data-rise>
+      <div class="geo-canvas"><canvas id="geoCanvas"></canvas></div>
+      <div class="geo-read">
+        <span class="geo-read__city" id="geoCity">Москва — отсюда всё началось</span>
+        <span class="geo-read__n" id="geoN">19 городов · 4 страны запуска</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- seam: into the terminal -->
+<div class="seam" aria-hidden="true">
+  <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
+    <defs><linearGradient id="sg5" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#04060a"/><stop offset="1" stop-color="#040705"/>
+    </linearGradient></defs>
+    <rect width="1440" height="120" fill="url(#sg5)"/>
+    <g fill="#7dff9b" opacity=".28">
+      <rect y="100" width="1440" height="1.5"/><rect y="108" width="1440" height="1"/>
+    </g>
+  </svg>
+</div>
+
+<!-- ═══ WORLD 8 — TERMINAL: бриф ══════════════════════════════════ -->
+<section class="stage w-brief" id="brief" aria-labelledby="briefTitle">
+  <div class="stage__bg">
+    <div class="w-brief__glow"></div>
+    <div class="fx-noise"></div>
+  </div>
+
+  <div class="stage__body shell">
+    <div class="brief-head">
+      <span class="eyebrow" data-rise>World 8 · финальный босс</span>
+      <h2 class="h-sec" id="briefTitle" data-rise>Расскажите про задачу. Вернёмся <em>с решением и сроками</em></h2>
+      <p class="lede" data-rise style="--rise-delay:100ms">Заявку читают те, кто будет делать. Первым сообщением придёт гипотеза, вилка бюджета и сроки — конкретными цифрами, в течение рабочего дня.</p>
+    </div>
+
+    <form class="term" id="briefForm" novalidate data-rise>
+      <div class="term__bar">
+        <span class="term__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+        <span>baza@brief — ~/новая-задача</span>
+      </div>
+
+      <div class="term__body">
+        <p class="term__prompt" id="termPrompt">Здравствуйте. Я соберу вводные за минуту — отмечайте, я считаю на ходу.<span class="hero__caret" aria-hidden="true"></span></p>
+
+        <div class="q">
+          <div class="q__t">Что нужно сделать <span>можно несколько</span></div>
+          <div class="chips" id="qTask" role="group" aria-label="Что нужно сделать"></div>
+        </div>
+
+        <div class="q">
+          <div class="q__t">Когда стартуем</div>
+          <div class="chips" id="qWhen" role="group" aria-label="Когда стартуем"></div>
+        </div>
+
+        <div class="q">
+          <div class="q__t">Что забирает больше всего сил <span>можно несколько</span></div>
+          <div class="chips" id="qPain" role="group" aria-label="Что забирает силы"></div>
+        </div>
+
+        <div class="calc" aria-live="polite">
+          <div class="calc__top">
+            <span class="calc__lbl">считаем прямо сейчас</span>
+            <span class="calc__term" id="calcTerm">выберите направление</span>
+          </div>
+          <div class="calc__sum" id="calcSum">—</div>
+          <div class="calc__lvls" id="calcLvls"></div>
+          <p class="calc__note" id="calcNote">Всё под вас, но без излишеств: дизайн свой, механики проверенные, сроки предсказуемые. Так берут чаще всего.</p>
+          <p class="calc__fine">Это вилка, а не счёт: точную цифру называем после разбора — и она уже не меняется по дороге.</p>
+        </div>
+
+        <div class="fields">
+          <label class="fld">
+            <span>как вас зовут</span>
+            <input type="text" id="fName" name="name" autocomplete="name" placeholder="Имя" required>
+            <span class="fld__err" id="eName"></span>
+          </label>
+          <label class="fld">
+            <span>куда вам ответить</span>
+            <input type="text" id="fContact" name="contact" autocomplete="tel" placeholder="Telegram, телефон или почта" required>
+            <span class="fld__err" id="eContact"></span>
+          </label>
+          <label class="fld fld--full">
+            <span>пара слов о задаче — необязательно</span>
+            <textarea id="fMsg" name="msg" placeholder="Что происходит сейчас и что должно происходить"></textarea>
+          </label>
+        </div>
+
+        <label class="agree">
+          <input type="checkbox" id="fAgree" required>
+          <span class="agree__box" aria-hidden="true"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+          <span>Согласен(-а) с <a href="#" data-legal="privacy">политикой конфиденциальности</a> и обработкой персональных данных</span>
+        </label>
+        <span class="fld__err" id="eAgree"></span>
+
+        <div class="term__send">
+          <button class="btn btn--go" type="submit"><span>Обсудить проект</span>
+            <span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h13.5M12 6.5l6 5.5-6 5.5"/></svg></span>
+          </button>
+          <a class="btn" href="https://t.me/lllbaza" target="_blank" rel="noopener"><span>Не хочу форму — напишу в Telegram</span></a>
+        </div>
+
+        <div class="term__done" id="briefDone" role="status">
+          <h3>Заявка у нас.</h3>
+          <p>Ответим в течение рабочего дня — от тех, кто будет делать, а не пересказом. Пока мы читаем — посмотрите на нас вблизи: там видно, как мы работаем на самом деле.</p>
+          <a class="btn btn--go" id="tgDup" href="https://t.me/lllbaza" target="_blank" rel="noopener"><span>Продублировать в Telegram</span></a>
+        </div>
+      </div>
+    </form>
+
+    <div class="promises">
+      <div class="promise" data-rise><span>кто читает</span><p>Заявку читают <b>те, кто будет делать</b>. Ответ придёт от них, а не пересказом.</p></div>
+      <div class="promise" data-rise><span>что придёт в ответ</span><p>Первым сообщением — <b>гипотеза, вилка бюджета и сроки</b>. Конкретными цифрами.</p></div>
+      <div class="promise" data-rise><span>кого берём</span><p>Не всех. Не увидим, где вырастут цифры — <b>честно откажем</b>.</p></div>
+      <div class="promise" data-rise><span>когда ответим</span><p>В течение <b>рабочего дня</b>. Если горит — напишите в Telegram, там быстрее.</p></div>
+    </div>
+
+    <div class="nofit" data-rise>
+      <h3>Мы не возьмёмся, если</h3>
+      <ul>
+        <li><i aria-hidden="true">✕</i><span>нужно «просто сверстать по готовому макету», без вопросов зачем</span></li>
+        <li><i aria-hidden="true">✕</i><span>сайт нужен вчера, а решения принимает совет из пяти человек</span></li>
+        <li><i aria-hidden="true">✕</i><span>вы уверены, что дело только в дизайне, и не хотите смотреть, что происходит с заявками</span></li>
+      </ul>
+      <p class="fine">Это не понты. В таких проектах мы не даём результат, за который берём деньги, — и лучше сказать это до, а не после.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ CREDITS ═══════════════════════════════════════════════════ -->
+<footer class="credits">
+  <div class="credits__bg" aria-hidden="true"></div>
+  <canvas class="credits__stars" id="creditStars" aria-hidden="true"></canvas>
+
+  <div class="credits__body shell">
+    <div class="credits__over" data-rise>
+      <b>THANKS FOR PLAYING</b>
+      <span>press ↑ to continue</span>
+    </div>
+
+    <div class="credits__grid">
+      <div data-rise>
+        <h2 class="h-sub" style="max-width:16ch">Возьмём вашу базу <span class="mark hl">на себя</span></h2>
+        <p class="lede" style="margin-top:14px">Пока мы читаем заявку — посмотрите на нас вблизи. Там видно, как мы работаем на самом деле.</p>
+        <a class="btn btn--neon" href="#brief" style="margin-top:20px"><span>Оставить заявку</span>
+          <span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h13.5M12 6.5l6 5.5-6 5.5"/></svg></span>
+        </a>
+      </div>
+
+      <div class="credits__socials" data-rise style="--rise-delay:80ms">
+        <a class="soc" href="https://t.me/lllbaza" target="_blank" rel="noopener">
+          <span class="soc__ico"><svg viewBox="-1.457 -3.284 29.964 29.964" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M9.42 15.18l-.4 5.58c.57 0 .82-.24 1.12-.53l2.68-2.57 5.56 4.07c1.02.57 1.75.27 2.02-.93L23.99 3.6c.33-1.5-.54-2.09-1.53-1.72L1.18 9.6C-.28 10.16-.26 10.97.93 11.34l5.32 1.65 12.35-7.73c.58-.39 1.11-.18.67.21z"/></svg></span>
+          <span class="soc__txt"><b>Telegram</b><span>Новости, эксклюзивный контент, розыгрыши и здоровые шутки.</span></span>
+          <svg class="arr" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg>
+        </a>
+        <a class="soc" href="https://vk.com/lllbaza" target="_blank" rel="noopener">
+          <span class="soc__ico"><svg viewBox="2.438 1.827 19.576 19.576" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12.785 16.241s.288-.032.436-.194c.136-.148.132-.427.132-.427s-.02-1.304.575-1.496c.588-.19 1.341 1.26 2.14 1.818.605.422 1.064.33 1.064.33l2.137-.03s1.118-.071.588-.964c-.043-.073-.308-.661-1.588-1.87-1.34-1.264-1.16-1.059.453-3.246.983-1.332 1.376-2.145 1.253-2.493-.117-.332-.84-.244-.84-.244l-2.406.015s-.178-.025-.31.056c-.13.079-.212.263-.212.263s-.382 1.03-.89 1.907c-1.07 1.85-1.499 1.948-1.674 1.832-.407-.267-.305-1.075-.305-1.648 0-1.793.267-2.54-.521-2.733-.262-.065-.454-.107-1.123-.114-.858-.009-1.585.003-1.996.208-.274.136-.485.44-.356.457.159.022.519.099.71.363.246.341.237 1.107.237 1.107s.142 2.11-.33 2.371c-.325.18-.77-.187-1.725-1.865-.489-.859-.858-1.81-.858-1.81s-.072-.176-.2-.271c-.155-.115-.372-.151-.372-.151l-2.286.015s-.343.01-.469.161c-.112.135-.009.412-.009.412s1.79 4.258 3.817 6.403c1.858 1.967 3.968 1.838 3.968 1.838z"/></svg></span>
+          <span class="soc__txt"><b>ВКонтакте</b><span>То же самое — для тех, кому привычнее ВК.</span></span>
+          <svg class="arr" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg>
+        </a>
+        <a class="soc" href="https://www.tiktok.com/@lllbaza" target="_blank" rel="noopener">
+          <span class="soc__ico"><svg viewBox="-2.802 -2.108 29.136 29.136" width="20" height="20" fill="currentColor" aria-hidden="true"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg></span>
+          <span class="soc__txt"><b>TikTok</b><span>Работа изнутри, юмор и то, ради чего к нам приходят.</span></span>
+          <svg class="arr" viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 17L17 7M9 7h8v8"/></svg>
+        </a>
+      </div>
+    </div>
+
+    <div class="credits__mark" data-rise>
+      <img src="assets/img/logo.webp" alt="ЭТО БАЗА" loading="lazy" width="2000" height="500">
+    </div>
+
+    <div class="credits__end">
+      <p>© 2026 БАЗА · ИП Мирошниченко Владислав Андреевич. Информация на сайте не является публичной офертой (ст. 437 ГК РФ). Персональные данные обрабатываем по ФЗ № 152-ФЗ.</p>
+      <div class="credits__links">
+        <a href="#" data-legal="privacy">Политика конфиденциальности</a>
+        <a href="#" data-legal="consent">Согласие на обработку</a>
+        <a href="#" data-legal="metrics">Как считаем рост</a>
+        <a href="#" id="cookieOpen">🍪 Настройки cookie</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</main>
+
+<!-- ═══ modal ═════════════════════════════════════════════════════ -->
+<div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modalT" hidden>
+  <div class="modal__box">
+    <button class="modal__x" type="button" id="modalX" aria-label="Закрыть"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M6 6l12 12M18 6L6 18"/></svg></button>
+    <h3 id="modalT"></h3>
+    <div id="modalB"></div>
+  </div>
+</div>
+
+<!-- ═══ cookie ════════════════════════════════════════════════════ -->
+<div class="cookie" id="cookie" role="region" aria-label="Настройки cookie">
+  <p>🍪 Печеньки — не только вкусные, но и полезные. Мы используем Cookie, чтобы сайт работал быстрее и удобнее для вас.</p>
+  <div class="cookie__row">
+    <button class="btn btn--solid" type="button" id="cookieYes"><span>Согласен 🍪</span></button>
+    <button class="btn" type="button" id="cookieNo"><span>Только необходимые</span></button>
+  </div>
+</div>
+
+<script>
+/* Failsafe: if data.js or app.js never runs, the boot overlay would sit on
+   top of the page forever. Lift it unconditionally after a few seconds. */
+setTimeout(function () {
+  var b = document.getElementById('boot');
+  if (b) b.classList.add('is-done');
+  document.body.classList.remove('is-locked');
+}, 6000);
+</script>
+<script src="assets/js/data.js"></script>
+<script src="assets/js/app.js"></script>
+</body>
+</html>

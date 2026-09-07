@@ -54,7 +54,15 @@
   var cur = 0, target = 0, lastDrawn = -1;
 
   function pad(n) { return ('000' + n).slice(-4); }
-  function url(i) { return set.dir + pad(i + 1) + '.webp'; }
+
+  /* In the single-file build the reel lives in window.__res as data URIs.
+     With no catalogue present this returns the plain path, so one source
+     serves both the folder build and the bundle. */
+  function url(i) {
+    var path = set.dir + pad(i + 1) + '.webp';
+    var cat = w.__res;
+    return (cat && cat[path]) || path;
+  }
 
   /* ------------------------------------------------------------ decode -- */
 
@@ -70,6 +78,12 @@
     if (i < 0 || i >= TOTAL || frames[i] || pending[i]) return Promise.resolve();
     pending[i] = 1;
     var mySet = set;
+
+    // a data: URI is already in memory — round-tripping it through fetch and
+    // a Blob only copies thirteen megabytes of base64 for nothing
+    if (url(i).charCodeAt(0) === 100 /* d */ && url(i).slice(0, 5) === 'data:') {
+      return legacy(i, mySet).then(function () { pending[i] = 0; });
+    }
 
     if (useBitmap && w.fetch) {
       return fetch(url(i), { cache: 'force-cache' })
@@ -340,8 +354,16 @@
     });
   }
 
+  /* The bundle parks its twenty megabytes of base64 at the very end of the
+     body — in the head it would mean nothing paints until the whole document
+     has been read — so there we wait for the document before touching it.
+     The folder build has nothing to wait for and starts pulling at once. */
   bumpBoot();
-  seed();
+  if (w.__bundled && d.readyState === 'loading') {
+    d.addEventListener('DOMContentLoaded', seed);
+  } else {
+    seed();
+  }
 
   B.hero = {
     progress: function () { return TOTAL > 1 ? cur / (TOTAL - 1) : 0; },

@@ -36,6 +36,26 @@ assets/fonts/         18 woff2 subsets
 assets/img/           logos, hero poster, favicon
 ```
 
+## One-file build
+
+```
+node build-single.mjs      # -> dist/baza.html
+```
+
+Everything inlined — styles, scripts, fonts, logos and both reels — into a
+single ~14 MB file that opens straight from disk, `file://` included. The
+reels go at the very end of the body rather than in the head: a browser
+paints nothing until it has read the head, so the base64 up there would mean
+a blank screen for the whole download. Down there the boot screen is already
+up while the catalogue streams in behind it, and `hero.js` waits for
+`DOMContentLoaded` before reading it (that is what the `__bundled` flag is
+for).
+
+`dist/baza.html` is a build artifact — regenerate it after any change to
+`index.html`, the styles, the scripts or the reels. Serve the folder build
+instead where you can: it streams, it caches per file, and a repeat visit
+re-downloads nothing.
+
 ## The frame reel
 
 `assets/seq/` is generated from the two source videos with ffmpeg. The

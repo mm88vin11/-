@@ -165,6 +165,8 @@ const only = (process.argv.find(a => a.startsWith('--only=')) || '').split('=')[
 
     if (wantShots) {
       fs.mkdirSync(SHOTDIR, { recursive: true });
+      // the cookie bar is correct behaviour but it sits over the art in shots
+      await page.evaluate(() => { const c = document.querySelector('#cook'); if (c) c.hidden = true; });
       const spots = await page.evaluate(() =>
         Array.from(document.querySelectorAll('section[id]')).map(s => ({
           id: s.id, y: s.getBoundingClientRect().top + window.scrollY

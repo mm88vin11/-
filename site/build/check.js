@@ -125,24 +125,42 @@ const only = (process.argv.find(a => a.startsWith('--only=')) || '').split('=')[
       };
     }, vp.height);
 
-    // horizontal overflow is the classic "page wiggles sideways on a phone" bug
+    /* Горизонтальное «ёрзанье».
+
+       Сравнивать scrollWidth с clientWidth здесь нельзя: в мобильной
+       эмуляции Chrome пустой документ уже показывает разницу в полторы сотни
+       пикселей, и проверка ловит эмулятор, а не сайт. Проверяется то, что
+       человек реально чувствует пальцем, — уезжает ли страница вбок, — а
+       список виновников собирается только если уезжает, и только из тех
+       элементов, которые не обрезаны предком. */
     const overflow = await page.evaluate(() => {
       const de = document.documentElement;
-      const bad = [];
-      if (de.scrollWidth > de.clientWidth + 1) {
-        document.querySelectorAll('body *').forEach(el => {
-          const r = el.getBoundingClientRect();
-          if (r.width && (r.right > de.clientWidth + 2 || r.left < -2)) {
-            const sel = el.tagName.toLowerCase() +
-              (el.id ? '#' + el.id : '') +
-              (el.className && typeof el.className === 'string'
-                ? '.' + el.className.trim().split(/\s+/).slice(0, 2).join('.') : '');
-            if (bad.length < 6 && !bad.includes(sel)) bad.push(sel);
-          }
-        });
-        return { over: de.scrollWidth - de.clientWidth, who: bad };
-      }
-      return null;
+      const before = window.scrollX;
+      window.scrollTo(400, window.scrollY);
+      const moved = Math.round(window.scrollX);
+      window.scrollTo(before, window.scrollY);
+      if (moved <= 1) return null;
+
+      const vw = de.clientWidth;
+      const clipped = (el) => {
+        for (let a = el.parentElement; a && a !== de; a = a.parentElement) {
+          const o = getComputedStyle(a).overflowX;
+          if (o === 'hidden' || o === 'clip' || o === 'auto' || o === 'scroll') return true;
+        }
+        return false;
+      };
+      const who = [];
+      document.querySelectorAll('body *').forEach(el => {
+        if (who.length >= 6) return;
+        const r = el.getBoundingClientRect();
+        if (!r.width || r.right <= vw + 2) return;
+        if (clipped(el)) return;
+        const sel = el.tagName.toLowerCase() + (el.id ? '#' + el.id : '') +
+          (el.className && typeof el.className === 'string'
+            ? '.' + el.className.trim().split(/\s+/).slice(0, 2).join('.') : '');
+        if (!who.includes(sel)) who.push(sel + ' →' + Math.round(r.right));
+      });
+      return { over: moved, who };
     });
 
     if (wantShots) {
@@ -170,7 +188,7 @@ const only = (process.argv.find(a => a.startsWith('--only=')) || '').split('=')[
       console.log(`   frames p50 ${pacing.p50}ms · p95 ${pacing.p95}ms · worst ${pacing.worst}ms` +
         ` · over 33ms: ${pacing.over33}/${pacing.frames}`);
     }
-    if (overflow) console.log(`   ✗ horizontal overflow ${overflow.over}px → ${overflow.who.join(', ')}`);
+    if (overflow) console.log(`   ✗ page scrolls sideways by ${overflow.over}px → ${overflow.who.join(', ')}`);
     if (errors.length) {
       console.log(`   ✗ ${errors.length} error(s):`);
       [...new Set(errors)].slice(0, 12).forEach(e => console.log('     • ' + e));

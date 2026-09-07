@@ -1953,3 +1953,87 @@ html.konami .mario__hud{animation:konami-hue 3s linear infinite}
   color:var(--warn,#e0a955);
   border-color:color-mix(in srgb,var(--warn,#e0a955) 45%,transparent);
 }
+
+/* ═══════════════════════════════════════════ ЗЕРКАЛЬНОЕ ИЗМЕРЕНИЕ ═════ */
+/* Шаг за кольцо уводит туда не одну секцию, а страницу целиком. Эффект
+   держится на двух вещах: геометрия ломается (лёгкий поворот и зеркало по
+   горизонтали), а свет уходит в тот же янтарь, что горит по кромке портала.
+   Всё — на composited-свойствах, поэтому переход ничего не пересчитывает. */
+
+html.mirror-in #shell{
+  transition:transform 1.05s cubic-bezier(.65,0,.2,1),
+             filter    1.05s cubic-bezier(.65,0,.2,1);
+  will-change:transform,filter;
+}
+html.mirror-on #shell{
+  transform:rotate(180deg) scaleX(-1);
+  filter:hue-rotate(-28deg) saturate(1.35) contrast(1.06);
+}
+/* Хром остаётся на месте: перевернуть шапку и форму значило бы сломать
+   навигацию ради эффекта. Мир меняется, выход из него — нет. */
+html.mirror-on #head,
+html.mirror-on #tick,
+html.mirror-on .snd,
+html.mirror-on #prog{ filter:hue-rotate(-28deg) saturate(1.3) }
+
+html.mirror-in body{ background:#120818 }
+
+/* Подсказка «шагните внутрь» — тот же промпт, но он теперь зовёт, а не
+   объясняет, поэтому и ведёт себя иначе. */
+.st__prompt.is-step{
+  color:#ffcf9a;
+  animation:st-step 2.4s ease-in-out infinite;
+}
+@keyframes st-step{
+  0%,100%{opacity:.72;transform:translate(-50%,0) scale(1)}
+  50%    {opacity:1;  transform:translate(-50%,0) scale(1.045)}
+}
+.st__hud.is-pop{ animation:st-hud .5s var(--e-out) }
+@keyframes st-hud{
+  from{opacity:0;transform:translateY(6px)}
+  to  {opacity:1;transform:none}
+}
+
+/* Никаких кульбитов для тех, кто их отключил: мир меняет цвет, но не крутится. */
+@media (prefers-reduced-motion:reduce){
+  html.mirror-on #shell{transform:none}
+}
+
+/* ═════════════════════════════════════════ ГЕОГРАФИЯ ПОД ПОРТАЛОМ ════ */
+/* То, что раньше было точками за кольцом. Здесь у неё честная роль —
+   социальное доказательство строкой, — поэтому и оформление спокойное. */
+.st__geo{
+  margin-top:clamp(28px,5vw,54px);
+  padding:clamp(20px,3vw,30px) clamp(18px,3vw,34px);
+  border:1px solid var(--line);
+  border-radius:var(--r-lg,18px);
+  background:linear-gradient(180deg,
+    rgba(255,176,92,.045), rgba(255,176,92,.012));
+  text-align:center;
+}
+.st__geoK{
+  display:block;
+  font-family:var(--f-mono);font-size:10px;letter-spacing:.24em;
+  text-transform:uppercase;opacity:.5;margin-bottom:14px;
+}
+.st__geoRow{
+  display:flex;flex-wrap:wrap;justify-content:center;align-items:center;
+  gap:clamp(8px,1.6vw,18px);
+  font-family:var(--f-display,var(--f-head));
+  font-size:clamp(15px,2.4vw,25px);
+  font-weight:700;line-height:1.25;
+  color:#ffd7ab;
+}
+.st__geoRow i{
+  width:4px;height:4px;border-radius:50%;
+  background:currentColor;opacity:.34;flex:0 0 auto;
+}
+.st__geoFine{
+  margin-top:12px;font-size:13px;opacity:.55;
+}
+@media (max-width:520px){
+  /* На узком экране точки-разделители переносятся отдельными строками и
+     строка распадается — на телефоне они не нужны. */
+  .st__geoRow i{display:none}
+  .st__geoRow{gap:6px 14px}
+}

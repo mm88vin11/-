@@ -207,12 +207,18 @@
   /* ====================================================================== */
   /*  07 · DOCTOR STRANGE — cut a hole into the other world                 */
   /* ---------------------------------------------------------------------- */
-  /*  The old build treated the circle as a switch: draw one, get a flat map
-      with HTML pins on it. Nothing was actually behind the ring. Here the
-      other world is rendered the whole time on its own canvas, and the ring
-      you trace is a real hole punched through to it — the world keeps
-      turning behind the hole, you can drag the hole around to look, and the
-      cities are places inside that world rather than labels on a picture.   */
+  /*  Круг должен открывать другой мир. Прошлая версия открывала карту: за
+      кольцом висели названия городов и счётчики проектов — то есть слайд
+      «география клиентов», которому пририсовали портал.
+
+      Здесь за кольцом настоящее место. Зеркальное измерение рендерится всё
+      время на своём канвасе, а обведённое кольцо — реальная дыра в него:
+      мир за ней продолжает вращаться, дыру можно таскать и заглядывать в
+      разные стороны, а можно шагнуть внутрь — тогда в зеркало уходит вся
+      страница целиком.
+
+      География никуда не делась, она просто перестала притворяться миром:
+      строка городов живёт под порталом обычным текстом.                     */
   /* ====================================================================== */
 
   (function strange() {
@@ -246,18 +252,25 @@
     var portal = null;                 // {x,y,r,t}
     var dragging = false, dragOff = { x: 0, y: 0 };
     var spin = 0, panX = 0, panY = 0, panTX = 0, panTY = 0, worldDirty = false;
-    var nearCity = null;
 
-    /* Places inside the other world, laid out in its own coordinate space
-       (-1..1 on both axes) rather than as percentages of a picture. */
-    var PLACES = D.cities.map(function (c, i) {
-      return {
-        n: c.n, c: c.c,
-        wx: (c.x - 42) / 30,
-        wy: (c.y - 44) / 26,
-        seed: i * 1.7
-      };
-    });
+    /* Обломки, висящие в зеркальном измерении. Раньше здесь лежал список
+       городов с подписями — из-за него портал и читался как карта. Теперь
+       это просто вещество мира: плиты, которые дрейфуют и ловят свет. */
+    var SHARDS = (function () {
+      var a = [];
+      for (var i = 0; i < (E.lite ? 9 : 16); i++) {
+        a.push({
+          wx: (Math.random() * 2 - 1) * 0.86,
+          wy: (Math.random() * 2 - 1) * 0.86,
+          sz: 0.03 + Math.random() * 0.085,
+          rot: Math.random() * 6.2832,
+          spin: (Math.random() - 0.5) * 0.24,
+          seed: Math.random() * 10,
+          depth: 0.35 + Math.random() * 0.65
+        });
+      }
+      return a;
+    })();
 
     function pos(ev) {
       var r = cv.getBoundingClientRect();
@@ -374,40 +387,37 @@
       c.fillRect(0, 0, W, H);
       c.globalCompositeOperation = 'source-over';
 
-      // the places, floating in the world and drifting with it
-      nearCity = null;
-      if (portal) {
-        var bestD = 1e9;
-        for (var i = 0; i < PLACES.length; i++) {
-          var pl = PLACES[i];
-          var wob = Math.sin(time * 0.5 + pl.seed) * 6;
-          var px = cx + pl.wx * W * 0.40;
-          var py = cy + pl.wy * H * 0.40 + wob;
-          var dToPortal = Math.hypot(px - portal.x, py - portal.y);
-          var vis = clamp(1 - dToPortal / Math.max(1, portal.r * 1.06), 0, 1);
-          if (vis <= 0.01) continue;
-          if (dToPortal < bestD) { bestD = dToPortal; nearCity = pl; }
+      /* Плиты. Они не подписаны и ничего не считают — это просто то, из чего
+         сделан мир: куски улицы, оторванные от своей улицы. Ближние крупнее и
+         светлее, дальние почти растворены, поэтому в дыре читается глубина. */
+      c.save();
+      for (var i = 0; i < SHARDS.length; i++) {
+        var sh = SHARDS[i];
+        var wob = Math.sin(time * 0.34 + sh.seed) * 10 * sh.depth;
+        var sx = cx + sh.wx * W * 0.46;
+        var sy = cy + sh.wy * H * 0.46 + wob;
+        var size = Math.min(W, H) * sh.sz * sh.depth;
 
-          // waypoint
-          c.save();
-          c.globalAlpha = vis;
-          var pulse = 0.6 + 0.4 * Math.sin(time * 2.2 + pl.seed);
-          c.fillStyle = 'rgba(255,190,110,' + (0.5 + 0.4 * pulse) + ')';
-          c.beginPath(); c.arc(px, py, 3.4, 0, 6.2832); c.fill();
-          c.strokeStyle = 'rgba(255,170,80,' + (0.34 * pulse) + ')';
-          c.lineWidth = 1;
-          c.beginPath(); c.arc(px, py, 9 + pulse * 5, 0, 6.2832); c.stroke();
+        c.save();
+        c.translate(sx, sy);
+        c.rotate(sh.rot + time * sh.spin * 0.2);
+        c.globalAlpha = 0.16 + sh.depth * 0.42;
 
-          c.font = '600 12px ' + (E.mobile ? 'system-ui' : 'Manrope, system-ui');
-          c.textAlign = 'center';
-          c.fillStyle = 'rgba(255,226,190,.95)';
-          c.fillText(pl.n, px, py - 16);
-          c.fillStyle = 'rgba(255,180,110,.7)';
-          c.font = '600 10px ' + (E.mobile ? 'system-ui' : 'Manrope, system-ui');
-          c.fillText(pl.c + ' ' + B.plural(pl.c, ['проект', 'проекта', 'проектов']), px, py + 22);
-          c.restore();
+        // тело плиты
+        c.fillStyle = 'rgba(58,32,64,.92)';
+        c.fillRect(-size, -size * 0.30, size * 2, size * 0.60);
+        // подсвеченная кромка — она и делает плиту объёмной
+        c.fillStyle = 'rgba(255,176,92,' + (0.20 + sh.depth * 0.42).toFixed(3) + ')';
+        c.fillRect(-size, -size * 0.30, size * 2, Math.max(1, size * 0.05));
+        // редкие окна
+        c.fillStyle = 'rgba(255,206,150,' + (0.16 + sh.depth * 0.30).toFixed(3) + ')';
+        for (var q = 0; q < 4; q++) {
+          if (((i + q + (time * 0.7 | 0)) % 5) === 0) continue;
+          c.fillRect(-size * 0.82 + q * size * 0.44, -size * 0.10, size * 0.20, size * 0.16);
         }
+        c.restore();
       }
+      c.restore();
 
       /* Punch the hole. Everything painted above survives only where the
          portal disc is — which is what makes this a window rather than a
@@ -447,8 +457,13 @@
       cv.setPointerCapture && cv.setPointerCapture(ev.pointerId);
 
       if (portal) {
-        // an open portal is draggable: grab it and look somewhere else
-        if (Math.hypot(p.x - portal.x, p.y - portal.y) < portal.r * 1.12) {
+        if (stepping) return;
+        var dToC = Math.hypot(p.x - portal.x, p.y - portal.y);
+        /* Ядро кольца — вход, кромка — ручка. Разделение по радиусу, а не по
+           отдельной кнопке: тянуть окно и заходить в него — два разных
+           намерения, и рука их различает без подписи. */
+        if (dToC < portal.r * 0.62) { stepThrough(); return; }
+        if (dToC < portal.r * 1.12) {
           dragging = true;
           dragOff.x = portal.x - p.x;
           dragOff.y = portal.y - p.y;
@@ -580,13 +595,77 @@
       if (hud) hud.hidden = false;
       B.audio.sfx('portal');
       B.buzz(24);
-      B.toast('Портал держится. Тяните его — за ним есть на что посмотреть.', 4200);
+      B.toast('Портал держится. Тяните его за край — или шагните внутрь.', 4200);
+      setTimeout(offerStep, 2600);
     }
 
     on(skip, 'click', function () {
       if (done) return;
       openPortal(W / 2, H / 2, Math.min(W, H) * 0.34);
     });
+
+    /* ────────────────────────────────────────────────── шаг за кольцо ──── */
+    /* Открытый портал — это ещё не «другой мир», это окно в него. Мир
+       начинается, когда в него заходят. Тап внутрь кольца утягивает туда всю
+       страницу: она уходит в зеркало целиком, держится несколько секунд и
+       возвращается. Дальше портал остаётся окном, но человек уже там был. */
+
+    var stepped = false, stepping = false;
+
+    function stepThrough() {
+      if (stepping) return;
+      stepping = true;
+      var first = !stepped;
+      stepped = true;
+
+      var root = d.documentElement;
+      root.classList.add('mirror-in');
+      B.audio.sfx('portal');
+      B.buzz(30);
+
+      // кольцо раскрывается до размера экрана — это и есть «проход внутрь»
+      var grow = { r0: portal.r, t: 0 };
+      var open = B.ticker.add(function (sy, dt) {
+        grow.t = Math.min(1, grow.t + (dt || 1 / 60) / 0.85);
+        var e = B.ease.io(grow.t);
+        portal.r = grow.r0 + (Math.max(W, H) * 1.25 - grow.r0) * e;
+        portal.x += (W / 2 - portal.x) * B.damp(0.10, dt || 1 / 60);
+        portal.y += (H / 2 - portal.y) * B.damp(0.10, dt || 1 / 60);
+        if (grow.t >= 1) B.ticker.remove(open);
+      }, 5);
+
+      setTimeout(function () {
+        root.classList.add('mirror-on');
+        if (first) {
+          B.toast('Вы по ту сторону. Здесь бизнес работает без вас — ' +
+            'это единственная разница.', 4600);
+        }
+      }, 620);
+
+      // и обратно: мир показан, держать в нём насильно незачем
+      setTimeout(function () {
+        root.classList.remove('mirror-on');
+        var back = { t: 0, r0: portal.r };
+        var shut = B.ticker.add(function (sy, dt) {
+          back.t = Math.min(1, back.t + (dt || 1 / 60) / 0.7);
+          portal.r = back.r0 + (Math.min(W, H) * 0.30 - back.r0) * B.ease.io(back.t);
+          if (back.t >= 1) {
+            B.ticker.remove(shut);
+            root.classList.remove('mirror-in');
+            stepping = false;
+          }
+        }, 5);
+      }, 4200);
+    }
+
+    // подсказка появляется один раз, когда портал уже держится
+    function offerStep() {
+      if (stepped || !prompt) return;
+      prompt.classList.remove('is-off', 'is-dim');
+      prompt.innerHTML = '<span class="st__promptIco" aria-hidden="true">◉</span>' +
+        'а теперь шагните внутрь';
+      prompt.classList.add('is-step');
+    }
 
     /* ------------------------------------------------------------ ring -- */
 
@@ -665,7 +744,18 @@
 
     /* ----------------------------------------------------------- frame -- */
 
-    var hudName = '';
+    /* Что говорит HUD, пока портал открыт. Раньше он называл город под
+       курсором — то есть подписывал карту. Теперь это сводки из-за кольца:
+       мир на той стороне живёт своей жизнью и иногда о ней сообщает. */
+    var SIGNALS = [
+      ['связь установлена', 'на той стороне уже работает то, что вы ещё обсуждаете'],
+      ['геометрия держится', 'здесь заявка доходит до человека за минуты, а не за день'],
+      ['слой стабилен', 'ни одного «я посмотрю и вернусь» за весь квартал'],
+      ['эхо с той стороны', 'владелец спит. бизнес работает. это не сон'],
+      ['координаты приняты', 'Казань, Москва, Дубай, Сан-Франциско — вход один и тот же']
+    ];
+    var sigI = -1, sigAt = 0;
+
     function render(dt) {
       if (!W && !fit()) return;
       var time = performance.now() / 1000;
@@ -677,11 +767,13 @@
       paintWorld(dt, time);
       paintRing(dt, time);
 
-      if (hud && portal && nearCity && nearCity.n !== hudName) {
-        hudName = nearCity.n;
-        hudCity.textContent = nearCity.n;
-        hudMeta.textContent = nearCity.c + ' ' +
-          B.plural(nearCity.c, ['проект', 'проекта', 'проектов']);
+      // сводка меняется сама, раз в несколько секунд, пока портал держат
+      if (hud && portal && hudCity && time - sigAt > 4.4) {
+        sigAt = time;
+        sigI = (sigI + 1) % SIGNALS.length;
+        hudCity.textContent = SIGNALS[sigI][0];
+        if (hudMeta) hudMeta.textContent = SIGNALS[sigI][1];
+        hud.classList.remove('is-pop'); void hud.offsetWidth; hud.classList.add('is-pop');
       }
     }
 

@@ -1,4 +1,3 @@
-<style>
 /* ==========================================================================
    БАЗА — universes.
    House rule enforced throughout: anything with a shadow or glow gets a
@@ -1937,7 +1936,6 @@ html.konami .mario__hud{animation:konami-hue 3s linear infinite}
 
 @media (max-width:760px){:root{--tick-h:calc(30px + env(safe-area-inset-bottom,0px))}}
 
-</style>
 /* ═══════════════════════════════════════════════ HONEYPOT · BRIEF ═════ */
 /* Убирается за пределы экрана, а не display:none — часть ботов поля, снятые
    с раскладки, пропускает, а уехавшее за край заполняет наравне с обычными. */
@@ -2006,7 +2004,7 @@ html.mirror-in body{ background:#120818 }
   margin-top:clamp(28px,5vw,54px);
   padding:clamp(20px,3vw,30px) clamp(18px,3vw,34px);
   border:1px solid var(--line);
-  border-radius:var(--r-lg,18px);
+  border-radius:18px;
   background:linear-gradient(180deg,
     rgba(255,176,92,.045), rgba(255,176,92,.012));
   text-align:center;
@@ -2019,7 +2017,7 @@ html.mirror-in body{ background:#120818 }
 .st__geoRow{
   display:flex;flex-wrap:wrap;justify-content:center;align-items:center;
   gap:clamp(8px,1.6vw,18px);
-  font-family:var(--f-display,var(--f-head));
+  font-family:var(--f-myth);
   font-size:clamp(15px,2.4vw,25px);
   font-weight:700;line-height:1.25;
   color:#ffd7ab;

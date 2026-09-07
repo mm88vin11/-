@@ -246,89 +246,143 @@
     }
 
     /* ---- beat 3: inside the pipe ---------------------------------------- */
-    /* Rings are placed in depth and projected with a real 1/z, so the ones
-       far away crowd together and the near ones sweep past the camera. That
-       spacing is the whole reason it reads as falling rather than zooming. */
+    /*  Прошлая версия рисовала кольца плоской заливкой и ровными концентри-
+        ческими окружностями. Получалась мишень: круги были, трубы не было.
+        Цилиндр читается по трём признакам, и раньше не было ни одного.
+
+        1. Свет приходит с одной стороны. Кольцо, залитое ровно, — это круг;
+           кольцо со светом слева и тенью справа — это стенка.
+        2. У трубы есть длина. Рёбра, сходящиеся к точке схода, дают глазу
+           линии, вдоль которых он и считывает движение вперёд.
+        3. Кольца должны сгущаться к центру по 1/z. Равномерные кольца — это
+           спираль гипноза, а не глубина.                                     */
 
     function drawTunnel(c, W, H, dive, roll) {
       var cx = W / 2, cy = H / 2;
-      var f = Math.min(W, H) * 0.86;                // focal length
-      var R = Math.min(W, H) * 0.52;                // tunnel radius
+      var R = Math.max(W, H) * 0.62;
+      var SEG = E.lite ? 14 : 22;
 
       c.save();
       c.translate(cx, cy);
       c.rotate(roll);
       c.translate(-cx, -cy);
 
-      c.fillStyle = '#04120a';
+      /* Заливка кадра — не пустота, а ближняя стенка. Раньше за самым большим
+         кольцом оставался тёмный фон, и по углам читался чёрный серп: труба
+         выглядела наклейкой на пустом экране, а не окружающей со всех сторон. */
+      var wall = c.createLinearGradient(0, 0, W, H);
+      wall.addColorStop(0, '#7fd25e');
+      wall.addColorStop(0.46, '#4f9c3a');
+      wall.addColorStop(1, '#1d4a18');
+      c.fillStyle = wall;
       c.fillRect(0, 0, W, H);
 
-      // travelled distance: eased so the fall accelerates, then holds
+      /* Глубина считается дальше, чем видно: кольца должны досчитаться до
+         точки схода, иначе в середине остаётся чёрная дыра, и труба выглядит
+         обрывающейся в пустоту. Мелкие кольца отсекаются по радиусу. */
+      var DEPTH = RINGS + 16;
       var travel = dive * RINGS;
+      var frac = travel % 1;
 
-      for (var i = RINGS; i >= 0; i--) {
-        var z = i - (travel % 1) - Math.floor(0) + 0.001;
-        z = i + 0.6 - (travel % 1);
-        if (z <= 0.12) continue;
-        var scale = f / (z * f * 0.12 + f * 0.14);
-        var rad = R * scale;
-        if (rad < 2) continue;
+      /* Кольца. z считается так, чтобы ближнее уходило за кадр, а дальние
+         сгущались у точки схода — это и есть ощущение падения. */
+      var radii = [];
+      for (var i = DEPTH; i >= 0; i--) {
+        var z = i + 0.6 - frac;
+        if (z <= 0.14) continue;
+        var rad = R / (z * 0.34 + 0.30);
+        if (rad < 1.5) continue;
+        radii.push({ r: rad, i: i, z: z });
 
-        /* Alternating bands give the wall something to read as it rushes
-           past; without them a smooth green tube looks static no matter how
-           fast it moves. Brightness falls off with depth but never all the
-           way to black, or the far half of the tunnel disappears. */
+        var lum = clamp(1.14 - (z / DEPTH) * 1.02, 0.10, 1);
+        /* Чередование ослаблено: при сильном контрасте кольца читались
+           полосами, а не стенкой. Нужно ровно столько, чтобы глаз видел, как
+           стенка бежит навстречу. */
         var band = ((i + Math.floor(travel)) % 2) === 0;
-        var lum = clamp(1.12 - (z / RINGS) * 0.92, 0.16, 1);
-        var r0 = band ? 138 : 58, g0 = band ? 236 : 150, b0 = band ? 96 : 42;
-        var ring = 'rgba(' + Math.round(r0 * lum) + ',' + Math.round(g0 * lum) +
-          ',' + Math.round(b0 * lum) + ',1)';
-        var deep = 'rgba(' + Math.round(14 * lum) + ',' + Math.round(48 * lum) +
-          ',' + Math.round(12 * lum) + ',1)';
-        var g = c.createRadialGradient(cx, cy, rad * 0.62, cx, cy, rad * 1.5);
-        g.addColorStop(0, deep);
-        g.addColorStop(0.30, ring);
-        g.addColorStop(1, deep);
+        var base = band ? [104, 196, 78] : [66, 152, 50];
+
+        /* Свет сверху-слева. Именно этот градиент превращает круг в стенку:
+           одна сторона трубы освещена, противоположная уходит в тень. */
+        var g = c.createLinearGradient(cx - rad, cy - rad, cx + rad, cy + rad);
+        g.addColorStop(0, 'rgb(' + Math.round(base[0] * lum * 1.25) + ',' +
+          Math.round(base[1] * lum * 1.2) + ',' + Math.round(base[2] * lum * 1.25) + ')');
+        g.addColorStop(0.46, 'rgb(' + Math.round(base[0] * lum) + ',' +
+          Math.round(base[1] * lum) + ',' + Math.round(base[2] * lum) + ')');
+        g.addColorStop(1, 'rgb(' + Math.round(base[0] * lum * 0.42) + ',' +
+          Math.round(base[1] * lum * 0.46) + ',' + Math.round(base[2] * lum * 0.42) + ')');
         c.fillStyle = g;
         c.beginPath();
-        c.arc(cx, cy, rad * 1.45, 0, 6.2832);
-        c.arc(cx, cy, rad * 0.72, 0, 6.2832, true);
+        c.arc(cx, cy, rad, 0, 6.2832);
+        c.arc(cx, cy, rad * 0.80, 0, 6.2832, true);
         c.fill();
-
-        // a bright seam on the leading edge of each band — this is what the
-        // eye actually tracks as it sweeps outward
-        c.strokeStyle = 'rgba(' + Math.round(200 * lum) + ',255,' +
-          Math.round(170 * lum) + ',' + (0.34 * lum).toFixed(3) + ')';
-        c.lineWidth = Math.max(0.6, rad * 0.012);
-        c.beginPath();
-        c.arc(cx, cy, rad * 0.72, 0, 6.2832);
-        c.stroke();
       }
 
-      // speed streaks — only while actually moving fast
-      var sp = ss(clamp((dive - 0.08) / 0.5, 0, 1)) * (1 - ss(clamp((dive - 0.82) / 0.18, 0, 1)));
-      if (sp > 0.02 && !E.lite) {
-        c.strokeStyle = 'rgba(200,255,170,' + (0.16 * sp).toFixed(3) + ')';
-        c.lineWidth = 1.4;
-        for (var k = 0; k < 22; k++) {
-          var a = (k / 22) * 6.2832 + dive * 3.1;
-          var r0 = R * (0.34 + ((k * 37) % 60) / 100) * (0.5 + sp);
-          var r1 = r0 + R * 0.5 * sp;
+      /* Рёбра вдоль трубы. Они сходятся к точке схода и не двигаются вбок,
+         пока камера не кренится, — поэтому кольца, пробегающие по ним,
+         читаются как движение вперёд, а не как пульсация на месте. */
+      if (radii.length > 1) {
+        var near = radii[0].r, far = radii[radii.length - 1].r;
+        c.lineWidth = Math.max(0.7, W * 0.0016);
+        for (var k = 0; k < SEG; k++) {
+          var a = (k / SEG) * 6.2832;
+          var ca = Math.cos(a), sa = Math.sin(a);
+          // ребро ярче на освещённой стороне и почти пропадает в тени
+          var lit = 0.5 + 0.5 * Math.cos(a + 2.356);
+          c.strokeStyle = 'rgba(196,255,168,' + (0.05 + lit * 0.20).toFixed(3) + ')';
           c.beginPath();
-          c.moveTo(cx + Math.cos(a) * r0, cy + Math.sin(a) * r0);
-          c.lineTo(cx + Math.cos(a) * r1, cy + Math.sin(a) * r1);
+          c.moveTo(cx + ca * far * 0.35, cy + sa * far * 0.35);
+          c.lineTo(cx + ca * near, cy + sa * near);
           c.stroke();
         }
       }
 
-      // the far end: a bright disc that grows into the next world
+      // штрихи скорости — только пока камера действительно летит
+      var sp = ss(clamp((dive - 0.08) / 0.5, 0, 1)) *
+        (1 - ss(clamp((dive - 0.82) / 0.18, 0, 1)));
+      if (sp > 0.02 && !E.lite) {
+        c.strokeStyle = 'rgba(214,255,190,' + (0.20 * sp).toFixed(3) + ')';
+        c.lineWidth = 1.6;
+        for (var q = 0; q < 20; q++) {
+          var aa = (q / 20) * 6.2832 + dive * 3.1;
+          var s0 = R * (0.30 + ((q * 37) % 60) / 130) * (0.4 + sp);
+          var s1 = s0 + R * 0.42 * sp;
+          c.beginPath();
+          c.moveTo(cx + Math.cos(aa) * s0, cy + Math.sin(aa) * s0);
+          c.lineTo(cx + Math.cos(aa) * s1, cy + Math.sin(aa) * s1);
+          c.stroke();
+        }
+      }
+
+      /* Горловина. Тонкое цветное расслоение по краю выхода — то, что на
+         быстрой камере читается как воздух, а не как ещё одно кольцо. */
+      /* Свет в конце трубы есть всегда, пусть и еле заметный: в реальной
+         трубе виден выход, а чёрная точка в центре читается как тупик. */
+      var seed = 0.05 + 0.05 * Math.sin(dive * 6.0);
+      var sg = c.createRadialGradient(cx, cy, 0, cx, cy, Math.max(W, H) * 0.09);
+      sg.addColorStop(0, 'rgba(190,222,255,' + (0.42 + seed).toFixed(3) + ')');
+      sg.addColorStop(0.5, 'rgba(120,170,240,.14)');
+      sg.addColorStop(1, 'rgba(92,148,252,0)');
+      c.fillStyle = sg;
+      c.beginPath(); c.arc(cx, cy, Math.max(W, H) * 0.09, 0, 6.2832); c.fill();
+
       var out = ss(clamp((dive - 0.62) / 0.38, 0, 1));
       if (out > 0) {
         var orad = Math.max(W, H) * (0.02 + out * out * 1.15);
+        if (!E.lite && out < 0.9) {
+          c.globalCompositeOperation = 'lighter';
+          c.globalAlpha = 0.30 * (1 - out);
+          c.strokeStyle = '#4fd8ff';
+          c.lineWidth = Math.max(1, orad * 0.03);
+          c.beginPath(); c.arc(cx, cy, orad * 1.04, 0, 6.2832); c.stroke();
+          c.strokeStyle = '#ff7a4f';
+          c.beginPath(); c.arc(cx, cy, orad * 0.96, 0, 6.2832); c.stroke();
+          c.globalAlpha = 1;
+          c.globalCompositeOperation = 'source-over';
+        }
         var og = c.createRadialGradient(cx, cy, 0, cx, cy, orad);
-        og.addColorStop(0, '#dff0ff');
-        og.addColorStop(0.42, '#8fc0ff');
-        og.addColorStop(0.8, 'rgba(92,148,252,' + (0.85 * out).toFixed(3) + ')');
+        og.addColorStop(0, '#f2f8ff');
+        og.addColorStop(0.40, '#a8ceff');
+        og.addColorStop(0.78, 'rgba(92,148,252,' + (0.88 * out).toFixed(3) + ')');
         og.addColorStop(1, 'rgba(92,148,252,0)');
         c.fillStyle = og;
         c.beginPath();

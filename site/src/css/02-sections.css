@@ -983,7 +983,12 @@
   background:radial-gradient(70% 70% at 50% 46%,rgba(40,20,8,.6),rgba(8,6,10,.7));
   box-shadow:0 30px 70px rgba(0,0,0,.5),inset 0 0 60px rgba(255,120,30,.06);
   overflow:hidden;
-  touch-action:none;                  /* the canvas owns the gesture */
+  /* Прокрутка важнее рисования. Панель большая, и при touch-action:none палец,
+     начавший движение на ней, не мог пролистать страницу вообще — получалась
+     мёртвая зона в половину экрана. Здесь жест по умолчанию отдаётся странице,
+     а рисование включается удержанием (см. 08-sections2.js) и только тогда
+     перехватывает движение. */
+  touch-action:pan-y;
   transition:border-color .8s var(--e-io),box-shadow .8s var(--e-io);
 }
 .st__ring.is-open{
@@ -1210,7 +1215,10 @@
   padding:13px 15px;border-radius:12px;
   border:1px solid rgba(10,10,10,.18);
   background:rgba(255,255,255,.55);
-  font-size:15px;letter-spacing:-.01em;
+  /* 16px, не меньше: Safari на iOS зумит страницу при фокусе в поле с более
+     мелким шрифтом и обратно её не возвращает. Именно из-за этого экран
+     «увеличивался при нажатии», а дальше всё уезжало. */
+  font-size:16px;letter-spacing:-.01em;
   transition:border-color .28s var(--e-out),box-shadow .28s var(--e-out),
              background-color .28s var(--e-out);
 }
@@ -2034,4 +2042,12 @@ html.mirror-in body{ background:#120818 }
      строка распадается — на телефоне они не нужны. */
   .st__geoRow i{display:none}
   .st__geoRow{gap:6px 14px}
+}
+
+/* Панель «взяла» жест: рамка отзывается, чтобы удержание было видно, а не
+   угадывалось. */
+.st__ring canvas.is-armed{cursor:crosshair}
+.st__ring:has(canvas.is-armed){
+  border-color:rgba(255,160,60,.5);
+  box-shadow:0 30px 90px rgba(0,0,0,.55),inset 0 0 90px rgba(255,120,30,.14);
 }

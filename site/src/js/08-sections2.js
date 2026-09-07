@@ -231,6 +231,14 @@
 
     var W = 0, H = 0, live = false;
 
+    /* Инструкция зависит от устройства: мышью круг ведут сразу, пальцем —
+       после удержания, иначе жест забрал бы прокрутку. Обещать одно и то же
+       обоим нельзя: половина людей выполнит не то действие. */
+    if (prompt && E.coarse) {
+      prompt.innerHTML = '<span class="st__promptIco" aria-hidden="true">◯</span>' +
+        'задержите палец — и обведите круг';
+    }
+
     function fit() {
       var r = cv.getBoundingClientRect();
       if (!r.width) return false;
@@ -451,8 +459,59 @@
 
     /* -------------------------------------------------------- gestures -- */
 
+    /* ─────────────────────────────────── жест на тач-устройстве ──────────
+       Панель занимает половину экрана, и раньше она забирала себе любое
+       касание: страницу нельзя было пролистать пальцем, начав движение на
+       ней. Теперь по умолчанию жест принадлежит странице, а рисование
+       включается удержанием — палец постоял на месте, панель это заметила и
+       дальше ведёт линию.
+
+       touch-action на лету не переключить: браузер решает судьбу жеста в
+       момент его начала. Поэтому прокрутку останавливает preventDefault в
+       не-пассивном обработчике touchmove, и только когда рисование включено. */
+    var armed = false, armT = 0, armPt = null;
+
+    function disarm() {
+      armed = false;
+      clearTimeout(armT);
+      cv.classList.remove('is-armed');
+    }
+
+    if (E.coarse) {
+      on(cv, 'touchstart', function (ev) {
+        if (portal || done) return;
+        var t = ev.touches[0];
+        armPt = { x: t.clientX, y: t.clientY };
+        clearTimeout(armT);
+        armT = setTimeout(function () {
+          armed = true;
+          cv.classList.add('is-armed');
+          B.buzz(12);
+          if (prompt) prompt.classList.add('is-dim');
+        }, 170);
+      }, { passive: true });
+
+      // палец уехал раньше, чем панель успела «взять» жест — это прокрутка
+      on(cv, 'touchmove', function (ev) {
+        if (!armed) {
+          var t = ev.touches[0];
+          if (armPt && Math.hypot(t.clientX - armPt.x, t.clientY - armPt.y) > 12) {
+            clearTimeout(armT);
+          }
+          return;
+        }
+        // рисование включено: движение принадлежит линии, не странице
+        if (ev.cancelable) ev.preventDefault();
+      }, { passive: false });
+
+      on(cv, 'touchend', disarm);
+      on(cv, 'touchcancel', disarm);
+    }
+
     on(cv, 'pointerdown', function (ev) {
       if (ev.pointerType === 'mouse' && ev.button !== 0) return;
+      // на тач-устройстве линия начинается только после удержания
+      if (ev.pointerType === 'touch' && !portal && !armed) return;
       var p = pos(ev);
       cv.setPointerCapture && cv.setPointerCapture(ev.pointerId);
 
@@ -477,6 +536,7 @@
     });
 
     on(cv, 'pointermove', function (ev) {
+      if (ev.pointerType === 'touch' && !armed && !dragging) return;
       var p = pos(ev);
 
       if (dragging && portal) {
@@ -487,7 +547,11 @@
         panTY = clamp((H / 2 - portal.y) * 0.42, -H * 0.30, H * 0.30);
         return;
       }
-      if (!drawing) return;
+      if (!drawing) {
+        // удержание сработало уже после нажатия — начинаем линию отсюда
+        if (armed && !portal && !done) { drawing = true; pts = [p]; }
+        else return;
+      }
 
       var last = pts[pts.length - 1];
       if (!last || Math.hypot(p.x - last.x, p.y - last.y) > 4) {
@@ -504,6 +568,7 @@
 
     function endStroke() {
       dragging = false;
+      disarm();
       if (!drawing) return;
       drawing = false;
       judge();

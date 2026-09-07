@@ -1,0 +1,110 @@
+/* ═══════════════════════════════════════════════════════════════════════
+   sky.css — the seamless world backdrop.
+
+   Every world's background lives in one fixed layer stack behind the page
+   instead of inside its own section. Scrolling cross-fades the layers, so
+   there is no boundary line anywhere: one universe dissolves into the next.
+   Sections themselves are fully transparent.
+   ═══════════════════════════════════════════════════════════════════════ */
+
+.sky {
+  position: fixed; inset: 0; z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+  contain: strict;
+}
+
+/* one gradient layer per world; JS drives --a (0…1) */
+.sky__l {
+  position: absolute; inset: 0;
+  opacity: var(--a, 0);
+  will-change: opacity;
+}
+
+/* the shared particle canvas paints the active world (and the one it is
+   dissolving into) with per-scene globalAlpha */
+.sky__fx { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+/* grain + vignette ride on top of everything so the stack reads as one image */
+.sky__grain {
+  position: absolute; inset: -50%;
+  opacity: .045; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  animation: sky-grain 640ms steps(4) infinite;
+}
+@keyframes sky-grain {
+  0%   { transform: translate3d(0, 0, 0); }
+  25%  { transform: translate3d(-2%, 2%, 0); }
+  50%  { transform: translate3d(2%, -2%, 0); }
+  75%  { transform: translate3d(-1%, -2%, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+.sky__vig {
+  position: absolute; inset: 0;
+  background: radial-gradient(128% 88% at 50% 44%, transparent 44%, rgba(0,0,0,.5) 100%);
+}
+
+/* ── the ten skies ──────────────────────────────────────────────────── */
+/* 0 · Flappy Bird — that exact cyan daytime sky */
+.sky--flappy { background: linear-gradient(180deg, #4ec0ca 0%, #6fd3d8 52%, #9be5e2 78%, #ded895 92%, #d0be7a 100%); }
+/* 1 · Pac-Man — arcade night */
+.sky--pac    { background: linear-gradient(180deg, #04040e 0%, #070a24 46%, #05060f 100%); }
+/* 2 · Mortal Kombat — the pit, lit from below */
+.sky--mk     { background: linear-gradient(180deg, #14060a 0%, #3a0a08 54%, #7a1c06 84%, #c24a0c 100%); }
+/* 3 · Super Mario — 1-1 */
+.sky--mario  { background: linear-gradient(180deg, #5c94fc 0%, #5c94fc 74%, #7cb0ff 100%); }
+/* 4 · Tetris — the well */
+.sky--tetris { background: linear-gradient(180deg, #05070f 0%, #0b1226 50%, #05060f 100%); }
+/* 5 · Shrek — the swamp at dusk */
+.sky--shrek  { background: linear-gradient(180deg, #101f0c 0%, #1d3312 44%, #0a1407 100%); }
+/* 6 · Game Boy — DMG plastic and pea-green LCD */
+.sky--gb     { background: linear-gradient(180deg, #1d2216 0%, #2a3320 46%, #151a10 100%); }
+/* 7 · Indiana Jones — aged paper */
+.sky--map    { background: linear-gradient(180deg, #3a2c18 0%, #574126 46%, #2a1f11 100%); }
+/* 8 · The Matrix — void */
+.sky--matrix { background: linear-gradient(180deg, #000 0%, #02170a 52%, #000 100%); }
+/* 9 · Star Wars — deep space */
+.sky--sw     { background: radial-gradient(120% 80% at 50% 20%, #060815 0%, #000 70%); }
+
+/* ── the transition props ───────────────────────────────────────────── */
+/* These sit in the sky stack and are driven by the same scroll value, so a
+   pipe, a curtain or a power-on flash lands exactly on the cross-fade. */
+.sky__prop { position: absolute; inset: 0; opacity: var(--p, 0); }
+
+/* MK "FIGHT!" flash */
+.prop-fight {
+  display: grid; place-items: center;
+  font-family: var(--f-pixel); font-size: clamp(48px, 13vw, 170px);
+  letter-spacing: .1em; color: #ffd23f;
+  text-shadow: 0 0 40px rgba(255,90,0,.9), 0 6px 0 #7a1c06;
+  transform: scale(var(--s, .7));
+}
+
+/* Game Boy power-on: the LCD wash that precedes the boot logo */
+.prop-lcd { background: #9bbc0f; }
+
+/* Star Wars: "A long time ago…" — sits high so the crawl can rise under it */
+.prop-longago {
+  display: grid; place-items: start center; padding: 22vh 8vw 0;
+  font-family: var(--f-body); font-weight: 400;
+  font-size: clamp(14px, 2.2vw, 26px); line-height: 1.5;
+  color: #4bd5ee; text-align: center; letter-spacing: .02em;
+}
+
+/* ── section shells sit on the sky ──────────────────────────────────── */
+.stage { position: relative; z-index: 1; padding-block: var(--sec-pad); }
+.stage__body { position: relative; z-index: 1; }
+
+/* Content that needs to stay legible over a bright sky gets a soft scrim
+   that is itself feathered, so it never draws an edge. */
+.scrim {
+  position: absolute; inset: -6% -12%; z-index: 0; pointer-events: none;
+  background: radial-gradient(62% 52% at 34% 46%, rgba(4,4,8,.72), transparent 74%);
+}
+.scrim--light {
+  background: radial-gradient(64% 54% at 34% 46%, rgba(255,250,240,.82), transparent 74%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sky__grain { display: none; }
+}

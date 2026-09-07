@@ -96,63 +96,92 @@ by hand — the export surface is the source of truth.
 
 ## The БАЗА site
 
-`index.html` at the repo root is the БАЗА landing page — a static, dependency-free
-single page. Open the file directly, or serve the folder:
+`index.html` at the repo root is the БАЗА landing page — a static,
+dependency-free single page. Open the file directly, or serve the folder:
 
 ```bash
 python3 -m http.server 8000   # then http://localhost:8000
 ```
 
-It is built as an arcade: nine "worlds", each with its own background, typography,
-scroll behaviour and one thing you can actually play with.
+`dist/baza-arcade.html` is the same page as **one standalone file** with the
+CSS, JS, fonts and images inlined. It opens straight from the filesystem and
+makes no network request at all. Rebuild it after any edit:
 
-| World | Section | The interaction |
-| --- | --- | --- |
-| 0 | Hero | Parallax starfield + retro grid floor, typewriter pitch, world picker |
-| 1 | О нас | Four Pac-Man ghosts — tick the ones you recognise, the cabinet scores them |
-| 2 | Кто это делает | Fighting-game roster: pick a way to close the task, see what it costs |
-| 3 | Услуги | Mario `?` blocks — hit one, a coin pops and the direction opens |
-| 4 | Цены | A Tetris well that stacks to the level you pick on the fork slider |
-| 5 | Карта маршрута | Swamp with a trail that draws itself as you scroll |
-| 6 | Проекты | Arcade cabinet: swap cartridges, the CRT renders a stylised UI mock |
-| 7 | География | Radar sweep over a schematic world map, 19 cities |
-| 8 | Бриф | A terminal that answers as you fill it in and prices the job live |
+```bash
+node build.js                 # → dist/baza-arcade.html
+```
 
-Between worlds the transitions are part of the design: a Mario warp pipe, a Tetris
-line clear, a swamp drip. The nav also plays a pixel-block wipe between sections.
+### Ten worlds, one continuous scroll
+
+Each section is a universe most people recognise on sight, and each has one
+thing you can actually play with.
+
+| # | World | Section | What you can do |
+| --- | --- | --- | --- |
+| 0 | **Flappy Bird** | Первый экран | The bird flies the gaps as you scroll; click, tap or hit space to flap |
+| 1 | **Pac-Man** | О нас | Tick a symptom and Pac-Man eats that ghost on the backdrop; the cabinet scores it |
+| 2 | **Mortal Kombat** | Кто это делает | Pick a fighter, the health bars drain by the honest count of drawbacks, "Finish him" names the worst one |
+| 3 | **Super Mario** | Услуги | Hit a `?` block — Mario runs to it on the brick floor, jumps, and a coin pops |
+| 4 | **Tetris** | Цены | A real playable well: arrows / swipe / on-screen pad; clearing lines raises the budget tier |
+| 5 | **Shrek** | Маршрут | "Ogres are like onions" — peel the onion layer by layer, each layer opens a stage of the work |
+| 6 | **Game Boy** | Проекты | A DMG console: cartridges boot, the d-pad flips projects, A opens the owner's review |
+| 7 | **Indiana Jones** | География | Click a city and a red dashed line flies a plane there across an aged paper map |
+| 8 | **The Matrix** | Бриф | Code rain, a red pill / blue pill choice, and a terminal that answers as you fill it in |
+| 9 | **Star Wars** | Финал | The opening crawl, in real 3D perspective, driven by scroll |
+
+### Why there are no visible section edges
+
+Backgrounds do not live inside their sections. All ten skies sit in one fixed
+layer stack (`assets/css/sky.css`) behind the page, and the scroll position
+cross-fades between them — so one universe dissolves into the next with no
+boundary line anywhere. A single shared canvas paints the particle scene for
+whichever world you are in, plus the one you are dissolving into, at the same
+alphas.
+
+Transitions that land exactly on a crossover get their own prop: **FIGHT!**
+flashes between Pac-Man and Mortal Kombat, the pea-green **LCD wash** fires as
+the Game Boy powers on, and **«Давным-давно, в далёкой-далёкой галактике…»**
+appears just before the crawl rises.
 
 ### Structure
 
 ```
 index.html            markup + SEO + no-JS fallback
+build.js              inlines everything into dist/baza-arcade.html
 assets/css/fonts.css  self-hosted subsets (no third-party font request)
 assets/css/base.css   tokens, reset, typography, reveal engine
-assets/css/chrome.css header, nav, menu, HUD, level transitions, boot
-assets/css/worlds-a.css  hero · Pac-Man · VS select · Mario
-assets/css/worlds-b.css  Tetris · swamp · cabinet · radar · terminal · credits
+assets/css/sky.css    the cross-faded world backdrop + transition props
+assets/css/chrome.css header, nav, menu, HUD, warp curtain, boot
+assets/css/worlds-a.css  Flappy · Pac-Man · Mortal Kombat · Mario
+assets/css/worlds-b.css  Tetris · Shrek · Game Boy · map · Matrix · crawl
 assets/js/data.js     every piece of copy the page renders at runtime
-assets/js/app.js      one rAF loop drives all canvas scenes; the rest is events
+assets/js/scenes.js   the ten canvas scenes, one draw() each
+assets/js/app.js      sky engine, one rAF loop, all interactions
 assets/fonts/         Manrope, Unbounded, Pixelify Sans, Russo One, JetBrains Mono
 assets/img/           brand lockups
 ```
 
 Notes on how it behaves:
 
-- **No build step, no runtime dependencies.** Plain HTML, CSS and one script.
+- **No build step to run it, no runtime dependencies.** Plain HTML, CSS and JS.
 - **Fonts are vendored** (cyrillic + latin subsets only) so the page makes no
   request to Google and renders identically offline.
-- **Every scene pauses off screen** and every animation is transform/opacity only.
-- **`prefers-reduced-motion` is honoured**: animations collapse, nothing is hidden.
-- **Without JavaScript** the boot overlay lifts, the containers the runtime fills
-  are hidden, and a notice with prices and the Telegram contact takes their place.
-- **The brief keeps a local draft** in `localStorage` and hands the assembled lead
-  to Telegram — no endpoint or token is committed to this public repo.
+- **Two scenes at most per frame**, everything pauses off screen, and all
+  animation is transform/opacity only.
+- **`prefers-reduced-motion` is honoured**: animations collapse, nothing hides.
+- **Without JavaScript** the boot overlay lifts on a failsafe timer, the
+  runtime-filled containers are hidden, and a notice with prices and the
+  Telegram contact takes their place.
+- **The brief keeps a local draft** in `localStorage` and hands the assembled
+  lead to Telegram — no endpoint or token is committed to this public repo.
 
 ## Layout
 
 ```
 index.html          the БАЗА landing page
 assets/             its css, js, fonts and images
+build.js            single-file bundler
+dist/               standalone build (baza-arcade.html)
 .claude/skills/     10 skills
 .mcp.json           21st.dev MCP server (key via ${TWENTYFIRST_API_KEY})
 .env.example        template for the key

@@ -29,6 +29,7 @@
 
 <link rel="stylesheet" href="assets/css/fonts.css">
 <link rel="stylesheet" href="assets/css/base.css">
+<link rel="stylesheet" href="assets/css/sky.css">
 <link rel="stylesheet" href="assets/css/chrome.css">
 <link rel="stylesheet" href="assets/css/worlds-a.css">
 <link rel="stylesheet" href="assets/css/worlds-b.css">
@@ -42,11 +43,12 @@
 <noscript><style>
   /* Without JS the boot overlay would never lift and the panels the runtime
      fills stay empty — so hide both and show a plain, complete fallback. */
-  .boot, .hud, .hud-score, .cursor, .warp, .cookie,
+  .boot, .hud, .hud-score, .cursor, .warp, .cookie, .sky,
   #vsPick, #vsStat, #vsPros, #vsCons, #blocks, #marioPanel,
-  #tiers, #forkRows, #carts, #crtScreen, #crtDots, #rev,
+  #tiers, #forkRows, #carts, #gbScreen, #gbDots, #rev,
   #hiscoreRow, #qTask, #qWhen, #qPain, #calcLvls, .tetris-board,
-  .term__send, .agree { display: none !important; }
+  .term__send, .agree, .onion, .crawl { display: none !important; }
+  body { background: #0a0a0a; }
   .nojs { display: block !important; }
   [data-rise], .ch { opacity: 1 !important; transform: none !important; }
   .hero__mark img { clip-path: none !important; }
@@ -65,13 +67,33 @@
   Разбор за три дня — 25 000 ₽; сайт — от 250 000 ₽; система под ключ — от 900 000 ₽.</p>
 </div>
 
-<!-- ═══ boot screen ═══════════════════════════════════════════════ -->
+<!-- ═══ boot ══════════════════════════════════════════════════════ -->
 <div class="boot" id="boot" role="status" aria-live="polite">
   <div class="boot__inner">
     <img class="boot__logo" src="assets/img/logo-baza-2x.webp" alt="БАЗА" width="942" height="361">
     <div class="boot__bar"><div class="boot__fill" id="bootFill"></div></div>
-    <div class="boot__txt" id="bootTxt">загружаем картридж…</div>
+    <div class="boot__txt" id="bootTxt">вставляем картридж…</div>
   </div>
+</div>
+
+<!-- ═══ the sky: every world's backdrop, cross-faded on scroll ════ -->
+<div class="sky" id="sky" aria-hidden="true">
+  <div class="sky__l sky--flappy" data-sky="flappy"></div>
+  <div class="sky__l sky--pac"    data-sky="pac"></div>
+  <div class="sky__l sky--mk"     data-sky="mk"></div>
+  <div class="sky__l sky--mario"  data-sky="mario"></div>
+  <div class="sky__l sky--tetris" data-sky="tetris"></div>
+  <div class="sky__l sky--shrek"  data-sky="shrek"></div>
+  <div class="sky__l sky--gb"     data-sky="gb"></div>
+  <div class="sky__l sky--map"    data-sky="map"></div>
+  <div class="sky__l sky--matrix" data-sky="matrix"></div>
+  <div class="sky__l sky--sw"     data-sky="sw"></div>
+  <canvas class="sky__fx" id="skyFx"></canvas>
+  <div class="sky__prop prop-fight" id="propFight">FIGHT!</div>
+  <div class="sky__prop prop-lcd"   id="propLcd"></div>
+  <div class="sky__prop prop-longago" id="propLongAgo">Давным-давно, в далёкой-далёкой галактике…</div>
+  <div class="sky__grain"></div>
+  <div class="sky__vig"></div>
 </div>
 
 <!-- ═══ chrome ════════════════════════════════════════════════════ -->
@@ -83,14 +105,14 @@
 <div class="hud-score" id="hudScore" aria-live="polite">
   <span class="hud-score__coin" aria-hidden="true"></span>
   <span>очки</span>
-  <span class="hud-score__n" id="scoreN">0</span>
+  <span class="hud-score__n" id="scoreN">0000</span>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <header class="head" id="head">
   <div class="head__row">
-    <a class="brand" href="#top" data-warp="БАЗА">
+    <a class="brand" href="#top">
       <img class="brand__mark logo-img" src="assets/img/logo-baza-2x.webp" alt="БАЗА" width="942" height="361">
       <span class="brand__tag">это база</span>
     </a>
@@ -99,15 +121,15 @@
       <div class="nav__list" id="navList">
         <span class="nav__ink" id="navInk" aria-hidden="true"></span>
         <a class="nav__item" href="#about"    data-nav="about"    data-warp="World 1 · Pac-Man"><span>О нас</span><span aria-hidden="true">О нас</span></a>
-        <a class="nav__item" href="#services" data-nav="services" data-warp="World 3 · Услуги"><span>Услуги</span><span aria-hidden="true">Услуги</span></a>
-        <a class="nav__item" href="#pricing"  data-nav="pricing"  data-warp="World 4 · Цены"><span>Цены</span><span aria-hidden="true">Цены</span></a>
-        <a class="nav__item" href="#projects" data-nav="projects" data-warp="World 6 · Кейсы"><span>Проекты</span><span aria-hidden="true">Проекты</span></a>
-        <a class="nav__item" href="#brief"    data-nav="brief"    data-warp="World 8 · Контакты"><span>Контакты</span><span aria-hidden="true">Контакты</span></a>
+        <a class="nav__item" href="#services" data-nav="services" data-warp="World 3 · Mario"><span>Услуги</span><span aria-hidden="true">Услуги</span></a>
+        <a class="nav__item" href="#pricing"  data-nav="pricing"  data-warp="World 4 · Tetris"><span>Цены</span><span aria-hidden="true">Цены</span></a>
+        <a class="nav__item" href="#projects" data-nav="projects" data-warp="World 6 · Game Boy"><span>Проекты</span><span aria-hidden="true">Проекты</span></a>
+        <a class="nav__item" href="#brief"    data-nav="brief"    data-warp="World 8 · Matrix"><span>Контакты</span><span aria-hidden="true">Контакты</span></a>
       </div>
     </nav>
 
     <div class="head__cta">
-      <a class="btn btn--neon btn--hero" href="#brief" data-warp="World 8 · Контакты">
+      <a class="btn btn--neon btn--hero" href="#brief" data-warp="World 8 · Matrix">
         <span>Показать, где теряете</span>
         <span class="btn__ico" aria-hidden="true">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h13.5M12 6.5l6 5.5-6 5.5"/></svg>
@@ -141,63 +163,53 @@
 
 <main id="top">
 
-<!-- ═══ WORLD 0 — HERO / INSERT COIN ══════════════════════════════ -->
-<section class="hero" id="hero" aria-labelledby="heroTitle">
-  <div class="hero__sun" aria-hidden="true"></div>
-  <canvas class="hero__stars" id="heroStars" aria-hidden="true"></canvas>
-  <div class="hero__grid" id="heroGrid" aria-hidden="true"></div>
-  <div class="fx-noise" aria-hidden="true"></div>
+<!-- ═══ WORLD 0 — FLAPPY BIRD ═════════════════════════════════════ -->
+<section class="stage hero w-flappy" id="hero" data-world="flappy" aria-labelledby="heroTitle">
+  <!-- The bird gets its own layer above the copy's haze so the sprite stays
+       crisp; the pipes, clouds and ground stay on the shared sky canvas. -->
+  <canvas class="hero__bird" id="heroBird" aria-hidden="true"></canvas>
 
   <div class="shell hero__body">
-    <span class="hero__coin"><i aria-hidden="true"></i> insert coin — press ↓</span>
+    <button class="flap" id="flapBtn" type="button">
+      <i aria-hidden="true"></i>
+      <span>клик или пробел — взмах</span>
+      <b id="flapScore">0</b>
+    </button>
 
     <div class="hero__mark">
       <img class="hero__mark-eto" src="assets/img/logo-eto-2x.webp" alt="" width="470" height="180" aria-hidden="true">
       <img class="hero__mark-baza" src="assets/img/logo-baza-2x.webp" alt="БАЗА" width="942" height="361">
     </div>
 
-
     <div class="hero__cta-col">
-    <h1 id="heroTitle">Сайты, CRM, автоматизация и ИИ-боты для бизнеса, который держится на владельце</h1>
+      <h1 id="heroTitle">Сайты, CRM, автоматизация и ИИ-боты для бизнеса, который держится на владельце</h1>
+      <p class="hero__type" id="heroType" aria-live="off"></p>
 
-    <p class="hero__type" id="heroType" aria-live="off"></p>
+      <div class="hero__row">
+        <a class="btn btn--solid" href="#brief" data-warp="World 8 · Matrix"><span>Показать, где теряете</span>
+          <span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h13.5M12 6.5l6 5.5-6 5.5"/></svg></span>
+        </a>
+        <a class="btn btn--dark" href="#services" data-warp="World 3 · Mario"><span>Что мы делаем</span></a>
+        <a class="btn btn--dark" href="https://t.me/lllbaza" target="_blank" rel="noopener"><span>Написать в Telegram</span>
+          <span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg></span>
+        </a>
+      </div>
 
-    <div class="hero__row">
-      <a class="btn btn--solid" href="#brief" data-warp="World 8 · Контакты"><span>Показать, где теряете</span>
-        <span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h13.5M12 6.5l6 5.5-6 5.5"/></svg></span>
-      </a>
-      <a class="btn" href="#services" data-warp="World 3 · Услуги"><span>Что мы делаем</span></a>
-      <a class="btn" href="https://t.me/lllbaza" target="_blank" rel="noopener"><span>Написать в Telegram</span>
-        <span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 17L17 7M9 7h8v8"/></svg></span>
-      </a>
+      <div class="hero__stats">
+        <div class="hero__stat"><b data-count="167" data-pre="+" data-post="%">+167%</b><span>заявок после запуска</span></div>
+        <div class="hero__stat"><b data-count="38" data-pre="−" data-post="%">−38%</b><span>стоимость лида</span></div>
+        <div class="hero__stat"><b data-count="3" data-post=" дня">3 дня</b><span>разбор до старта</span></div>
+        <div class="hero__stat"><b data-count="19" data-post=" городов">19 городов</b><span>от Казани до Долины</span></div>
+      </div>
     </div>
 
-    <div class="hero__stats">
-      <div class="hero__stat"><b data-count="167" data-pre="+" data-post="%">+167%</b><span>заявок после запуска</span></div>
-      <div class="hero__stat"><b data-count="38" data-pre="−" data-post="%">−38%</b><span>стоимость лида</span></div>
-      <div class="hero__stat"><b data-count="3" data-post=" дня">3 дня</b><span>разбор до старта</span></div>
-      <div class="hero__stat"><b data-count="19" data-post=" городов">19 городов</b><span>от Казани до Долины</span></div>
-    </div>
-    </div>
     <nav class="worlds" aria-label="Быстрый переход по мирам">
       <span class="worlds__t">select your world</span>
       <div class="worlds__rail">
-        <a class="world" href="#about" data-warp="World 1 · Pac-Man" style="--wc:#ffd426">
-          <span class="world__n">01</span><span class="world__ico" aria-hidden="true">👻</span>
-          <span class="world__l">Призраки</span><span class="world__s">что съедает выручку</span>
-        </a>
-        <a class="world" href="#services" data-warp="World 3 · Услуги" style="--wc:#f7c948">
-          <span class="world__n">03</span><span class="world__ico" aria-hidden="true">🍄</span>
-          <span class="world__l">Блоки</span><span class="world__s">что мы делаем</span>
-        </a>
-        <a class="world" href="#pricing" data-warp="World 4 · Цены" style="--wc:#31e0c8">
-          <span class="world__n">04</span><span class="world__ico" aria-hidden="true">🧱</span>
-          <span class="world__l">Стакан</span><span class="world__s">сколько это стоит</span>
-        </a>
-        <a class="world" href="#projects" data-warp="World 6 · Кейсы" style="--wc:#ff2e88">
-          <span class="world__n">06</span><span class="world__ico" aria-hidden="true">🕹</span>
-          <span class="world__l">Картриджи</span><span class="world__s">пять запусков</span>
-        </a>
+        <a class="world" href="#about" data-warp="World 1 · Pac-Man" style="--wc:#ffd426"><span class="world__n">01</span><span class="world__ico" aria-hidden="true">👻</span><span class="world__l">Pac-Man</span><span class="world__s">кто ест заявки</span></a>
+        <a class="world" href="#services" data-warp="World 3 · Mario" style="--wc:#f7c948"><span class="world__n">03</span><span class="world__ico" aria-hidden="true">🍄</span><span class="world__l">Mario</span><span class="world__s">что мы делаем</span></a>
+        <a class="world" href="#pricing" data-warp="World 4 · Tetris" style="--wc:#31e0c8"><span class="world__n">04</span><span class="world__ico" aria-hidden="true">🧱</span><span class="world__l">Tetris</span><span class="world__s">сколько стоит</span></a>
+        <a class="world" href="#projects" data-warp="World 6 · Game Boy" style="--wc:#9bbc0f"><span class="world__n">06</span><span class="world__ico" aria-hidden="true">🎮</span><span class="world__l">Game Boy</span><span class="world__s">пять запусков</span></a>
       </div>
     </nav>
   </div>
@@ -205,34 +217,14 @@
   <div class="hero__cue" aria-hidden="true"><i></i><span>scroll</span></div>
 </section>
 
-<!-- seam: scanline wipe into World 1 -->
-<div class="seam" aria-hidden="true">
-  <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
-    <defs><linearGradient id="sg1" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#0a0a0a"/><stop offset="1" stop-color="#05060f"/>
-    </linearGradient></defs>
-    <rect width="1440" height="120" fill="url(#sg1)"/>
-    <g fill="#2b3bff" opacity=".5">
-      <rect y="86" width="1440" height="3"/><rect y="96" width="1440" height="2"/><rect y="104" width="1440" height="1"/>
-    </g>
-  </svg>
-</div>
-
-<!-- ═══ WORLD 1 — PAC-MAN: кто ест ваши заявки ════════════════════ -->
-<section class="stage w-pac" id="about" aria-labelledby="pacTitle">
-  <div class="stage__bg">
-    <canvas class="w-pac__maze" id="pacMaze" aria-hidden="true"></canvas>
-    <div class="w-pac__glow"></div>
-    <div class="fx-noise"></div>
-  </div>
-
-  <div class="pac-runner" id="pacRunner" aria-hidden="true"><div class="pac-runner__body"></div></div>
-
+<!-- ═══ WORLD 1 — PAC-MAN ═════════════════════════════════════════ -->
+<section class="stage w-pac" id="about" data-world="pac" aria-labelledby="pacTitle">
+  <div class="scrim" aria-hidden="true"></div>
   <div class="stage__body shell">
     <div class="w-pac__head">
-      <span class="eyebrow" data-rise>World 1 · призраки</span>
+      <span class="eyebrow" data-rise>World 1 · Pac-Man</span>
       <h2 class="h-sec" id="pacTitle" data-split data-rise>Вы не владелец. Вы самый дорогой сотрудник в своей компании.</h2>
-      <p class="lede" data-rise style="--rise-delay:120ms">Четыре призрака доедают выручку, пока вы отвечаете на сообщения. Отметьте тех, кого узнаёте — счёт справа посчитает, во что это обходится.</p>
+      <p class="lede" data-rise style="--rise-delay:120ms">Четыре призрака доедают выручку, пока вы отвечаете на сообщения. Отметьте тех, кого узнаёте — на фоне Pac-Man съест каждого отмеченного, а счёт справа посчитает, во что они обходятся.</p>
     </div>
 
     <div class="pac-grid">
@@ -242,19 +234,16 @@
           <span class="ghost__txt"><b>Заявки теряются</b><span>Директ, почта, мессенджеры. Часть ответов уходит через сутки, часть — никогда.</span></span>
           <span class="ghost__pill" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
         </button>
-
-        <button class="ghost" type="button" data-sym="b" data-rise style="--g:#ff9ad5;--rise-delay:60ms">
+        <button class="ghost" type="button" data-sym="b" style="--g:#ff9ad5" data-rise>
           <span class="ghost__ico" aria-hidden="true"><i></i><b></b><span class="ghost__eye"></span><span class="ghost__eye"></span></span>
           <span class="ghost__txt"><b>Сайт стыдно показать</b><span>Вы закрываете вкладку раньше, чем клиент дочитает первый экран.</span></span>
           <span class="ghost__pill" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
         </button>
-
         <button class="ghost" type="button" data-sym="c" style="--g:#31e0c8" data-rise>
           <span class="ghost__ico" aria-hidden="true"><i></i><b></b><span class="ghost__eye"></span><span class="ghost__eye"></span></span>
           <span class="ghost__txt"><b>Клиенты не ждут</b><span>Пока вы освободитесь — они уже написали тем, кто ответил сразу.</span></span>
           <span class="ghost__pill" aria-hidden="true"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
         </button>
-
         <button class="ghost" type="button" data-sym="d" style="--g:#ffa94d" data-rise>
           <span class="ghost__ico" aria-hidden="true"><i></i><b></b><span class="ghost__eye"></span><span class="ghost__eye"></span></span>
           <span class="ghost__txt"><b>Всё держится на вас</b><span>Уехали на неделю — продажи уехали вместе с вами. Второй менеджер = второй вы.</span></span>
@@ -264,13 +253,13 @@
 
       <div class="pac-score" data-rise style="--rise-delay:140ms">
         <div class="pac-score__top">
-          <span class="pac-score__lbl">съедено призраков</span>
+          <span class="pac-score__lbl">1UP · съедено</span>
           <span class="pac-score__n" id="pacN">0</span>
         </div>
         <div class="pac-pellets" id="pacPellets" aria-hidden="true"><i></i><i></i><i></i><i></i></div>
         <p class="pac-verdict" id="pacVerdict">Ничего? Либо у вас уже всё автоматизировано, либо мы плохо спросили.</p>
         <div class="pac-costs" id="pacCosts"></div>
-        <a class="btn btn--neon" href="#pricing" id="pacCta" data-warp="World 4 · Цены"><span>Посмотреть, как это чинится</span>
+        <a class="btn btn--neon" href="#pricing" id="pacCta" data-warp="World 4 · Tetris"><span>Посмотреть, как это чинится</span>
           <span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M12.5 6.5l5.5 5.5-5.5 5.5"/></svg></span>
         </a>
       </div>
@@ -280,99 +269,84 @@
   </div>
 </section>
 
-<!-- seam: VS flash -->
-<div class="seam" aria-hidden="true">
-  <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
-    <defs><linearGradient id="sg2" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#05060f"/><stop offset="1" stop-color="#170608"/>
-    </linearGradient></defs>
-    <rect width="1440" height="120" fill="url(#sg2)"/>
-    <path d="M0,120 L720,44 L1440,120 Z" fill="#ff4d2e" opacity=".16"/>
-  </svg>
-</div>
-
-<!-- ═══ WORLD 2 — VS SELECT: кто это делает ═══════════════════════ -->
-<section class="stage w-vs" aria-labelledby="vsTitle">
-  <div class="stage__bg">
-    <div class="w-vs__rays"></div>
-    <div class="w-vs__flash"></div>
-    <div class="fx-noise"></div>
-  </div>
-
+<!-- ═══ WORLD 2 — MORTAL KOMBAT ═══════════════════════════════════ -->
+<section class="stage w-mk" data-world="mk" aria-labelledby="mkTitle">
   <div class="stage__body shell">
-    <div class="vs-head">
-      <span class="eyebrow" data-rise>World 2 · выбор бойца</span>
-      <h2 class="h-sec" id="vsTitle" data-rise>Кто это <em>делает</em></h2>
-      <p class="lede" data-rise style="text-align:center;--rise-delay:100ms">Четыре способа закрыть одну и ту же задачу. Выберите — покажем, чем платите за каждый.</p>
+    <div class="mk-head">
+      <span class="eyebrow" data-rise>World 2 · Mortal Kombat</span>
+      <h2 class="h-sec" id="mkTitle" data-rise>Choose your <em>fighter</em></h2>
+      <p class="lede" style="text-align:center;margin-inline:auto" data-rise>Четыре способа закрыть одну и ту же задачу. Выберите бойца — увидите, чем платите за каждый раунд.</p>
     </div>
 
-    <div class="vs-pick" id="vsPick" role="tablist" aria-label="Способы закрыть задачу"></div>
+    <div class="mk-bars" data-rise>
+      <div class="mk-bar mk-bar--l">
+        <span class="mk-bar__nm" id="mkNameL">БАЗА</span>
+        <span class="mk-bar__track"><i id="mkHpL" style="width:100%"></i></span>
+      </div>
+      <span class="mk-bar__vs" aria-hidden="true">VS</span>
+      <div class="mk-bar mk-bar--r">
+        <span class="mk-bar__nm" id="mkNameR">Свой отдел</span>
+        <span class="mk-bar__track"><i id="mkHpR" style="width:100%"></i></span>
+      </div>
+    </div>
 
-    <div class="vs-board">
-      <div class="vs-stat" id="vsStat" data-rise></div>
-      <div class="card" data-rise style="--rise-delay:80ms">
-        <div class="vs-cols">
-          <div class="vs-col"><span class="vs-col__t">что получаете</span><div id="vsPros"></div></div>
-          <div class="vs-col"><span class="vs-col__t">чем платите</span><div id="vsCons"></div></div>
+    <div class="mk-pick" id="mkPick" role="tablist" aria-label="Способы закрыть задачу"></div>
+
+    <div class="mk-board">
+      <div class="mk-stat" id="mkStat" data-rise></div>
+      <div class="mk-card" data-rise style="--rise-delay:80ms">
+        <div class="mk-cols">
+          <div class="mk-col"><span class="mk-col__t">что получаете</span><div id="mkPros"></div></div>
+          <div class="mk-col"><span class="mk-col__t">чем платите</span><div id="mkCons"></div></div>
         </div>
       </div>
     </div>
+    <p class="mk-finish" id="mkFinish" aria-live="polite"></p>
   </div>
 </section>
 
-<!-- seam: warp pipe into World 3 -->
-<div class="seam-pipe" id="seamPipe" aria-hidden="true">
-  <div class="seam-pipe__body">
-    <div class="seam-pipe__hero" id="pipeHero"></div>
-    <div class="seam-pipe__lip"></div>
-    <div class="seam-pipe__shaft"></div>
-  </div>
-</div>
-
-<!-- ═══ WORLD 3 — SUPER MARIO: услуги ═════════════════════════════ -->
-<section class="stage w-mario" id="services" aria-labelledby="marioTitle">
-  <div class="stage__bg">
-    <canvas class="w-mario__clouds" id="marioSky" aria-hidden="true"></canvas>
-  </div>
-
+<!-- ═══ WORLD 3 — SUPER MARIO ═════════════════════════════════════ -->
+<section class="stage w-mario" id="services" data-world="mario" aria-labelledby="marioTitle">
   <div class="stage__body shell">
     <div class="mario-head">
-      <span class="eyebrow" data-rise>World 3 · выбей блок</span>
+      <span class="eyebrow" data-rise>World 3 · Super Mario</span>
       <h2 class="h-sec" id="marioTitle" data-rise>Что мы <em>делаем</em></h2>
-      <p class="lede" data-rise style="--rise-delay:100ms">Семь блоков — семь направлений. Бейте по любому: оттуда выпадет монета и то, что вы получаете на руки.</p>
+      <p class="lede" data-rise style="--rise-delay:100ms">Семь блоков — семь направлений. Бейте по любому: Марио внизу подбежит, подпрыгнет и выбьет монету вместе с тем, что вы получаете на руки.</p>
     </div>
 
     <div class="blocks" id="blocks" role="tablist" aria-label="Направления работ"></div>
-    <div class="mario-panel" id="marioPanel" data-rise></div>
-  </div>
 
-  <div class="mario-ground">
-    <div class="mario-ground__bricks"></div>
-    <div class="mario-runner" id="marioRunner" aria-hidden="true"><div class="mario-runner__b"></div></div>
+    <!-- Mario runs on this strip, directly under the blocks, so the jump is
+         always visible and visibly aimed at the block you hit. -->
+    <div class="mario-floor" aria-hidden="true"><canvas id="marioCanvas"></canvas></div>
+
+    <div class="mario-panel" id="marioPanel" data-rise></div>
   </div>
 </section>
 
-<!-- seam: tetris line clear -->
-<div class="seam-clear" id="seamClear" aria-hidden="true"><div class="seam-clear__row" id="seamClearRow"></div></div>
-
-<!-- ═══ WORLD 4 — TETRIS: цены ════════════════════════════════════ -->
-<section class="stage w-tetris" id="pricing" aria-labelledby="tetrisTitle">
-  <div class="stage__bg">
-    <div class="w-tetris__field"></div>
-    <div class="fx-noise"></div>
-  </div>
-
+<!-- ═══ WORLD 4 — TETRIS ══════════════════════════════════════════ -->
+<section class="stage w-tetris" id="pricing" data-world="tetris" aria-labelledby="tetrisTitle">
+  <div class="scrim" aria-hidden="true"></div>
   <div class="stage__body shell">
     <div class="tetris-head">
-      <span class="eyebrow" data-rise>World 4 · собери свой стакан</span>
+      <span class="eyebrow" data-rise>World 4 · Tetris</span>
       <h2 class="h-sec" id="tetrisTitle" data-split data-rise>Сколько это <span class="mark hl">стоит</span></h2>
-      <p class="lede" data-rise style="--rise-delay:100ms">Цену мы не прячем — но и не вешаем ценник на то, чего ещё не видели. Вместо прайса здесь вилка: она показывает, что меняется от денег. Точную цифру считает калькулятор ниже — за минуту и без созвона.</p>
+      <p class="lede" data-rise style="--rise-delay:100ms">Цену мы не прячем — но и не вешаем ценник на то, чего ещё не видели. Вместо прайса здесь вилка. Стакан слева можно собрать самому: стрелки или свайп двигают фигуру, пробел роняет.</p>
     </div>
 
     <div class="tetris-wrap">
       <div class="tetris-board" data-rise>
         <div class="tetris-board__hud"><span>стакан</span><b id="tetLevel">LV 1</b></div>
-        <div class="tetris-board__well"><canvas id="tetCanvas"></canvas></div>
+        <div class="tetris-board__well">
+          <canvas id="tetCanvas" tabindex="0" role="application" aria-label="Стакан тетриса: стрелки двигают фигуру, пробел роняет"></canvas>
+          <div class="tetris-board__hint" id="tetHint">← → ↓ · пробел</div>
+        </div>
+        <div class="tetris-board__pad" aria-hidden="true">
+          <button type="button" data-tet="left">◀</button>
+          <button type="button" data-tet="rot">⟳</button>
+          <button type="button" data-tet="right">▶</button>
+          <button type="button" data-tet="drop">▼</button>
+        </div>
         <div class="tetris-board__next"><span>уровень</span><b id="tetName">Экспресс-разбор</b></div>
       </div>
 
@@ -415,94 +389,51 @@
   </div>
 </section>
 
-<!-- seam: drip into the swamp -->
-<div class="seam-drip" aria-hidden="true">
-  <svg viewBox="0 0 1440 150" preserveAspectRatio="none">
-    <defs><linearGradient id="sg3" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#06070f"/><stop offset="1" stop-color="#0d1a0b"/>
-    </linearGradient></defs>
-    <rect width="1440" height="150" fill="url(#sg3)"/>
-    <path fill="#0d1a0b" d="M0,64 C120,64 140,102 200,102 C260,102 268,58 340,58 C412,58 428,110 500,110 C572,110 580,52 660,52 C740,52 748,116 830,116 C912,116 916,60 1000,60 C1084,60 1090,104 1160,104 C1230,104 1240,56 1320,56 C1400,56 1420,88 1440,88 L1440,150 L0,150 Z"/>
-    <g fill="#8bc34a" opacity=".5">
-      <circle cx="260" cy="126" r="4"><animate attributeName="cy" values="126;150;126" dur="4s" repeatCount="indefinite"/></circle>
-      <circle cx="740" cy="132" r="3"><animate attributeName="cy" values="132;150;132" dur="5.4s" repeatCount="indefinite"/></circle>
-      <circle cx="1180" cy="128" r="3.5"><animate attributeName="cy" values="128;150;128" dur="4.8s" repeatCount="indefinite"/></circle>
-    </g>
-  </svg>
-</div>
-
-<!-- ═══ WORLD 5 — SWAMP: карта маршрута ═══════════════════════════ -->
-<section class="stage w-swamp" aria-labelledby="swampTitle">
-  <div class="stage__bg">
-    <canvas class="w-swamp__hills" id="swampScene" aria-hidden="true"></canvas>
-    <div class="w-swamp__fog"></div>
-    <div class="fx-noise"></div>
-  </div>
-
+<!-- ═══ WORLD 5 — SHREK'S SWAMP ═══════════════════════════════════ -->
+<section class="stage w-shrek" data-world="shrek" aria-labelledby="shrekTitle">
   <div class="stage__body shell">
-    <div class="swamp-head">
-      <span class="eyebrow" data-rise>World 5 · болото</span>
-      <h2 class="h-sec" id="swampTitle" data-rise>Карта <em>маршрута</em></h2>
-      <span class="onion" data-rise>🧅 <b>Проекты — как лук.</b> У них есть слои. И да, иногда от них плачут — но только конкуренты.</span>
-      <p class="lede" data-rise style="--rise-delay:120ms">Три привала до того момента, когда бизнес перестаёт держаться на вас. Скролл ведёт по тропе — на каждом привале видно, что остаётся у вас на руках.</p>
+    <div class="shrek-head">
+      <span class="eyebrow" data-rise>World 5 · Болото</span>
+      <h2 class="h-sec" id="shrekTitle" data-rise>Проекты — как <em>лук</em></h2>
+      <div class="shrek-sign" data-rise aria-hidden="true">
+        <span>ОСТОРОЖНО:<br>ЗДЕСЬ РАБОТАЮТ</span>
+      </div>
+      <p class="lede" data-rise style="--rise-delay:120ms">«Огры как лук — у них есть слои». У проектов тоже. Снимайте слой за слоем — под каждым лежит этап работы и то, что остаётся у вас на руках. И да, иногда от них плачут — но только конкуренты.</p>
     </div>
 
-    <div class="route" id="route">
-      <div class="route__spine" aria-hidden="true"><span class="route__fill" id="routeFill"></span></div>
+    <div class="onion-wrap">
+      <div class="onion" data-rise>
+        <div class="onion__stage">
+          <svg class="onion__svg" viewBox="0 0 260 300" role="img" aria-label="Луковица: три слоя процесса">
+            <defs>
+              <radialGradient id="oG3" cx="42%" cy="34%"><stop offset="0" stop-color="#f3e6a8"/><stop offset="1" stop-color="#b89a3c"/></radialGradient>
+              <radialGradient id="oG2" cx="42%" cy="34%"><stop offset="0" stop-color="#eadd9a"/><stop offset="1" stop-color="#a88c33"/></radialGradient>
+              <radialGradient id="oG1" cx="42%" cy="34%"><stop offset="0" stop-color="#fdf6cf"/><stop offset="1" stop-color="#cdb45c"/></radialGradient>
+            </defs>
+            <path class="onion__sprout" d="M130 66 C118 40 96 30 78 30 C96 34 112 48 122 70 M130 66 C142 42 164 32 182 34 C164 38 148 50 138 70" fill="none" stroke="#6fae34" stroke-width="7" stroke-linecap="round"/>
+            <g class="onion__layer" data-layer="0">
+              <path d="M130 70 C196 70 238 128 238 186 C238 248 188 292 130 292 C72 292 22 248 22 186 C22 128 64 70 130 70Z" fill="url(#oG3)" stroke="#7d6420" stroke-width="3"/>
+              <path d="M78 120 C64 160 66 224 96 272 M182 120 C196 160 194 224 164 272" fill="none" stroke="rgba(125,100,32,.35)" stroke-width="3"/>
+            </g>
+            <g class="onion__layer" data-layer="1">
+              <path d="M130 104 C182 104 214 148 214 194 C214 244 176 278 130 278 C84 278 46 244 46 194 C46 148 78 104 130 104Z" fill="url(#oG2)" stroke="#7d6420" stroke-width="3"/>
+              <path d="M96 142 C86 172 88 224 110 262 M164 142 C174 172 172 224 150 262" fill="none" stroke="rgba(125,100,32,.35)" stroke-width="3"/>
+            </g>
+            <g class="onion__layer" data-layer="2">
+              <path d="M130 140 C168 140 190 172 190 204 C190 240 164 264 130 264 C96 264 70 240 70 204 C70 172 92 140 130 140Z" fill="url(#oG1)" stroke="#7d6420" stroke-width="3"/>
+              <circle cx="130" cy="204" r="22" fill="#fffbe6" stroke="rgba(125,100,32,.4)" stroke-width="3"/>
+            </g>
+          </svg>
+          <span class="onion__tear" id="onionTear" aria-hidden="true">💧</span>
+        </div>
+        <div class="onion__ctrl">
+          <button class="btn btn--swamp" type="button" id="onionPeel"><span>Снять слой</span></button>
+          <button class="btn btn--ghost" type="button" id="onionReset"><span>Собрать обратно</span></button>
+          <span class="onion__hint" id="onionHint">слой 1 из 3</span>
+        </div>
+      </div>
 
-      <article class="stop" data-rise>
-        <span class="stop__pin" aria-hidden="true">1</span>
-        <div class="stop__txt">
-          <span class="stop__when">неделя 1</span>
-          <h3 class="stop__t">Вы узнаёте, где теряете деньги</h3>
-          <p class="stop__d">Не спрашиваем «какой сайт хотите». Считаем, сколько заявок не доходит, сколько часов уходит на ручную работу и во что это обходится в месяц. Цифру называем до старта.</p>
-        </div>
-        <div class="stop__out">
-          <span class="stop__cap">на руках у вас</span>
-          <span class="stop__ot">Карта потерь</span>
-          <ul class="stop__list">
-            <li><i aria-hidden="true">✦</i><span>PDF: где течёт и сколько это стоит в месяц</span></li>
-            <li><i aria-hidden="true">✦</i><span>План на первые 30 дней</span></li>
-            <li><i aria-hidden="true">✦</i><span>Час созвона — на любые вопросы</span></li>
-          </ul>
-        </div>
-      </article>
-
-      <article class="stop" data-rise>
-        <span class="stop__pin" aria-hidden="true">2</span>
-        <div class="stop__txt">
-          <span class="stop__when">недели 2–4</span>
-          <h3 class="stop__t">Вы каждую пятницу видите, что изменилось</h3>
-          <p class="stop__d">Не отчёт о процессе — работающая версия, которую можно открыть и потыкать. Если что-то не то, вы говорите это на второй неделе, а не на сдаче.</p>
-        </div>
-        <div class="stop__out">
-          <span class="stop__cap">на руках у вас</span>
-          <span class="stop__ot">Ссылка каждую пятницу</span>
-          <ul class="stop__list">
-            <li><i aria-hidden="true">✦</i><span>Рабочая версия, а не отчёт о процессе</span></li>
-            <li><i aria-hidden="true">✦</i><span>Правки — на второй неделе, а не на сдаче</span></li>
-            <li><i aria-hidden="true">✦</i><span>Видно, что изменилось за неделю</span></li>
-          </ul>
-        </div>
-      </article>
-
-      <article class="stop" data-rise>
-        <span class="stop__pin" aria-hidden="true">3</span>
-        <div class="stop__txt">
-          <span class="stop__when">дальше</span>
-          <h3 class="stop__t">Вы перестаёте быть точкой отказа</h3>
-          <p class="stop__d">Запускаем, обучаем вашу команду, месяц держим руку на пульсе. Если через месяц вы всё ещё разбираете заявки руками — мы плохо сделали работу.</p>
-        </div>
-        <div class="stop__out">
-          <span class="stop__cap">на руках у вас</span>
-          <span class="stop__ot">Команда, которая справляется без вас</span>
-          <ul class="stop__list">
-            <li><i aria-hidden="true">✦</i><span>Обученная команда и записанные регламенты</span></li>
-            <li><i aria-hidden="true">✦</i><span>Месяц поддержки после запуска</span></li>
-            <li><i aria-hidden="true">✦</i><span>Цифры видно без ручной сборки отчётов</span></li>
-          </ul>
-        </div>
-      </article>
+      <div class="onion-out" id="onionOut" aria-live="polite"></div>
     </div>
 
     <div class="gains">
@@ -514,130 +445,120 @@
   </div>
 </section>
 
-<!-- seam: swamp → arcade -->
-<div class="seam" aria-hidden="true">
-  <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
-    <defs><linearGradient id="sg4" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#0a1408"/><stop offset="1" stop-color="#08050e"/>
-    </linearGradient></defs>
-    <rect width="1440" height="120" fill="url(#sg4)"/>
-    <g fill="#ff2e88" opacity=".22">
-      <rect x="0"    y="92" width="180" height="8" rx="3"/><rect x="220"  y="98" width="120" height="8" rx="3"/>
-      <rect x="400"  y="88" width="240" height="8" rx="3"/><rect x="700"  y="96" width="160" height="8" rx="3"/>
-      <rect x="920"  y="90" width="200" height="8" rx="3"/><rect x="1180" y="98" width="260" height="8" rx="3"/>
-    </g>
-  </svg>
-</div>
-
-<!-- ═══ WORLD 6 — ARCADE CABINET: кейсы ═══════════════════════════ -->
-<section class="stage w-cab" id="projects" aria-labelledby="cabTitle">
-  <div class="stage__bg">
-    <div class="w-cab__glow"></div>
-    <div class="fx-noise"></div>
-  </div>
-
+<!-- ═══ WORLD 6 — GAME BOY ════════════════════════════════════════ -->
+<section class="stage w-gb" id="projects" data-world="gb" aria-labelledby="gbTitle">
   <div class="stage__body shell">
-    <div class="cab-head">
-      <span class="eyebrow" data-rise>World 6 · автомат с картриджами</span>
-      <h2 class="h-sec" id="cabTitle" data-split data-rise>Пять <span class="mark hl">запусков</span></h2>
-      <p class="lede" data-rise style="--rise-delay:100ms">Вставьте картридж — на экране будет «было / стало» и слова владельца. Всё это реальные проекты, а не рендеры для портфолио.</p>
+    <div class="gb-head">
+      <span class="eyebrow" data-rise>World 6 · Game Boy</span>
+      <h2 class="h-sec" id="gbTitle" data-split data-rise>Пять <span class="mark hl-gb">запусков</span></h2>
+      <p class="lede" data-rise style="--rise-delay:100ms">Вставьте картридж — консоль загрузит проект. Крестовина листает, A открывает отзыв владельца. Всё это реальные запуски, а не рендеры для портфолио.</p>
     </div>
 
-    <div class="cab">
-      <div data-rise>
-        <div class="crt">
-          <div class="crt__screen" id="crtScreen" aria-live="polite"></div>
-          <div class="crt__deck">
-            <div class="crt__dots" id="crtDots" role="tablist" aria-label="Кейсы"></div>
-            <div class="crt__nav">
-              <button class="crt__btn" type="button" id="crtPrev" aria-label="Предыдущий кейс"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
-              <button class="crt__btn" type="button" id="crtNext" aria-label="Следующий кейс"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
-            </div>
+    <div class="gb-layout">
+      <!-- the console -->
+      <div class="gb" data-rise>
+        <div class="gb__top">
+          <span class="gb__led" id="gbLed" aria-hidden="true"></span>
+          <span class="gb__brand">BAZA<b>BOY</b></span>
+        </div>
+        <div class="gb__bezel">
+          <span class="gb__bezel-t" aria-hidden="true">DOT MATRIX WITH STEREO SOUND</span>
+          <div class="gb__screen" id="gbScreen" aria-live="polite"></div>
+        </div>
+        <div class="gb__logo" aria-hidden="true">BAZA <i>Game Boy</i></div>
+        <div class="gb__ctrl">
+          <div class="gb__dpad" role="group" aria-label="Крестовина">
+            <button type="button" class="gb__d gb__d--u" data-gb="up" aria-label="Вверх"></button>
+            <button type="button" class="gb__d gb__d--l" data-gb="prev" aria-label="Предыдущий проект"></button>
+            <span class="gb__d-mid" aria-hidden="true"></span>
+            <button type="button" class="gb__d gb__d--r" data-gb="next" aria-label="Следующий проект"></button>
+            <button type="button" class="gb__d gb__d--d" data-gb="down" aria-label="Вниз"></button>
+          </div>
+          <div class="gb__ab">
+            <button type="button" class="gb__btn" data-gb="b" aria-label="B — свернуть отзыв">B</button>
+            <button type="button" class="gb__btn" data-gb="a" aria-label="A — открыть отзыв">A</button>
           </div>
         </div>
-        <div class="rev" id="rev"></div>
+        <div class="gb__se">
+          <button type="button" class="gb__pill" data-gb="prev">select</button>
+          <button type="button" class="gb__pill" data-gb="a">start</button>
+        </div>
+        <div class="gb__speaker" aria-hidden="true"></div>
       </div>
 
-      <div class="carts" id="carts" role="tablist" aria-label="Картриджи" data-rise style="--rise-delay:80ms"></div>
+      <!-- cartridges + the review the A button opens -->
+      <div class="gb-side">
+        <div class="carts" id="carts" role="tablist" aria-label="Картриджи" data-rise></div>
+        <div class="rev" id="rev" data-rise style="--rise-delay:80ms"></div>
+      </div>
     </div>
 
     <div class="hiscore" data-rise>
-      <div class="hiscore__t"><span style="color:var(--coin)">HIGH SCORES · рост показателей клиентов</span><span>средние метрики за первые 3 месяца после запуска</span></div>
+      <div class="hiscore__t"><span>HIGH SCORES · рост показателей клиентов</span><span>средние метрики за первые 3 месяца после запуска</span></div>
       <div class="hiscore__belt"><div class="hiscore__row" id="hiscoreRow"></div></div>
     </div>
   </div>
 </section>
 
-<!-- ═══ WORLD 7 — RADAR: география ════════════════════════════════ -->
-<section class="stage w-geo" aria-labelledby="geoTitle">
-  <div class="stage__bg">
-    <div class="w-geo__scan"></div>
-    <div class="fx-noise"></div>
-  </div>
-
+<!-- ═══ WORLD 7 — INDIANA JONES MAP ═══════════════════════════════ -->
+<section class="stage w-map" data-world="map" aria-labelledby="mapTitle">
   <div class="stage__body shell">
-    <div class="geo-head">
-      <span class="eyebrow" data-rise>World 7 · радар</span>
-      <h2 class="h-sec" id="geoTitle" data-rise>Откуда пришли те, кто <span class="mark hl">уже решился</span></h2>
-      <p class="lede" data-rise style="--rise-delay:100ms">От Казани до Кремниевой долины — те же проекты, что на экране выше, только на карте. Наведите или нажмите на точку.</p>
+    <div class="map-head">
+      <span class="eyebrow" data-rise>World 7 · Карта путешествий</span>
+      <h2 class="h-sec" id="mapTitle" data-rise>Откуда пришли те, кто <em>уже решился</em></h2>
+      <p class="lede" data-rise style="--rise-delay:100ms">От Казани до Кремниевой долины. Нажмите на город — красный пунктир полетит туда, как в старом приключенческом кино.</p>
     </div>
 
-    <div class="geo-wrap" data-rise>
-      <div class="geo-canvas"><canvas id="geoCanvas"></canvas></div>
-      <div class="geo-read">
-        <span class="geo-read__city" id="geoCity">Москва — отсюда всё началось</span>
-        <span class="geo-read__n" id="geoN">19 городов · 4 страны запуска</span>
+    <div class="map-wrap" data-rise>
+      <div class="map-canvas"><canvas id="mapCanvas"></canvas></div>
+      <div class="map-read">
+        <span class="map-read__city" id="mapCity">Москва — отсюда всё началось</span>
+        <span class="map-read__n" id="mapN">19 городов · 4 страны запуска</span>
       </div>
+      <div class="map-chips" id="mapChips"></div>
     </div>
   </div>
 </section>
 
-<!-- seam: into the terminal -->
-<div class="seam" aria-hidden="true">
-  <svg viewBox="0 0 1440 120" preserveAspectRatio="none">
-    <defs><linearGradient id="sg5" x1="0" y1="0" x2="0" y2="1">
-      <stop offset="0" stop-color="#04060a"/><stop offset="1" stop-color="#040705"/>
-    </linearGradient></defs>
-    <rect width="1440" height="120" fill="url(#sg5)"/>
-    <g fill="#7dff9b" opacity=".28">
-      <rect y="100" width="1440" height="1.5"/><rect y="108" width="1440" height="1"/>
-    </g>
-  </svg>
-</div>
-
-<!-- ═══ WORLD 8 — TERMINAL: бриф ══════════════════════════════════ -->
-<section class="stage w-brief" id="brief" aria-labelledby="briefTitle">
-  <div class="stage__bg">
-    <div class="w-brief__glow"></div>
-    <div class="fx-noise"></div>
-  </div>
-
+<!-- ═══ WORLD 8 — THE MATRIX ══════════════════════════════════════ -->
+<section class="stage w-matrix" id="brief" data-world="matrix" aria-labelledby="briefTitle">
   <div class="stage__body shell">
     <div class="brief-head">
-      <span class="eyebrow" data-rise>World 8 · финальный босс</span>
+      <span class="eyebrow" data-rise>World 8 · The Matrix</span>
       <h2 class="h-sec" id="briefTitle" data-rise>Расскажите про задачу. Вернёмся <em>с решением и сроками</em></h2>
       <p class="lede" data-rise style="--rise-delay:100ms">Заявку читают те, кто будет делать. Первым сообщением придёт гипотеза, вилка бюджета и сроки — конкретными цифрами, в течение рабочего дня.</p>
+    </div>
+
+    <div class="pills" data-rise>
+      <button class="pill pill--red" type="button" id="pillRed">
+        <span class="pill__cap" aria-hidden="true"></span>
+        <span class="pill__t">Красная таблетка</span>
+        <span class="pill__s">Показать, сколько вы теряете, и посчитать вилку</span>
+      </button>
+      <button class="pill pill--blue" type="button" id="pillBlue">
+        <span class="pill__cap" aria-hidden="true"></span>
+        <span class="pill__t">Синяя таблетка</span>
+        <span class="pill__s">Ничего не считать — просто написать в Telegram</span>
+      </button>
     </div>
 
     <form class="term" id="briefForm" novalidate data-rise>
       <div class="term__bar">
         <span class="term__dots" aria-hidden="true"><i></i><i></i><i></i></span>
-        <span>baza@brief — ~/новая-задача</span>
+        <span>baza@matrix — ~/новая-задача</span>
       </div>
 
       <div class="term__body">
-        <p class="term__prompt" id="termPrompt">Здравствуйте. Я соберу вводные за минуту — отмечайте, я считаю на ходу.<span class="hero__caret" aria-hidden="true"></span></p>
+        <p class="term__prompt" id="termPrompt">Wake up, Neo… Я соберу вводные за минуту — отмечайте, я считаю на ходу.<span class="hero__caret" aria-hidden="true"></span></p>
 
         <div class="q">
           <div class="q__t">Что нужно сделать <span>можно несколько</span></div>
           <div class="chips" id="qTask" role="group" aria-label="Что нужно сделать"></div>
         </div>
-
         <div class="q">
           <div class="q__t">Когда стартуем</div>
           <div class="chips" id="qWhen" role="group" aria-label="Когда стартуем"></div>
         </div>
-
         <div class="q">
           <div class="q__t">Что забирает больше всего сил <span>можно несколько</span></div>
           <div class="chips" id="qPain" role="group" aria-label="Что забирает силы"></div>
@@ -682,7 +603,7 @@
           <button class="btn btn--go" type="submit"><span>Обсудить проект</span>
             <span class="btn__ico" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h13.5M12 6.5l6 5.5-6 5.5"/></svg></span>
           </button>
-          <a class="btn" href="https://t.me/lllbaza" target="_blank" rel="noopener"><span>Не хочу форму — напишу в Telegram</span></a>
+          <a class="btn btn--ghost" href="https://t.me/lllbaza" target="_blank" rel="noopener"><span>Не хочу форму — напишу в Telegram</span></a>
         </div>
 
         <div class="term__done" id="briefDone" role="status">
@@ -712,15 +633,22 @@
   </div>
 </section>
 
-<!-- ═══ CREDITS ═══════════════════════════════════════════════════ -->
-<footer class="credits">
-  <div class="credits__bg" aria-hidden="true"></div>
-  <canvas class="credits__stars" id="creditStars" aria-hidden="true"></canvas>
+<!-- ═══ WORLD 9 — STAR WARS CRAWL / CREDITS ═══════════════════════ -->
+<footer class="credits w-sw" data-world="sw">
+  <div class="crawl" aria-hidden="true">
+    <div class="crawl__inner" id="crawlInner">
+      <p class="crawl__ep">Эпизод IX</p>
+      <h2 class="crawl__t">ВОЗЬМЁМ ВАШУ БАЗУ НА СЕБЯ</h2>
+      <p>Это была эпоха, когда бизнес держался на одном человеке. Заявки терялись в мессенджерах, сайт стыдно было показать, а отпуск владельца стоил ровно недельной выручки.</p>
+      <p>Но появилась БАЗА. Сайты, CRM, автоматизация и ИИ-боты — чтобы компания продавала и без вас. Разбор за три дня показывает, где течёт. Дальше остаётся только починить.</p>
+      <p>Ответ приходит от тех, кто будет делать. В течение рабочего дня.</p>
+    </div>
+  </div>
 
   <div class="credits__body shell">
     <div class="credits__over" data-rise>
-      <b>THANKS FOR PLAYING</b>
-      <span>press ↑ to continue</span>
+      <b>THE END?</b>
+      <span>press ↑ to continue · или просто напишите</span>
     </div>
 
     <div class="credits__grid">
@@ -783,13 +711,13 @@
   <p>🍪 Печеньки — не только вкусные, но и полезные. Мы используем Cookie, чтобы сайт работал быстрее и удобнее для вас.</p>
   <div class="cookie__row">
     <button class="btn btn--solid" type="button" id="cookieYes"><span>Согласен 🍪</span></button>
-    <button class="btn" type="button" id="cookieNo"><span>Только необходимые</span></button>
+    <button class="btn btn--ghost" type="button" id="cookieNo"><span>Только необходимые</span></button>
   </div>
 </div>
 
 <script>
-/* Failsafe: if data.js or app.js never runs, the boot overlay would sit on
-   top of the page forever. Lift it unconditionally after a few seconds. */
+/* Failsafe: if a script never runs, the boot overlay must not sit on the
+   page forever. Lift it unconditionally after a few seconds. */
 setTimeout(function () {
   var b = document.getElementById('boot');
   if (b) b.classList.add('is-done');
@@ -797,6 +725,7 @@ setTimeout(function () {
 }, 6000);
 </script>
 <script src="assets/js/data.js"></script>
+<script src="assets/js/scenes.js"></script>
 <script src="assets/js/app.js"></script>
 </body>
 </html>

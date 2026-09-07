@@ -15,11 +15,15 @@
   var dirOpen = portrait ? 'seqm5' : 'seqd';
   var dirClose = portrait ? 'closem5' : 'seqdc';
 
+  // In the single-file build the frames live in window.__res as data URIs.
+  // With no catalog present this returns the plain path, so one source serves
+  // both the folder build and the bundle.
   function src(i) {
-    var n;
-    if (i < OPEN) { n = i; return 'assets/' + dirOpen + '/f' + pad(n) + '.webp'; }
-    n = i - OPEN;
-    return 'assets/' + dirClose + '/f' + pad(n) + '.webp';
+    var path = i < OPEN
+      ? 'assets/' + dirOpen + '/f' + pad(i) + '.webp'
+      : 'assets/' + dirClose + '/f' + pad(i - OPEN) + '.webp';
+    var cat = w.__res;
+    return (cat && cat[path]) || path;
   }
   function pad(n) { return n < 10 ? '00' + n : n < 100 ? '0' + n : '' + n; }
 
@@ -202,6 +206,14 @@
   }
 
   // Start pulling frames right away; the CSS poster covers the first paint.
-  startLoading();
+  // The bundle appends its catalogue at the very end of the body (20MB of
+  // base64 in the head would mean nothing paints until it is all parsed), so
+  // there we wait for the document before reading it.
   bumpBoot();
+  if (w.__bundled) {
+    if (d.readyState === 'loading') d.addEventListener('DOMContentLoaded', startLoading);
+    else startLoading();
+  } else {
+    startLoading();
+  }
 })(window, document);

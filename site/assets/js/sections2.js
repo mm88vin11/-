@@ -66,7 +66,19 @@
 
       wingT += 0.35 + Math.abs(birdVY) * 12;
       var bx = W * 0.26, by = birdY * playH;
-      bird(ctx, bx, by, Math.max(-0.5, Math.min(0.7, birdVY * 7)), wingT);
+      var bsc = clamp(W / 820, 0.95, 2.4);
+      var brot = Math.max(-0.5, Math.min(0.7, birdVY * 7));
+      // motion ghosts, strongest when the bird is actually moving
+      var speed = Math.min(Math.abs(birdVY) * 26, 1);
+      if (speed > 0.05) {
+        for (var gi = 1; gi <= 2; gi++) {
+          ctx.save();
+          ctx.globalAlpha = 0.20 * speed / gi;
+          bird(ctx, bx - gi * 16 * bsc, by - birdVY * playH * gi * 0.5, brot, wingT, bsc);
+          ctx.restore();
+        }
+      }
+      bird(ctx, bx, by, brot, wingT, bsc);
 
       // score when a pipe crosses the bird
       var scored = 0;
@@ -101,10 +113,14 @@
       c.strokeRect(x - lipOver + 1, ly + 1, pw + lipOver * 2 - 2, lipH - 2);
     }
 
-    function bird(c, x, y, rot, t) {
+    /* The bird was drawn at fixed pixel sizes, so on a 1440-wide stage it was
+       a 34px speck in an empty sky. It scales with the stage now, and trails
+       a couple of ghosts so a fast passage reads as movement. */
+    function bird(c, x, y, rot, t, sc) {
       c.save();
       c.translate(x, y);
       c.rotate(rot);
+      c.scale(sc, sc);
       // body
       c.fillStyle = '#f5c242';
       c.beginPath(); c.ellipse(0, 0, 17, 14, 0, 0, 6.2832); c.fill();

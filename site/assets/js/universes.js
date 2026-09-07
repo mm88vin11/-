@@ -408,9 +408,36 @@
         puff(c, cl.x * W, cl.y * H, 20 * cl.s * (W / 900 + .5));
       }
 
+      var gh = Math.max(52, H * .12);
+
+      /* Distant skyline. Flappy Bird has one, and without it this band was a
+         flat wall of cyan with a pipe in the middle — three quarters of the
+         frame doing nothing. It parallaxes slower than the bushes, which is
+         what gives the flight any sense of speed at all. */
+      var sk = H - gh;
+      var so2 = (B.scrollY * .09) % 260;
+      c.fillStyle = 'rgba(122,196,196,.55)';
+      for (var bx2 = -260; bx2 < W + 260; bx2 += 260) {
+        var o = bx2 - so2;
+        // one repeating block of towers, drawn from a fixed silhouette so it
+        // tiles seamlessly
+        var towers = [[0, 54], [34, 92], [72, 40], [98, 118], [136, 66],
+                      [170, 100], [206, 48], [232, 78]];
+        for (var ti = 0; ti < towers.length; ti++) {
+          var tw = towers[ti];
+          var hgt = tw[1] * (H / 900 + .45);
+          c.fillRect(o + tw[0], sk - hgt, 26, hgt);
+        }
+      }
+      // a haze band so the skyline sits behind the play area rather than in it
+      var hz = c.createLinearGradient(0, sk - H * .22, 0, sk);
+      hz.addColorStop(0, 'rgba(122,212,220,0)');
+      hz.addColorStop(1, 'rgba(160,226,232,.55)');
+      c.fillStyle = hz;
+      c.fillRect(0, sk - H * .22, W, H * .22);
+
       // bushes
       c.fillStyle = '#73bf2e';
-      var gh = Math.max(52, H * .12);
       var off = (B.scrollY * .3) % 120;
       c.beginPath();
       for (var x = -120; x < W + 120; x += 120) {

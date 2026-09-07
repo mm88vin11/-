@@ -478,7 +478,6 @@ body.menu-open .menu__link{opacity:1;transform:none;transition-delay:var(--md,0m
   will-change:transform;
   animation:mq-run var(--mq-dur,34s) linear infinite;
 }
-.mq--rev .mq__run{animation-direction:reverse}
 @keyframes mq-run{from{transform:translate3d(0,0,0)}to{transform:translate3d(-50%,0,0)}}
 .mq:hover .mq__run{animation-play-state:paused}
 .mq__item{

@@ -175,6 +175,100 @@
       raf = requestAnimationFrame(step);
     }
 
+    /* --- обратное демо (Законы 105-111) --------------------------------
+       Мы не показываем продукт. Человек показывает нам, как он живёт сейчас,
+       и выводы собираются из его же ответов — ничего выдуманного. */
+    (function reverseDemo() {
+      var host = $('#rd');
+      if (!host || !D.rd) return;
+      var pick = { src: [], who: '', speed: '', log: '' };
+
+      Object.keys(D.rd).forEach(function (key) {
+        var box = host.querySelector('[data-rd="' + key + '"] .rd__opts');
+        if (!box) return;
+        var cfg = D.rd[key];
+        cfg.opts.forEach(function (o) {
+          var b = el('button', 'rd__opt');
+          b.type = 'button';
+          b.setAttribute('aria-pressed', 'false');
+          b.textContent = o.t;
+          on(b, 'click', function () {
+            if (cfg.multi) {
+              var i = pick[key].indexOf(o.id);
+              if (i > -1) pick[key].splice(i, 1); else pick[key].push(o.id);
+            } else {
+              pick[key] = pick[key] === o.id ? '' : o.id;
+              box.querySelectorAll('.rd__opt').forEach(function (n) {
+                n.classList.remove('is-on'); n.setAttribute('aria-pressed', 'false');
+              });
+            }
+            var onNow = cfg.multi ? pick[key].indexOf(o.id) > -1 : pick[key] === o.id;
+            b.classList.toggle('is-on', onNow);
+            b.setAttribute('aria-pressed', onNow ? 'true' : 'false');
+            B.audio.sfx('blip');
+            render();
+          });
+          box.appendChild(b);
+        });
+      });
+
+      var outEl = $('#rdOut'), gridEl = $('#rdGrid'), verdictEl = $('#rdVerdict');
+
+      function opt(key, id) {
+        var a = D.rd[key].opts.filter(function (o) { return o.id === id; });
+        return a[0] || null;
+      }
+
+      function render() {
+        var ready = pick.src.length && pick.who && pick.speed && pick.log;
+        if (!ready) { if (outEl) outEl.hidden = true; return; }
+
+        var who = opt('who', pick.who), sp = opt('speed', pick.speed), lg = opt('log', pick.log);
+        var chan = pick.src.length;
+        // every number below is arithmetic on what the visitor just said
+        var places = chan + (lg.risk >= 3 ? 1 : 0);
+        var checks = chan * 6;
+        var risk = who.risk + sp.risk + lg.risk;
+
+        var cards = [
+          { v: chan, k: B.plural(chan, ['канал', 'канала', 'каналов']) + ', куда пишут' },
+          { v: '~' + checks, k: B.plural(checks, ['раз', 'раза', 'раз']) + ' в день туда заглянуть' },
+          { v: places, k: B.plural(places, ['место', 'места', 'мест']) + ', где заявка может лечь' },
+          { v: sp.say, k: 'столько она ждёт ответа', wide: true }
+        ];
+        if (gridEl) {
+          gridEl.innerHTML = '';
+          cards.forEach(function (c, i) {
+            var n = el('div', 'rd__card' + (c.wide ? ' rd__card--wide' : ''));
+            n.style.setProperty('--rdd', (i * 70) + 'ms');
+            n.innerHTML = '<b>' + c.v + '</b><span>' + c.k + '</span>';
+            gridEl.appendChild(n);
+          });
+        }
+
+        var line;
+        if (risk <= 2) {
+          line = 'Схема рабочая. Узкое место одно: она держится на людях — пока они на месте, всё в порядке.';
+        } else if (risk <= 5) {
+          line = 'Заявка проходит через ' + places + ' ' +
+                 B.plural(places, ['точку', 'точки', 'точек']) +
+                 ', где её никто не держит, и след остаётся ' + lg.say + '.';
+        } else {
+          line = 'Заявка приходит в ' + chan + ' ' +
+                 B.plural(chan, ['место', 'места', 'мест']) +
+                 ', ответ уходит ' + sp.say + ', а след остаётся ' + lg.say +
+                 '. Здесь теряется не «иногда» — здесь теряется по расписанию.';
+        }
+        if (verdictEl) verdictEl.textContent = line;
+
+        if (outEl && outEl.hidden) {
+          outEl.hidden = false;
+          requestAnimationFrame(function () { outEl.classList.add('is-on'); });
+          B.audio.sfx('bump');
+        }
+      }
+    })();
+
     /* --- services grid -------------------------------------------------- */
     var grid = $('#svcGrid');
     if (grid) {
@@ -311,7 +405,9 @@
   (function tetris() {
     var range = $('#ttRange');
     if (!range) return;
-    var priceEl = $('#ttPrice'), termEl = $('#ttTerm');
+    var priceEl = $('#ttPrice'), priceHiEl = $('#ttPriceHi'), termEl = $('#ttTerm');
+    var adviceEl = $('#ttAdvice'), adviceName = $('#ttAdviceName'),
+        adviceWhy = $('#ttAdviceWhy'), adviceGo = $('#ttAdviceGo');
     var nameEl = $('#ttTierName'), textEl = $('#ttTierText'), featEl = $('#ttFeats');
     var linesEl = $('#ttLines'), levelEl = $('#ttLevel');
 
@@ -413,14 +509,17 @@
     var lastName = '';
     function apply(v, silent) {
       var t = tierFor(v), nx = nextTier(v);
-      // interpolate the headline number between anchors so dragging feels live
-      var price = t.price, term = t.term;
+      // Law 56: a single figure is a wall, and walls get tested. The readout
+      // stays a moving range so there is nothing to push against.
+      var price = t.price, hi = t.hi, term = t.term;
       if (nx) {
         var k = (v - t.at) / (nx.at - t.at);
         price = Math.round((t.price + (nx.price - t.price) * k) / 10) * 10;
+        hi = Math.round((t.hi + (nx.hi - t.hi) * k) / 10) * 10;
         term = Math.round(t.term + (nx.term - t.term) * k);
       }
       if (priceEl) priceEl.textContent = price;
+      if (priceHiEl) priceHiEl.textContent = hi;
       if (termEl) termEl.textContent = term;
       if (nameEl) nameEl.textContent = t.name;
       if (textEl) textEl.textContent = t.text;
@@ -446,9 +545,33 @@
       } else if (!silent) {
         // quiet tick while dragging inside one tier
       }
+      syncAdvice(v);
       if (!wellW) fitWell();
       drawWell();
     }
+
+    // Law 78: name the rung we would pick, and say why
+    var pickTier = D.tiers.filter(function (x) { return x.pick; })[0] || D.tiers[1];
+    if (adviceName) adviceName.textContent = pickTier.name;
+    if (adviceWhy) adviceWhy.textContent = ' — ' + pickTier.why;
+    function syncAdvice(v) {
+      if (!adviceEl) return;
+      var here = tierFor(v).name === pickTier.name;
+      adviceEl.classList.toggle('is-here', here);
+      if (adviceGo) adviceGo.hidden = here;
+    }
+    on(adviceGo, 'click', function () {
+      var target = pickTier.at + 14;
+      var from = +range.value;
+      var t0 = performance.now();
+      (function step(now) {
+        var k = B.ease.out(Math.min(1, (now - t0) / 520));
+        range.value = Math.round(from + (target - from) * k);
+        apply(+range.value, k < 1);
+        if (k < 1) requestAnimationFrame(step);
+        else { B.audio.sfx('clear'); B.buzz(10); }
+      })(t0);
+    });
 
     on(range, 'input', function () { apply(+range.value, false); });
     on(range, 'change', function () { apply(+range.value, false); });

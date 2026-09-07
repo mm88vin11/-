@@ -256,6 +256,15 @@
 
   /* --------------------------------------------------------------- misc -- */
 
+  // Russian plural agreement: 1 канал, 2 канала, 5 каналов
+  B.plural = function (n, forms) {
+    var a = Math.abs(n) % 100, b = a % 10;
+    if (a > 10 && a < 20) return forms[2];
+    if (b > 1 && b < 5) return forms[1];
+    if (b === 1) return forms[0];
+    return forms[2];
+  };
+
   B.$ = function (sel, root) { return (root || d).querySelector(sel); };
   B.$$ = function (sel, root) {
     return Array.prototype.slice.call((root || d).querySelectorAll(sel));

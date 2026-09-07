@@ -1766,3 +1766,182 @@ html.konami .mario__hud{animation:konami-hue 3s linear infinite}
   content:'';position:absolute;inset:0;
   background:radial-gradient(80% 60% at 26% 34%,rgba(7,10,28,.82) 0%,rgba(7,10,28,.34) 58%,transparent 100%);
 }
+
+/* --- Pricing: the recommendation (Law 78) --------------------------------
+   The scale alone leaves the visitor holding the decision. This names the
+   rung we would pick and why, and offers to move the handle there. */
+/* .tt__num paints its gradient with background-clip:text and color:transparent.
+   Children inherit that transparent colour, and their own opacity takes them
+   out of the parent's clip — so the dash and the unit need a real colour. */
+.tt__num i,.tt__num small{
+  color:#b9cdf0;
+  -webkit-text-fill-color:#b9cdf0;
+}
+.tt__num i{font-style:normal;opacity:.45;margin-inline:.05em}
+.tt__num small{opacity:.72}
+.tt__advice{
+  position:relative;
+  padding:16px 18px;border-radius:16px;
+  border:1px solid rgba(255,212,0,.28);
+  background:linear-gradient(160deg,rgba(255,212,0,.09),rgba(255,212,0,.03));
+  display:flex;flex-direction:column;gap:8px;
+  transition:border-color .5s var(--e-out),background-color .5s var(--e-out);
+}
+.tt__advice.is-here{
+  border-color:rgba(0,229,255,.45);
+  background:linear-gradient(160deg,rgba(0,229,255,.1),rgba(0,229,255,.03));
+}
+.tt__adviceK{
+  font-family:var(--f-pixel);font-size:8.5px;letter-spacing:.08em;
+  color:#ffd400;text-transform:lowercase;
+}
+.tt__advice.is-here .tt__adviceK{color:#7ee8ff}
+.tt__advice p{font-size:14px;line-height:1.5;opacity:.88}
+.tt__advice b{color:#fff;font-weight:800}
+.tt__adviceGo{
+  align-self:flex-start;
+  font-size:12.5px;color:#ffd400;
+  text-decoration:underline;text-underline-offset:3px;
+  transition:opacity .3s ease;
+}
+.tt__adviceGo:hover{opacity:.75}
+.tt__ask{
+  font-size:clamp(15px,1.7vw,19px);line-height:1.4;font-weight:700;
+  letter-spacing:-.018em;color:#fff;
+}
+
+/* --- Обратное демо (Законы 105-111) ---------------------------------------
+   Зеркало, а не витрина: ни одного слова о нашем продукте, только вопросы
+   про то, как человек живёт сейчас. */
+.rd{
+  margin-top:clamp(24px,4vh,42px);
+  padding:clamp(20px,2.6vw,32px);
+  border-radius:20px;
+  border:1px solid rgba(92,255,143,.2);
+  background:linear-gradient(180deg,rgba(3,18,8,.8),rgba(2,10,5,.8));
+  -webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);
+  box-shadow:0 24px 60px rgba(0,0,0,.42);
+  display:flex;flex-direction:column;gap:6px;
+}
+.rd__ask{
+  font-family:var(--f-mono);
+  font-size:clamp(16px,2.1vw,24px);line-height:1.35;
+  color:#d6ffe4;letter-spacing:-.01em;
+}
+.rd__sub{font-size:13px;line-height:1.5;opacity:.5;margin-bottom:14px}
+
+.rd__q{display:flex;flex-direction:column;gap:9px;margin-top:14px}
+.rd__qt{
+  font-family:var(--f-mono);font-size:11px;letter-spacing:.14em;
+  text-transform:uppercase;color:#5cff8f;opacity:.85;
+  display:flex;gap:8px;align-items:baseline;flex-wrap:wrap;
+}
+.rd__qt em{font-style:normal;letter-spacing:.04em;text-transform:none;opacity:.5;font-size:11px}
+.rd__opts{display:flex;flex-wrap:wrap;gap:7px}
+.rd__opt{
+  padding:8px 13px;border-radius:99px;
+  border:1px solid rgba(92,255,143,.24);
+  background:rgba(4,20,9,.6);
+  color:#bfe9cd;font-size:13px;font-weight:600;letter-spacing:-.01em;
+  transition:border-color .26s var(--e-out),background-color .26s var(--e-out),
+             color .26s var(--e-out),transform .26s var(--e-out);
+}
+@media (hover:hover){.rd__opt:hover{border-color:rgba(92,255,143,.55);transform:translateY(-1px)}}
+.rd__opt:active{transform:scale(.97)}
+.rd__opt.is-on{
+  background:#5cff8f;border-color:#5cff8f;color:#04140a;
+  box-shadow:0 0 22px rgba(92,255,143,.34);
+}
+
+.rd__out{
+  margin-top:22px;padding-top:20px;
+  border-top:1px dashed rgba(92,255,143,.24);
+  opacity:0;transform:translateY(10px);
+  transition:opacity .5s var(--e-out),transform .5s var(--e-out);
+}
+.rd__out.is-on{opacity:1;transform:none}
+.rd__grid{
+  display:grid;grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px;margin-bottom:16px;
+}
+.rd__card{
+  padding:14px 16px;border-radius:14px;
+  background:rgba(92,255,143,.07);
+  border:1px solid rgba(92,255,143,.16);
+  display:flex;flex-direction:column;gap:3px;
+  animation:rd-in .5s var(--e-out) backwards;
+  animation-delay:var(--rdd,0ms);
+}
+@keyframes rd-in{from{opacity:0;transform:translateY(8px)}}
+.rd__card--wide{grid-column:span 3}
+.rd__card b{
+  font-size:clamp(20px,2.4vw,28px);font-weight:800;letter-spacing:-.03em;
+  color:#5cff8f;line-height:1.1;
+}
+.rd__card span{font-size:12.5px;line-height:1.35;opacity:.62}
+@media (max-width:640px){
+  .rd__grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .rd__card--wide{grid-column:span 2}
+}
+
+.rd__verdict{
+  font-size:clamp(15px,1.75vw,19px);line-height:1.45;
+  color:#eaffef;font-weight:600;letter-spacing:-.015em;
+  margin-bottom:8px;
+}
+.rd__mine{font-size:13.5px;line-height:1.5;opacity:.55}
+
+/* --- Внутренний адвокат (Законы 117-121) ---------------------------------- */
+.adv{
+  margin-top:clamp(20px,3vh,30px);
+  padding:18px 20px;border-radius:16px;
+  border:1px dashed rgba(10,10,10,.22);
+  background:rgba(10,10,10,.035);
+  display:flex;flex-direction:column;gap:7px;
+}
+.adv__t{font-size:15px;font-weight:800;letter-spacing:-.02em}
+.adv__d{font-size:13.5px;line-height:1.5;opacity:.62;max-width:52ch}
+.adv__btn{
+  align-self:flex-start;margin-top:5px;
+  display:inline-flex;align-items:center;gap:9px;
+  padding:9px 15px;border-radius:99px;
+  border:1px solid rgba(10,10,10,.24);
+  background:rgba(255,255,255,.6);
+  font-size:13.5px;font-weight:700;letter-spacing:-.01em;
+  transition:border-color .28s var(--e-out),background-color .28s var(--e-out),
+             transform .28s var(--e-out);
+}
+.adv__ico{font-size:15px;opacity:.6}
+@media (hover:hover){.adv__btn:hover{border-color:var(--ink);background:#fff;transform:translateY(-1px)}}
+.adv__btn:active{transform:scale(.97)}
+
+/* --- Что дальше после запуска (Законы 127-133) ---------------------------- */
+.after{
+  position:relative;z-index:1;
+  margin-top:clamp(30px,5vh,58px);
+  padding:clamp(22px,2.6vw,34px);
+  border-radius:20px;
+  background:rgba(255,255,255,.9);
+  -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+  border:2px solid rgba(14,34,51,.12);
+  box-shadow:0 20px 50px rgba(0,40,60,.2);
+  display:flex;flex-direction:column;gap:10px;
+  color:#0e2233;
+}
+.after__k{
+  font-family:var(--f-pixel);font-size:8.5px;letter-spacing:.08em;color:#0e5a66;
+}
+.after h3{color:#0e2233}
+.after__list{display:flex;flex-direction:column;gap:9px;margin-top:4px}
+.after__list li{
+  /* label and text belong on one flowing line, not stacked */
+  display:block;
+  font-size:14.5px;line-height:1.5;color:#1d3d52;
+  padding-left:16px;position:relative;
+}
+.after__list li::before{
+  content:'';position:absolute;left:0;top:.62em;
+  width:7px;height:7px;border-radius:2px;background:#73bf2e;
+}
+.after__list b{font-weight:800;color:#0e2233}
+.after__fine{font-size:13px;line-height:1.5;color:#1d3d52;opacity:.68;margin-top:4px}

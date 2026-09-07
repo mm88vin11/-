@@ -182,6 +182,60 @@
     }, 620);
   });
 
+  /* --------------------------------------------- внутренний адвокат ----
+     Законы 117-121: не убеждать всех, а вооружить того одного, кто будет
+     защищать проект внутри. Пересказ по памяти теряет половину смысла. */
+  on($('#advCopy'), 'click', function () {
+    var names = state.wants.map(function (id) {
+      var it = D.wants.filter(function (x) { return x.id === id; })[0];
+      return it ? it.t.toLowerCase() : '';
+    }).filter(Boolean);
+
+    var lines = [
+      'Коротко, зачем нам подрядчик по цифре.',
+      '',
+      'Что болит сейчас:'
+    ];
+    if (state.pain.length) {
+      state.pain.forEach(function (id) {
+        var it = D.pains.filter(function (x) { return x.id === id; })[0];
+        if (it) lines.push('— ' + it.t.toLowerCase());
+      });
+    } else {
+      lines.push('— заявки теряются, всё держится на ручной работе');
+    }
+    lines.push('');
+    lines.push('Что предлагается сделать:');
+    lines.push(names.length ? '— ' + names.join('\n— ') : '— сайт и автоматизация приёма заявок');
+    lines.push('');
+    var from = ($('#brFrom') || {}).textContent || '';
+    var to = ($('#brTo') || {}).textContent || '';
+    var term = ($('#brTerm') || {}).textContent || '';
+    if (from && from !== '—') {
+      lines.push('Ориентир по бюджету: ' + from + '—' + to + ' ₽. Срок: ' + term + '.');
+      lines.push('Это вилка, а не счёт: точная цифра называется после разбора и дальше не меняется.');
+    } else {
+      lines.push('Ориентир по бюджету и срок называются после короткого разбора.');
+    }
+    lines.push('');
+    lines.push('Начинаем не с договора на всё, а с разбора — это отдельная небольшая работа.');
+    lines.push('Если делаем проект, её стоимость уходит в счёт проекта.');
+    lines.push('');
+    lines.push('Подрядчик: БАЗА — lllbaza.ru');
+
+    var text = lines.join('\n');
+    var okMsg = 'Текст скопирован — можно отправлять';
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(
+        function () { B.toast(okMsg, 3200); },
+        function () { B.toast('Не вышло скопировать — выделите текст вручную'); });
+    } else {
+      B.toast('Скопируйте текст из консоли браузера');
+      if (w.console) console.log(text);
+    }
+    B.audio.sfx('blip');
+  });
+
   /* -------------------------------------------------------- scene hook -- */
   B.scene({ el: '#brief', name: 'brief', bg: '[data-bg="brief"]', margin: 0.4 });
 })(window, document);

@@ -1,0 +1,1230 @@
+{
+ "fonts": [
+  {
+   "family": "JetBrains Mono",
+   "style": "normal",
+   "weight": "400",
+   "file": "font/jetbrains-mono-400-feae5721.woff2",
+   "range": "U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F"
+  },
+  {
+   "family": "JetBrains Mono",
+   "style": "normal",
+   "weight": "400",
+   "file": "font/jetbrains-mono-400-9d8db2e8.woff2",
+   "range": "U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116"
+  },
+  {
+   "family": "JetBrains Mono",
+   "style": "normal",
+   "weight": "400",
+   "file": "font/jetbrains-mono-400-06ad3600.woff2",
+   "range": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF"
+  },
+  {
+   "family": "JetBrains Mono",
+   "style": "normal",
+   "weight": "400",
+   "file": "font/jetbrains-mono-400-4f27206c.woff2",
+   "range": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD"
+  },
+  {
+   "family": "JetBrains Mono",
+   "style": "normal",
+   "weight": "700",
+   "file": "font/jetbrains-mono-400-feae5721.woff2",
+   "range": "U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F"
+  },
+  {
+   "family": "JetBrains Mono",
+   "style": "normal",
+   "weight": "700",
+   "file": "font/jetbrains-mono-400-9d8db2e8.woff2",
+   "range": "U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116"
+  },
+  {
+   "family": "JetBrains Mono",
+   "style": "normal",
+   "weight": "700",
+   "file": "font/jetbrains-mono-400-06ad3600.woff2",
+   "range": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF"
+  },
+  {
+   "family": "JetBrains Mono",
+   "style": "normal",
+   "weight": "700",
+   "file": "font/jetbrains-mono-400-4f27206c.woff2",
+   "range": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD"
+  },
+  {
+   "family": "Manrope",
+   "style": "normal",
+   "weight": "500",
+   "file": "font/manrope-500-5d8e0798.woff2",
+   "range": "U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F"
+  },
+  {
+   "family": "Manrope",
+   "style": "normal",
+   "weight": "500",
+   "file": "font/manrope-500-d8fc94bf.woff2",
+   "range": "U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116"
+  },
+  {
+   "family": "Manrope",
+   "style": "normal",
+   "weight": "500",
+   "file": "font/manrope-500-1f62546f.woff2",
+   "range": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF"
+  },
+  {
+   "family": "Manrope",
+   "style": "normal",
+   "weight": "500",
+   "file": "font/manrope-500-b4295101.woff2",
+   "range": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD"
+  },
+  {
+   "family": "Manrope",
+   "style": "normal",
+   "weight": "600",
+   "file": "font/manrope-500-5d8e0798.woff2",
+   "range": "U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F"
+  },
+  {
+   "family": "Manrope",
+   "style": "normal",
+   "weight": "600",
+   "file": "font/manrope-500-d8fc94bf.woff2",
+   "range": "U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116"
+  },
+  {
+   "family": "Manrope",
+   "style": "normal",
+   "weight": "600",
+   "file": "font/manrope-500-1f62546f.woff2",
+   "range": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF"
+  },
+  {
+   "family": "Manrope",
+   "style": "normal",
+   "weight": "600",
+   "file": "font/manrope-500-b4295101.woff2",
+   "range": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD"
+  },
+  {
+   "family": "Manrope",
+   "style": "normal",
+   "weight": "700",
+   "file": "font/manrope-500-5d8e0798.woff2",
+   "range": "U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F"
+  },
+  {
+   "family": "Manrope",
+   "style": "normal",
+   "weight": "700",
+   "file": "font/manrope-500-d8fc94bf.woff2",
+   "range": "U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116"
+  },
+  {
+   "family": "Manrope",
+   "style": "normal",
+   "weight": "700",
+   "file": "font/manrope-500-1f62546f.woff2",
+   "range": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF"
+  },
+  {
+   "family": "Manrope",
+   "style": "normal",
+   "weight": "700",
+   "file": "font/manrope-500-b4295101.woff2",
+   "range": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD"
+  },
+  {
+   "family": "Manrope",
+   "style": "normal",
+   "weight": "800",
+   "file": "font/manrope-500-5d8e0798.woff2",
+   "range": "U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F"
+  },
+  {
+   "family": "Manrope",
+   "style": "normal",
+   "weight": "800",
+   "file": "font/manrope-500-d8fc94bf.woff2",
+   "range": "U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116"
+  },
+  {
+   "family": "Manrope",
+   "style": "normal",
+   "weight": "800",
+   "file": "font/manrope-500-1f62546f.woff2",
+   "range": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF"
+  },
+  {
+   "family": "Manrope",
+   "style": "normal",
+   "weight": "800",
+   "file": "font/manrope-500-b4295101.woff2",
+   "range": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD"
+  },
+  {
+   "family": "Playfair Display",
+   "style": "normal",
+   "weight": "700",
+   "file": "font/playfair-display-700-83c9b620.woff2",
+   "range": "U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116"
+  },
+  {
+   "family": "Playfair Display",
+   "style": "normal",
+   "weight": "700",
+   "file": "font/playfair-display-700-99a7c18e.woff2",
+   "range": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF"
+  },
+  {
+   "family": "Playfair Display",
+   "style": "normal",
+   "weight": "700",
+   "file": "font/playfair-display-700-daeff530.woff2",
+   "range": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD"
+  },
+  {
+   "family": "Playfair Display",
+   "style": "normal",
+   "weight": "900",
+   "file": "font/playfair-display-700-83c9b620.woff2",
+   "range": "U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116"
+  },
+  {
+   "family": "Playfair Display",
+   "style": "normal",
+   "weight": "900",
+   "file": "font/playfair-display-700-99a7c18e.woff2",
+   "range": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF"
+  },
+  {
+   "family": "Playfair Display",
+   "style": "normal",
+   "weight": "900",
+   "file": "font/playfair-display-700-daeff530.woff2",
+   "range": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD"
+  },
+  {
+   "family": "Press Start 2P",
+   "style": "normal",
+   "weight": "400",
+   "file": "font/press-start-2p-400-eefdc307.woff2",
+   "range": "U+0460-052F, U+1C80-1C8A, U+20B4, U+2DE0-2DFF, U+A640-A69F, U+FE2E-FE2F"
+  },
+  {
+   "family": "Press Start 2P",
+   "style": "normal",
+   "weight": "400",
+   "file": "font/press-start-2p-400-2970d3ed.woff2",
+   "range": "U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116"
+  },
+  {
+   "family": "Press Start 2P",
+   "style": "normal",
+   "weight": "400",
+   "file": "font/press-start-2p-400-6074e77f.woff2",
+   "range": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF"
+  },
+  {
+   "family": "Press Start 2P",
+   "style": "normal",
+   "weight": "400",
+   "file": "font/press-start-2p-400-87ab8daa.woff2",
+   "range": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD"
+  },
+  {
+   "family": "Russo One",
+   "style": "normal",
+   "weight": "400",
+   "file": "font/russo-one-400-e3628171.woff2",
+   "range": "U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116"
+  },
+  {
+   "family": "Russo One",
+   "style": "normal",
+   "weight": "400",
+   "file": "font/russo-one-400-530e3de3.woff2",
+   "range": "U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF"
+  },
+  {
+   "family": "Russo One",
+   "style": "normal",
+   "weight": "400",
+   "file": "font/russo-one-400-a5674301.woff2",
+   "range": "U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD"
+  }
+ ],
+ "images": [
+  {
+   "sha": "045678dee0",
+   "rel": "img/045678dee0.svg",
+   "ext": "svg",
+   "bytes": 259
+  },
+  {
+   "sha": "2fed74c9dd",
+   "rel": "img/2fed74c9dd.webp",
+   "ext": "webp",
+   "bytes": 77434
+  },
+  {
+   "sha": "39be6c8434",
+   "rel": "img/39be6c8434.webp",
+   "ext": "webp",
+   "bytes": 169100
+  },
+  {
+   "sha": "a960b7b585",
+   "rel": "img/a960b7b585.webp",
+   "ext": "webp",
+   "bytes": 50708
+  },
+  {
+   "sha": "bcfe65773f",
+   "rel": "img/bcfe65773f.webp",
+   "ext": "webp",
+   "bytes": 49802
+  },
+  {
+   "sha": "2fed74c9dd",
+   "rel": "img/2fed74c9dd.webp",
+   "ext": "webp",
+   "bytes": 77434
+  }
+ ],
+ "files": {
+  "seq/d/0001.webp": {
+   "bytes": 23840
+  },
+  "seq/d/0002.webp": {
+   "bytes": 23950
+  },
+  "seq/d/0003.webp": {
+   "bytes": 24232
+  },
+  "seq/d/0004.webp": {
+   "bytes": 24572
+  },
+  "seq/d/0005.webp": {
+   "bytes": 24870
+  },
+  "seq/d/0006.webp": {
+   "bytes": 25064
+  },
+  "seq/d/0007.webp": {
+   "bytes": 24804
+  },
+  "seq/d/0008.webp": {
+   "bytes": 24996
+  },
+  "seq/d/0009.webp": {
+   "bytes": 25644
+  },
+  "seq/d/0010.webp": {
+   "bytes": 25780
+  },
+  "seq/d/0011.webp": {
+   "bytes": 25892
+  },
+  "seq/d/0012.webp": {
+   "bytes": 25732
+  },
+  "seq/d/0013.webp": {
+   "bytes": 26478
+  },
+  "seq/d/0014.webp": {
+   "bytes": 26242
+  },
+  "seq/d/0015.webp": {
+   "bytes": 26918
+  },
+  "seq/d/0016.webp": {
+   "bytes": 27414
+  },
+  "seq/d/0017.webp": {
+   "bytes": 28010
+  },
+  "seq/d/0018.webp": {
+   "bytes": 28022
+  },
+  "seq/d/0019.webp": {
+   "bytes": 28582
+  },
+  "seq/d/0020.webp": {
+   "bytes": 29670
+  },
+  "seq/d/0021.webp": {
+   "bytes": 30558
+  },
+  "seq/d/0022.webp": {
+   "bytes": 32658
+  },
+  "seq/d/0023.webp": {
+   "bytes": 35162
+  },
+  "seq/d/0024.webp": {
+   "bytes": 39056
+  },
+  "seq/d/0025.webp": {
+   "bytes": 42670
+  },
+  "seq/d/0026.webp": {
+   "bytes": 45576
+  },
+  "seq/d/0027.webp": {
+   "bytes": 45546
+  },
+  "seq/d/0028.webp": {
+   "bytes": 44640
+  },
+  "seq/d/0029.webp": {
+   "bytes": 47730
+  },
+  "seq/d/0030.webp": {
+   "bytes": 49236
+  },
+  "seq/d/0031.webp": {
+   "bytes": 48122
+  },
+  "seq/d/0032.webp": {
+   "bytes": 45942
+  },
+  "seq/d/0033.webp": {
+   "bytes": 51314
+  },
+  "seq/d/0034.webp": {
+   "bytes": 55646
+  },
+  "seq/d/0035.webp": {
+   "bytes": 54560
+  },
+  "seq/d/0036.webp": {
+   "bytes": 54054
+  },
+  "seq/d/0037.webp": {
+   "bytes": 61112
+  },
+  "seq/d/0038.webp": {
+   "bytes": 68146
+  },
+  "seq/d/0039.webp": {
+   "bytes": 68560
+  },
+  "seq/d/0040.webp": {
+   "bytes": 69446
+  },
+  "seq/d/0041.webp": {
+   "bytes": 72332
+  },
+  "seq/d/0042.webp": {
+   "bytes": 76106
+  },
+  "seq/d/0043.webp": {
+   "bytes": 72570
+  },
+  "seq/d/0044.webp": {
+   "bytes": 68590
+  },
+  "seq/d/0045.webp": {
+   "bytes": 66342
+  },
+  "seq/d/0046.webp": {
+   "bytes": 68232
+  },
+  "seq/d/0047.webp": {
+   "bytes": 61862
+  },
+  "seq/d/0048.webp": {
+   "bytes": 56696
+  },
+  "seq/d/0049.webp": {
+   "bytes": 56770
+  },
+  "seq/d/0050.webp": {
+   "bytes": 56414
+  },
+  "seq/d/0051.webp": {
+   "bytes": 52238
+  },
+  "seq/d/0052.webp": {
+   "bytes": 52226
+  },
+  "seq/d/0053.webp": {
+   "bytes": 50138
+  },
+  "seq/d/0054.webp": {
+   "bytes": 48304
+  },
+  "seq/d/0055.webp": {
+   "bytes": 48484
+  },
+  "seq/d/0056.webp": {
+   "bytes": 46114
+  },
+  "seq/d/0057.webp": {
+   "bytes": 45756
+  },
+  "seq/d/0058.webp": {
+   "bytes": 44512
+  },
+  "seq/d/0059.webp": {
+   "bytes": 44916
+  },
+  "seq/d/0060.webp": {
+   "bytes": 43150
+  },
+  "seq/d/0061.webp": {
+   "bytes": 42862
+  },
+  "seq/d/0062.webp": {
+   "bytes": 41966
+  },
+  "seq/d/0063.webp": {
+   "bytes": 42244
+  },
+  "seq/d/0064.webp": {
+   "bytes": 41250
+  },
+  "seq/d/0065.webp": {
+   "bytes": 40234
+  },
+  "seq/d/0066.webp": {
+   "bytes": 40552
+  },
+  "seq/d/0067.webp": {
+   "bytes": 40564
+  },
+  "seq/d/0068.webp": {
+   "bytes": 40056
+  },
+  "seq/d/0069.webp": {
+   "bytes": 39852
+  },
+  "seq/d/0070.webp": {
+   "bytes": 39568
+  },
+  "seq/d/0071.webp": {
+   "bytes": 40136
+  },
+  "seq/d/0072.webp": {
+   "bytes": 39884
+  },
+  "seq/d/0073.webp": {
+   "bytes": 39660
+  },
+  "seq/d/0074.webp": {
+   "bytes": 39866
+  },
+  "seq/d/0075.webp": {
+   "bytes": 40556
+  },
+  "seq/d/0076.webp": {
+   "bytes": 39484
+  },
+  "seq/d/0077.webp": {
+   "bytes": 39476
+  },
+  "seq/d/0078.webp": {
+   "bytes": 40348
+  },
+  "seq/d/0079.webp": {
+   "bytes": 39678
+  },
+  "seq/d/0080.webp": {
+   "bytes": 39588
+  },
+  "seq/d/0081.webp": {
+   "bytes": 39864
+  },
+  "seq/d/0082.webp": {
+   "bytes": 39176
+  },
+  "seq/d/0083.webp": {
+   "bytes": 38424
+  },
+  "seq/d/0084.webp": {
+   "bytes": 38542
+  },
+  "seq/d/0085.webp": {
+   "bytes": 37972
+  },
+  "seq/d/0086.webp": {
+   "bytes": 38168
+  },
+  "seq/d/0087.webp": {
+   "bytes": 37634
+  },
+  "seq/d/0088.webp": {
+   "bytes": 38120
+  },
+  "seq/d/0089.webp": {
+   "bytes": 37766
+  },
+  "seq/d/0090.webp": {
+   "bytes": 38976
+  },
+  "seq/d/0091.webp": {
+   "bytes": 37220
+  },
+  "seq/d/0092.webp": {
+   "bytes": 36730
+  },
+  "seq/d/0093.webp": {
+   "bytes": 36294
+  },
+  "seq/d/0094.webp": {
+   "bytes": 36328
+  },
+  "seq/d/0095.webp": {
+   "bytes": 35830
+  },
+  "seq/d/0096.webp": {
+   "bytes": 36210
+  },
+  "seq/d/0097.webp": {
+   "bytes": 36764
+  },
+  "seq/d/0098.webp": {
+   "bytes": 35778
+  },
+  "seq/d/0099.webp": {
+   "bytes": 35720
+  },
+  "seq/d/0100.webp": {
+   "bytes": 35952
+  },
+  "seq/d/0101.webp": {
+   "bytes": 36812
+  },
+  "seq/d/0102.webp": {
+   "bytes": 36956
+  },
+  "seq/d/0103.webp": {
+   "bytes": 34874
+  },
+  "seq/d/0104.webp": {
+   "bytes": 36260
+  },
+  "seq/d/0105.webp": {
+   "bytes": 35522
+  },
+  "seq/d/0106.webp": {
+   "bytes": 35780
+  },
+  "seq/d/0107.webp": {
+   "bytes": 35918
+  },
+  "seq/d/0108.webp": {
+   "bytes": 36028
+  },
+  "seq/d/0109.webp": {
+   "bytes": 35966
+  },
+  "seq/d/0110.webp": {
+   "bytes": 36552
+  },
+  "seq/d/0111.webp": {
+   "bytes": 36900
+  },
+  "seq/d/0112.webp": {
+   "bytes": 37388
+  },
+  "seq/d/0113.webp": {
+   "bytes": 37280
+  },
+  "seq/d/0114.webp": {
+   "bytes": 38202
+  },
+  "seq/d/0115.webp": {
+   "bytes": 37856
+  },
+  "seq/d/0116.webp": {
+   "bytes": 38018
+  },
+  "seq/d/0117.webp": {
+   "bytes": 38498
+  },
+  "seq/d/0118.webp": {
+   "bytes": 40508
+  },
+  "seq/d/0119.webp": {
+   "bytes": 38550
+  },
+  "seq/d/0120.webp": {
+   "bytes": 38676
+  },
+  "seq/d/0121.webp": {
+   "bytes": 46004
+  },
+  "seq/d/0122.webp": {
+   "bytes": 38428
+  },
+  "seq/d/0123.webp": {
+   "bytes": 38798
+  },
+  "seq/d/0124.webp": {
+   "bytes": 39208
+  },
+  "seq/d/0125.webp": {
+   "bytes": 39316
+  },
+  "seq/d/0126.webp": {
+   "bytes": 39786
+  },
+  "seq/d/0127.webp": {
+   "bytes": 41354
+  },
+  "seq/d/0128.webp": {
+   "bytes": 38124
+  },
+  "seq/d/0129.webp": {
+   "bytes": 38384
+  },
+  "seq/d/0130.webp": {
+   "bytes": 38518
+  },
+  "seq/d/0131.webp": {
+   "bytes": 38520
+  },
+  "seq/d/0132.webp": {
+   "bytes": 38804
+  },
+  "seq/d/0133.webp": {
+   "bytes": 37506
+  },
+  "seq/d/0134.webp": {
+   "bytes": 37920
+  },
+  "seq/d/0135.webp": {
+   "bytes": 37490
+  },
+  "seq/d/0136.webp": {
+   "bytes": 37006
+  },
+  "seq/d/0137.webp": {
+   "bytes": 39820
+  },
+  "seq/d/0138.webp": {
+   "bytes": 37374
+  },
+  "seq/d/0139.webp": {
+   "bytes": 36936
+  },
+  "seq/d/0140.webp": {
+   "bytes": 36194
+  },
+  "seq/d/0141.webp": {
+   "bytes": 35960
+  },
+  "seq/d/0142.webp": {
+   "bytes": 35698
+  },
+  "seq/d/0143.webp": {
+   "bytes": 34626
+  },
+  "seq/d/0144.webp": {
+   "bytes": 34816
+  },
+  "seq/d/0145.webp": {
+   "bytes": 35346
+  },
+  "seq/d/0146.webp": {
+   "bytes": 34436
+  },
+  "seq/d/0147.webp": {
+   "bytes": 33352
+  },
+  "seq/d/0148.webp": {
+   "bytes": 32574
+  },
+  "seq/d/0149.webp": {
+   "bytes": 32130
+  },
+  "seq/d/0150.webp": {
+   "bytes": 31194
+  },
+  "seq/d/0151.webp": {
+   "bytes": 31630
+  },
+  "seq/d/0152.webp": {
+   "bytes": 30640
+  },
+  "seq/d/0153.webp": {
+   "bytes": 30072
+  },
+  "seq/d/0154.webp": {
+   "bytes": 28744
+  },
+  "seq/d/0155.webp": {
+   "bytes": 28300
+  },
+  "seq/d/0156.webp": {
+   "bytes": 27126
+  },
+  "seq/d/0157.webp": {
+   "bytes": 26518
+  },
+  "seq/d/0158.webp": {
+   "bytes": 25408
+  },
+  "seq/d/0159.webp": {
+   "bytes": 24686
+  },
+  "seq/d/0160.webp": {
+   "bytes": 23058
+  },
+  "seq/d/0161.webp": {
+   "bytes": 22832
+  },
+  "seq/d/0162.webp": {
+   "bytes": 21684
+  },
+  "seq/d/0163.webp": {
+   "bytes": 19846
+  },
+  "seq/d/0164.webp": {
+   "bytes": 19120
+  },
+  "seq/d/0165.webp": {
+   "bytes": 18456
+  },
+  "seq/d/0166.webp": {
+   "bytes": 17360
+  },
+  "seq/d/0167.webp": {
+   "bytes": 15702
+  },
+  "seq/d/0168.webp": {
+   "bytes": 13860
+  },
+  "seq/d/0169.webp": {
+   "bytes": 12860
+  },
+  "seq/d/0170.webp": {
+   "bytes": 11252
+  },
+  "seq/d/0171.webp": {
+   "bytes": 9770
+  },
+  "seq/d/0172.webp": {
+   "bytes": 9228
+  },
+  "seq/d/0173.webp": {
+   "bytes": 7276
+  },
+  "seq/d/0174.webp": {
+   "bytes": 6408
+  },
+  "seq/d/0175.webp": {
+   "bytes": 6180
+  },
+  "seq/d/0176.webp": {
+   "bytes": 6280
+  },
+  "seq/d/0177.webp": {
+   "bytes": 6160
+  },
+  "seq/d/0178.webp": {
+   "bytes": 6170
+  },
+  "seq/d/0179.webp": {
+   "bytes": 6134
+  },
+  "seq/d/0180.webp": {
+   "bytes": 5904
+  },
+  "seq/d/0181.webp": {
+   "bytes": 5956
+  },
+  "seq/d/0182.webp": {
+   "bytes": 5940
+  },
+  "seq/m/0001.webp": {
+   "bytes": 29026
+  },
+  "seq/m/0002.webp": {
+   "bytes": 29104
+  },
+  "seq/m/0003.webp": {
+   "bytes": 29640
+  },
+  "seq/m/0004.webp": {
+   "bytes": 30094
+  },
+  "seq/m/0005.webp": {
+   "bytes": 30358
+  },
+  "seq/m/0006.webp": {
+   "bytes": 30750
+  },
+  "seq/m/0007.webp": {
+   "bytes": 31276
+  },
+  "seq/m/0008.webp": {
+   "bytes": 31482
+  },
+  "seq/m/0009.webp": {
+   "bytes": 31980
+  },
+  "seq/m/0010.webp": {
+   "bytes": 32534
+  },
+  "seq/m/0011.webp": {
+   "bytes": 33538
+  },
+  "seq/m/0012.webp": {
+   "bytes": 33576
+  },
+  "seq/m/0013.webp": {
+   "bytes": 32810
+  },
+  "seq/m/0014.webp": {
+   "bytes": 33954
+  },
+  "seq/m/0015.webp": {
+   "bytes": 33210
+  },
+  "seq/m/0016.webp": {
+   "bytes": 34778
+  },
+  "seq/m/0017.webp": {
+   "bytes": 36124
+  },
+  "seq/m/0018.webp": {
+   "bytes": 33106
+  },
+  "seq/m/0019.webp": {
+   "bytes": 33026
+  },
+  "seq/m/0020.webp": {
+   "bytes": 31954
+  },
+  "seq/m/0021.webp": {
+   "bytes": 33214
+  },
+  "seq/m/0022.webp": {
+   "bytes": 32966
+  },
+  "seq/m/0023.webp": {
+   "bytes": 34516
+  },
+  "seq/m/0024.webp": {
+   "bytes": 37486
+  },
+  "seq/m/0025.webp": {
+   "bytes": 44096
+  },
+  "seq/m/0026.webp": {
+   "bytes": 59958
+  },
+  "seq/m/0027.webp": {
+   "bytes": 60836
+  },
+  "seq/m/0028.webp": {
+   "bytes": 63498
+  },
+  "seq/m/0029.webp": {
+   "bytes": 67314
+  },
+  "seq/m/0030.webp": {
+   "bytes": 62940
+  },
+  "seq/m/0031.webp": {
+   "bytes": 66894
+  },
+  "seq/m/0032.webp": {
+   "bytes": 66632
+  },
+  "seq/m/0033.webp": {
+   "bytes": 61612
+  },
+  "seq/m/0034.webp": {
+   "bytes": 62470
+  },
+  "seq/m/0035.webp": {
+   "bytes": 54388
+  },
+  "seq/m/0036.webp": {
+   "bytes": 53692
+  },
+  "seq/m/0037.webp": {
+   "bytes": 50660
+  },
+  "seq/m/0038.webp": {
+   "bytes": 47942
+  },
+  "seq/m/0039.webp": {
+   "bytes": 45218
+  },
+  "seq/m/0040.webp": {
+   "bytes": 42536
+  },
+  "seq/m/0041.webp": {
+   "bytes": 37206
+  },
+  "seq/m/0042.webp": {
+   "bytes": 36412
+  },
+  "seq/m/0043.webp": {
+   "bytes": 31022
+  },
+  "seq/m/0044.webp": {
+   "bytes": 30542
+  },
+  "seq/m/0045.webp": {
+   "bytes": 27402
+  },
+  "seq/m/0046.webp": {
+   "bytes": 25568
+  },
+  "seq/m/0047.webp": {
+   "bytes": 25274
+  },
+  "seq/m/0048.webp": {
+   "bytes": 23092
+  },
+  "seq/m/0049.webp": {
+   "bytes": 23104
+  },
+  "seq/m/0050.webp": {
+   "bytes": 22360
+  },
+  "seq/m/0051.webp": {
+   "bytes": 22076
+  },
+  "seq/m/0052.webp": {
+   "bytes": 21708
+  },
+  "seq/m/0053.webp": {
+   "bytes": 21604
+  },
+  "seq/m/0054.webp": {
+   "bytes": 21620
+  },
+  "seq/m/0055.webp": {
+   "bytes": 21392
+  },
+  "seq/m/0056.webp": {
+   "bytes": 21502
+  },
+  "seq/m/0057.webp": {
+   "bytes": 21220
+  },
+  "seq/m/0058.webp": {
+   "bytes": 21002
+  },
+  "seq/m/0059.webp": {
+   "bytes": 21208
+  },
+  "seq/m/0060.webp": {
+   "bytes": 21456
+  },
+  "seq/m/0061.webp": {
+   "bytes": 21208
+  },
+  "seq/m/0062.webp": {
+   "bytes": 21350
+  },
+  "seq/m/0063.webp": {
+   "bytes": 21370
+  },
+  "seq/m/0064.webp": {
+   "bytes": 20404
+  },
+  "seq/m/0065.webp": {
+   "bytes": 20752
+  },
+  "seq/m/0066.webp": {
+   "bytes": 20640
+  },
+  "seq/m/0067.webp": {
+   "bytes": 20688
+  },
+  "seq/m/0068.webp": {
+   "bytes": 20660
+  },
+  "seq/m/0069.webp": {
+   "bytes": 20964
+  },
+  "seq/m/0070.webp": {
+   "bytes": 21140
+  },
+  "seq/m/0071.webp": {
+   "bytes": 21542
+  },
+  "seq/m/0072.webp": {
+   "bytes": 21326
+  },
+  "seq/m/0073.webp": {
+   "bytes": 20950
+  },
+  "seq/m/0074.webp": {
+   "bytes": 21232
+  },
+  "seq/m/0075.webp": {
+   "bytes": 21566
+  },
+  "seq/m/0076.webp": {
+   "bytes": 21590
+  },
+  "seq/m/0077.webp": {
+   "bytes": 21640
+  },
+  "seq/m/0078.webp": {
+   "bytes": 21550
+  },
+  "seq/m/0079.webp": {
+   "bytes": 21410
+  },
+  "seq/m/0080.webp": {
+   "bytes": 20708
+  },
+  "seq/m/0081.webp": {
+   "bytes": 20428
+  },
+  "seq/m/0082.webp": {
+   "bytes": 19640
+  },
+  "seq/m/0083.webp": {
+   "bytes": 19162
+  },
+  "seq/m/0084.webp": {
+   "bytes": 18842
+  },
+  "seq/m/0085.webp": {
+   "bytes": 18390
+  },
+  "seq/m/0086.webp": {
+   "bytes": 19068
+  },
+  "seq/m/0087.webp": {
+   "bytes": 16678
+  },
+  "seq/m/0088.webp": {
+   "bytes": 16162
+  },
+  "seq/m/0089.webp": {
+   "bytes": 15614
+  },
+  "seq/m/0090.webp": {
+   "bytes": 14252
+  },
+  "seq/m/0091.webp": {
+   "bytes": 13356
+  },
+  "seq/m/0092.webp": {
+   "bytes": 12150
+  },
+  "seq/m/0093.webp": {
+   "bytes": 10792
+  },
+  "seq/m/0094.webp": {
+   "bytes": 9526
+  },
+  "seq/m/0095.webp": {
+   "bytes": 7470
+  },
+  "seq/m/0096.webp": {
+   "bytes": 5568
+  },
+  "seq/m/0097.webp": {
+   "bytes": 4394
+  },
+  "seq/m/0098.webp": {
+   "bytes": 4306
+  },
+  "seq/m/0099.webp": {
+   "bytes": 4276
+  },
+  "seq/m/0100.webp": {
+   "bytes": 4242
+  },
+  "seq/m/0101.webp": {
+   "bytes": 4506
+  },
+  "seq/m/0102.webp": {
+   "bytes": 4348
+  },
+  "seq/m/0103.webp": {
+   "bytes": 4116
+  },
+  "seq/m/0104.webp": {
+   "bytes": 4028
+  },
+  "font/jetbrains-mono-400-feae5721.woff2": {
+   "bytes": 1640
+  },
+  "font/jetbrains-mono-400-9d8db2e8.woff2": {
+   "bytes": 8872
+  },
+  "font/jetbrains-mono-400-06ad3600.woff2": {
+   "bytes": 11624
+  },
+  "font/jetbrains-mono-400-4f27206c.woff2": {
+   "bytes": 31432
+  },
+  "font/manrope-500-5d8e0798.woff2": {
+   "bytes": 2552
+  },
+  "font/manrope-500-d8fc94bf.woff2": {
+   "bytes": 14500
+  },
+  "font/manrope-500-1f62546f.woff2": {
+   "bytes": 15120
+  },
+  "font/manrope-500-b4295101.woff2": {
+   "bytes": 24836
+  },
+  "font/playfair-display-700-83c9b620.woff2": {
+   "bytes": 21152
+  },
+  "font/playfair-display-700-99a7c18e.woff2": {
+   "bytes": 21140
+  },
+  "font/playfair-display-700-daeff530.woff2": {
+   "bytes": 38404
+  },
+  "font/press-start-2p-400-eefdc307.woff2": {
+   "bytes": 6704
+  },
+  "font/press-start-2p-400-2970d3ed.woff2": {
+   "bytes": 6864
+  },
+  "font/press-start-2p-400-6074e77f.woff2": {
+   "bytes": 9856
+  },
+  "font/press-start-2p-400-87ab8daa.woff2": {
+   "bytes": 12512
+  },
+  "font/russo-one-400-e3628171.woff2": {
+   "bytes": 4492
+  },
+  "font/russo-one-400-530e3de3.woff2": {
+   "bytes": 4344
+  },
+  "font/russo-one-400-a5674301.woff2": {
+   "bytes": 7344
+  },
+  "img/045678dee0.svg": {
+   "bytes": 259
+  },
+  "img/2fed74c9dd.webp": {
+   "bytes": 77434
+  },
+  "img/39be6c8434.webp": {
+   "bytes": 169100
+  },
+  "img/a960b7b585.webp": {
+   "bytes": 50708
+  },
+  "img/bcfe65773f.webp": {
+   "bytes": 49802
+  }
+ }
+}

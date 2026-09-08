@@ -1,15 +1,14 @@
 /* ==========================================================================
-   БАЗА — craft: курсор, магнетизм, живая шапка, буквы, бегущая строка.
+   БАЗА — хром, перенесённый из боевой сборки.
 
-   Всё, что отличает «работает» от «дорого». Ни одной новой библиотеки:
-   физика взята из готовых пресетов (магнит с зажимом 0.3 и elastic-выходом,
-   посимвольный вылет с rotateX и шагом 15 мс), но считается на том же
-   единственном rAF, что уже крутит страницу. Вторая петля анимации стоила бы
-   ровно те же кадры, которые мы только что отвоевали.
+   Четыре механизма, ради которых это делалось:
+     1. чернильная пилюля под навигацией, темнящая слово ровно по своей кромке;
+     2. геометрия заливки кнопок (--swa/--swl);
+     3. искры от нажатия;
+     4. прелоадер, который улетает в шапку и становится её логотипом.
 
-   Правило на весь файл: анимируются только transform и opacity. Любое
-   свойство, которое трогает раскладку, выкидывает кадр на пересчёт — и на
-   середине страницы это видно.
+   Старый билд был на React и держал это в состоянии компонента. Здесь всё
+   на том же единственном rAF, что крутит остальную страницу.
    ========================================================================== */
 (function (w, d) {
   'use strict';
@@ -17,317 +16,266 @@
   if (!B) return;
   var E = B.env, $ = B.$, $$ = B.$$, on = B.on, clamp = B.clamp;
 
-  var OFF = (w.__craftOff||'').split(',');
-  var fine = !E.coarse && w.matchMedia && w.matchMedia('(hover:hover)').matches;
+  var root = d.documentElement;
 
-  /* ══════════════════════════════════════════════════ 1 · КУРСОР ═══════ */
-  /* Две точки: ядро идёт за пальцем почти без задержки, кольцо отстаёт и
-     догоняет. Именно разница скоростей читается как вес — одна точка,
-     приклеенная к курсору, выглядит как баг отрисовки, а не как курсор. */
+  /* ═════════════════════════════════════ 1 · ЧЕРНИЛЬНАЯ ПИЛЮЛЯ ════════ */
 
-  var cursor = null;
-  if (fine && !E.reduce && OFF.indexOf('cursor')<0) {
-    cursor = d.createElement('div');
-    cursor.className = 'cur';
-    cursor.setAttribute('aria-hidden', 'true');
-    cursor.innerHTML = '<i class="cur__ring"></i><i class="cur__dot"></i>' +
-      '<span class="cur__label"></span>';
-    d.body.appendChild(cursor);
-    d.documentElement.classList.add('has-cur');
+  var nav = $('#headNav'), ink = $('#headInk');
+  var items = nav ? $$('.head__link', nav) : [];
+  var inkS = null, hover = null, active = 'pain';
 
-    var ring = $('.cur__ring', cursor), dot = $('.cur__dot', cursor);
-    var label = $('.cur__label', cursor);
-
-    var mx = w.innerWidth / 2, my = w.innerHeight / 2;
-    var rx = mx, ry = my, dx = mx, dy = my;
-    var scale = 1, tScale = 1, shown = 0, tShown = 0;
-    var lastO = '', labelled = false;
-
-    on(w, 'pointermove', function (e) {
-      if (e.pointerType && e.pointerType !== 'mouse') return;
-      mx = e.clientX; my = e.clientY; tShown = 1;
-    }, { passive: true });
-    on(d, 'pointerleave', function () { tShown = 0; });
-    on(w, 'blur', function () { tShown = 0; });
-
-    /* Что под курсором, решается на pointerover, а не в кадре: спрашивать
-       closest() шестьдесят раз в секунду — это шестьдесят обходов дерева
-       ради ответа, который меняется пару раз за всё время. */
-    var HOT = 'a,button,[role="button"],input,label,summary,.chip,.pill,.mblock,.nope,.socc,.udl';
-    on(d, 'pointerover', function (e) {
-      var t = e.target.closest ? e.target.closest(HOT) : null;
-      var draw = e.target.closest && e.target.closest('#stC');
-      cursor.classList.toggle('is-hot', !!t);
-      cursor.classList.toggle('is-draw', !!draw);
-      tScale = draw ? 2.1 : t ? 1.75 : 1;
-      var hint = t && t.getAttribute('data-cur');
-      if (label) label.textContent = hint || (draw ? 'ведите' : '');
-      labelled = !!(hint || draw);
-      cursor.classList.toggle('is-labelled', labelled);
-    });
-    on(d, 'pointerdown', function () { tScale *= 0.72; });
-    on(d, 'pointerup', function () {
-      tScale = cursor.classList.contains('is-draw') ? 2.1
-        : cursor.classList.contains('is-hot') ? 1.75 : 1;
-    });
-
-    B.ticker.add(function (sy, dt) {
-      dt = Math.min(dt || 1 / 60, 1 / 24);
-      // ядро почти без инерции, кольцо заметно отстаёт — отсюда вес
-      var kd = B.damp(0.62, dt), kr = B.damp(0.20, dt);
-      dx += (mx - dx) * kd; dy += (my - dy) * kd;
-      rx += (mx - rx) * kr; ry += (my - ry) * kr;
-      scale += (tScale - scale) * B.damp(0.24, dt);
-      shown += (tShown - shown) * B.damp(0.30, dt);
-
-      dot.style.transform = 'translate3d(' + dx.toFixed(1) + 'px,' + dy.toFixed(1) + 'px,0) translate(-50%,-50%)';
-      ring.style.transform = 'translate3d(' + rx.toFixed(1) + 'px,' + ry.toFixed(1) + 'px,0) translate(-50%,-50%) scale(' + scale.toFixed(3) + ')';
-      // прозрачность меняется двумя движениями за сеанс — писать её каждый
-      // кадр значит просить пересчёт там, где ничего не поменялось
-      var o = shown.toFixed(2);
-      if (o !== lastO) { cursor.style.opacity = o; lastO = o; }
-      // подпись почти всегда пуста; двигать пустой узел незачем
-      if (label && labelled) {
-        label.style.transform = 'translate3d(' + rx.toFixed(1) + 'px,' + (ry + 30).toFixed(1) + 'px,0) translate(-50%,0)';
-      }
-    }, 95);
-  }
-
-  /* ═════════════════════════════════════════════════ 2 · МАГНЕТИЗМ ════ */
-  /* Кнопка тянется к курсору. Сила зажата: элемент никогда не покидает свою
-     зону нажатия, иначе клик промахивается мимо того, что видно. Вешается
-     на считанные элементы — магнитится всё подряд, и страница дрожит. */
-
-  function magnetise(el, strength, radius) {
-    if (!fine || E.reduce) return;
-    var tx = 0, ty = 0, cx = 0, cy = 0, live = false;
-    var S = strength || 0.3, R = radius || 90;
-
-    function move(e) {
-      var r = el.getBoundingClientRect();
-      var ox = e.clientX - (r.left + r.width / 2);
-      var oy = e.clientY - (r.top + r.height / 2);
-      var dist = Math.hypot(ox, oy);
-      var reach = Math.max(r.width, r.height) / 2 + R;
-      if (dist > reach) { tx = ty = 0; return; }
-      var f = 1 - dist / reach;
-      tx = ox * S * f; ty = oy * S * f;
-    }
-    on(w, 'pointermove', function (e) {
-      if (!live) return;
-      move(e);
-    }, { passive: true });
-
-    // тикает только пока курсор рядом: сотня спящих кнопок не должна
-    // отнимать кадр у того, что действительно движется
-    var step = function (sy, dt) {
-      var k = B.damp(0.18, Math.min(dt || 1 / 60, 1 / 24));
-      cx += (tx - cx) * k; cy += (ty - cy) * k;
-      el.style.transform = 'translate3d(' + cx.toFixed(2) + 'px,' + cy.toFixed(2) + 'px,0)';
-      if (!live && Math.abs(cx) < 0.05 && Math.abs(cy) < 0.05) {
-        el.style.transform = '';
-        B.ticker.remove(step);
-        step.__on = false;
-      }
-    };
-    step.__on = false;
-
-    on(el, 'pointerenter', function () {
-      live = true;
-      if (!step.__on) { step.__on = true; B.ticker.add(step, 92); }
-    });
-    on(el, 'pointerleave', function () { live = false; tx = ty = 0; });
-  }
-  B.magnetise = magnetise;
-
-  /* ════════════════════════════════════════════ 3 · БУКВЫ ЗАГОЛОВКОВ ══ */
-  /* Заголовок собирается из букв. Разбиваются только короткие строки:
-     на абзаце это сотни узлов ради эффекта, которого никто не заметит.
-     Оригинальный текст остаётся в aria-label, поэтому скринридер читает
-     фразу, а не перечисляет буквы по одной. */
-
-  function splitChars(el) {
-    if (el.__split) return;
-    el.__split = 1;
-    var text = el.textContent.trim();
-    if (!text || text.length > 90) return;
-    el.setAttribute('aria-label', text);
-
-    var frag = d.createDocumentFragment();
-    var nodes = [];
-    Array.prototype.forEach.call(el.childNodes, function (n) { nodes.push(n); });
-
-    function walk(node, into) {
-      if (node.nodeType === 3) {
-        var s = node.nodeValue;
-        for (var i = 0; i < s.length; i++) {
-          var ch = s[i];
-          if (ch === ' ') { into.appendChild(d.createTextNode(' ')); continue; }
-          var sp = d.createElement('span');
-          sp.className = 'ch';
-          sp.textContent = ch;
-          into.appendChild(sp);
-        }
-      } else if (node.nodeType === 1) {
-        if (node.tagName === 'BR') { into.appendChild(node.cloneNode()); return; }
-        var clone = node.cloneNode(false);
-        Array.prototype.forEach.call(node.childNodes, function (c) { walk(c, clone); });
-        into.appendChild(clone);
-      }
-    }
-    nodes.forEach(function (n) { walk(n, frag); });
-
-    el.textContent = '';
-    el.appendChild(frag);
-    el.setAttribute('aria-hidden', 'false');
-    el.classList.add('split');
-
-    /* Задержка растёт с индексом, но не бесконечно. На заголовке в 75 знаков
-       линейный шаг давал больше секунды одного только разбега: человек,
-       листающий быстро, успевал увидеть заголовок недорисованным. После
-       двадцать шестого знака волна догоняет сама себя, и любой заголовок
-       собирается меньше чем за полсекунды. */
-    var chars = $$('.ch', el);
-    chars.forEach(function (c, i) { c.style.setProperty('--i', Math.min(i, 26)); });
-    el.style.setProperty('--n', chars.length);
-  }
-
-  /* Разбор — ленивый, и это не оптимизация «на всякий случай», а условие
-     работоспособности. `perspective` на заголовке создаёт 3D-контекст, и
-     каждая буква с rotateX внутри него становится слоем, который композитор
-     пересобирает каждый кадр — даже когда заголовок далеко за экраном. Пока
-     разбирались все заголовки сразу, страница честно держала 30 кадров вместо
-     60. Поэтому: разбираем в момент подхода, а сразу после проигрыша
-     схлопываем обратно в плоский текст и 3D-контекст убираем совсем. */
-
-  var SPLIT_MS = 1500;
-
-  function playSplit(el) {
-    splitChars(el);
-    if (!el.classList.contains('split')) return;   // слишком длинный — пропущен
-    requestAnimationFrame(function () {
-      el.classList.add('is-lit');
-      var chars = Math.min($$('.ch', el).length, 26);
-      setTimeout(function () { el.classList.add('is-flat'); },
-        SPLIT_MS + chars * 15);
-    });
-  }
-
-  function initSplits() {
-    if (E.reduce || OFF.indexOf('split') >= 0) return;
-    var heads = $$('h1.h-xl:not([data-split]), h2.h-lg:not([data-split])');
-    if (!heads.length) return;
-
-    var io = new IntersectionObserver(function (entries) {
-      entries.forEach(function (e) {
-        if (!e.isIntersecting) return;
-        io.unobserve(e.target);
-        playSplit(e.target);
-      });
-    }, { rootMargin: '0px 0px -12% 0px', threshold: 0.12 });
-
-    heads.forEach(function (h) {
-      h.setAttribute('data-split', '');
-      io.observe(h);
-    });
-  }
-
-  /* ═══════════════════════════════════════ 4 · БЕГУЩАЯ СТРОКА ═════════ */
-  /* Лента жила своей жизнью с постоянной скоростью и не знала, что делает
-     человек. Теперь она реагирует: стоишь — ползёт, летишь вниз — разгоняется,
-     листаешь вверх — идёт назад. Это дешёвый, но очень заметный признак того,
-     что страница живая. */
-
-  function liveTicker() {
-    if (OFF.indexOf('ticker')>=0) return;
-    var run = $('#tickRun');
-    if (!run || E.reduce) return;
-    var pos = 0, vel = 0, lastY = w.scrollY || 0, width = 0;
-
-    function measure() { width = run.scrollWidth / 2 || 1; }
-    measure();
-    B.onResize(measure);
-    w.addEventListener('baza:ready', measure);
-
-    B.ticker.add(function (sy, dt) {
-      dt = Math.min(dt || 1 / 60, 1 / 24);
-      var dy = sy - lastY;
-      lastY = sy;
-      // скорость скролла подмешивается к базовому ходу и затухает
-      vel += (dy * 2.6 - vel) * B.damp(0.14, dt);
-      var base = 46;                       // px/сек в покое
-      pos -= (base * dt + vel * dt * 3.2);
-      if (!width) measure();
-      if (width) {
-        // модуль по длине одной копии: лента бесшовная в обе стороны
-        pos = pos % width;
-        if (pos > 0) pos -= width;
-      }
-      run.style.transform = 'translate3d(' + pos.toFixed(2) + 'px,0,0)';
-    }, 88);
-    run.classList.add('is-driven');
-  }
-
-  /* ════════════════════════════════════════════════ 5 · ШАПКА ════════ */
-  /* Шапка ужимается на пути вниз и раскрывается, когда человек пошёл вверх:
-     вверх идут за навигацией. Плюс нить, которая переезжает под наведённый
-     пункт, — она и связывает пункты в одну панель, а не в шесть ссылок. */
-
-  function liveHead() {
-    if (OFF.indexOf('head')>=0) return;
-    var head = $('#head'), pod = $('.head__pod');
-    if (!head) return;
-
-    var lastY = w.scrollY || 0, dir = 0, acc = 0;
-    B.ticker.add(function (sy) {
-      var dy = sy - lastY;
-      lastY = sy;
-      if (Math.abs(dy) < 0.5) return;
-      // накопитель, иначе шапка дёргается на каждом микродвижении тачпада
-      acc = clamp(acc + dy, -90, 90);
-      var want = sy < 90 ? 0 : acc > 60 ? 1 : acc < -60 ? 0 : dir;
-      if (want !== dir) {
-        dir = want;
-        head.classList.toggle('is-tight', !!dir);
-      }
-    }, 87);
-
-    if (!pod || !fine) return;
-    // нить под пунктами
-    var thread = d.createElement('i');
-    thread.className = 'head__thread';
-    thread.setAttribute('aria-hidden', 'true');
-    pod.appendChild(thread);
-
-    var links = $$('.head__link', pod);
-    links.forEach(function (a) {
-      on(a, 'pointerenter', function () {
-        var pr = pod.getBoundingClientRect(), ar = a.getBoundingClientRect();
-        thread.style.transform = 'translate3d(' + (ar.left - pr.left) + 'px,0,0)';
-        thread.style.width = ar.width + 'px';
-        pod.classList.add('is-threaded');
-      });
-    });
-    on(pod, 'pointerleave', function () { pod.classList.remove('is-threaded'); });
-  }
-
-  /* ═══════════════════════════════════════════════ 6 · СБОРКА ════════ */
-
-  function boot() {
-    initSplits();
-    liveTicker();
-    liveHead();
-
-    // магнитятся только по-настоящему главные цели
-    $$('.head__cta .btn, .br__send, .tt__cta, .sw__cta .btn').forEach(function (b) {
-      magnetise(b, 0.28, 70);
-    });
-    $$('.nope').forEach(function (b) { magnetise(b, 0.55, 120); });
-  }
-
-  B.ready(boot);
-  w.addEventListener('baza:ready', function () {
-    // после раскрытия ленты часть разметки уже создана скриптами секций
-    initSplits();
+  /* Тёмный дубль текста у каждого пункта. Строится один раз: он и есть тот
+     слой, который подрезается по кромке пилюли. */
+  items.forEach(function (el) {
+    if ($('.lb-dark', el)) return;
+    var dk = d.createElement('span');
+    dk.className = 'lb-dark';
+    dk.setAttribute('aria-hidden', 'true');
+    dk.innerHTML = '<span>' + (el.textContent || '').trim() + '</span>';
+    el.appendChild(dk);
+    el.__dk = dk;
   });
+
+  function inkPaint() {
+    if (!inkS || !ink) return;
+    var wv = inkS.w.toFixed(1) + 'px';
+    if (ink.__wv !== wv) { ink.__wv = wv; ink.style.width = wv; }
+    var tv = 'translate3d(' + inkS.x.toFixed(1) + 'px,0,0)';
+    if (ink.__tv !== tv) { ink.__tv = tv; ink.style.transform = tv; }
+
+    /* Подрезка тёмной копии по пересечению с пилюлей. Именно из-за неё буква
+       может быть тёмной наполовину — эффект, ради которого всё и затевалось. */
+    var a0 = inkS.x, a1 = inkS.x + inkS.w;
+    for (var i = 0; i < items.length; i++) {
+      var el = items[i], dk = el.__dk;
+      if (!dk) continue;
+      var b0 = el.offsetLeft, b1 = b0 + el.offsetWidth;
+      var l = Math.max(0, Math.min(b1 - b0, a0 - b0));
+      var r = Math.max(0, Math.min(b1 - b0, b1 - a1));
+      var cv = 'inset(0px ' + r.toFixed(1) + 'px 0px ' + l.toFixed(1) + 'px)';
+      if (dk.__cv !== cv) {
+        dk.__cv = cv;
+        dk.style.clipPath = cv;
+        dk.style.webkitClipPath = cv;
+      }
+    }
+  }
+
+  function paintNav() {
+    if (!items.length || !ink) return;
+    var key = hover || active, hit = null;
+    for (var i = 0; i < items.length; i++) {
+      var el = items[i];
+      if (el.getAttribute('data-k') === key) hit = el;
+      el.classList.toggle('is-here', el.getAttribute('data-k') === active);
+    }
+    if (!hit || !hit.offsetWidth) return;
+    var x = hit.offsetLeft, wd = hit.offsetWidth;
+    if (!inkS) { inkS = { x: x, w: wd, tx: x, tw: wd }; inkPaint(); }
+    else { inkS.tx = x; inkS.tw = wd; }
+    if (nav) nav.classList.add('is-inked');
+  }
+
+  if (nav && ink) {
+    items.forEach(function (el) {
+      on(el, 'pointerenter', function () { hover = el.getAttribute('data-k'); paintNav(); });
+    });
+    on(nav, 'pointerleave', function () { hover = null; paintNav(); });
+
+    /* Догоняющее движение — экспоненциальное сглаживание, независимое от
+       частоты кадров: на 120 Гц пилюля едет ровно столько же, сколько на 60. */
+    B.ticker.add(function (sy, dt) {
+      if (!inkS) return;
+      if (inkS.x === inkS.tx && inkS.w === inkS.tw) return;
+      var a = 1 - Math.exp(-clamp(dt || 1 / 60, 0.008, 0.06) / 0.105);
+      inkS.x += (inkS.tx - inkS.x) * a;
+      inkS.w += (inkS.tw - inkS.w) * a;
+      if (Math.abs(inkS.tx - inkS.x) + Math.abs(inkS.tw - inkS.w) < 0.2) {
+        inkS.x = inkS.tx; inkS.w = inkS.tw;
+      }
+      inkPaint();
+    }, 86);
+
+    /* Активный раздел ведём по тем же секциям, что и остальная страница. */
+    var SPY = [
+      { k: 'pain', sel: '#pain' }, { k: 'services', sel: '#services' },
+      { k: 'cases', sel: '#cases' }, { k: 'pricing', sel: '#pricing' },
+      { k: 'atlas', sel: '#atlas' }, { k: 'brief', sel: '#brief' }
+    ];
+    B.ticker.add(function (sy) {
+      var line = sy + w.innerHeight * 0.34, act = SPY[0].k;
+      for (var i = 0; i < SPY.length; i++) {
+        var el = SPY[i].el || (SPY[i].el = $(SPY[i].sel));
+        if (!el) continue;
+        if (sy + el.getBoundingClientRect().top <= line) act = SPY[i].k;
+      }
+      if (act !== active) { active = act; paintNav(); }
+    }, 85);
+
+    B.onResize(function () { inkS = null; paintNav(); });
+    w.addEventListener('baza:ready', paintNav);
+  }
+
+  /* ═══════════════════════════════════════ 2 · ГЕОМЕТРИЯ ЗАЛИВКИ ══════ */
+  /* Пока кнопка в покое, кружок со стрелкой стоит справа, подпись слева. При
+     наведении они меняются местами: кружок уезжает к левому краю, подпись
+     встаёт справа от него. Обе дистанции считаются от реальных
+     прямоугольников — svg не знает offsetWidth. */
+
+  function sweepGeo() {
+    $$('[data-sw]').forEach(function (el) {
+      var ar = $('[data-ar="1"]', el);
+      if (!ar) return;
+      var disc = ar;
+      while (disc && disc.parentElement !== el) disc = disc.parentElement;
+      if (!disc) return;
+
+      var er = el.getBoundingClientRect();
+      var lab = null;
+      for (var i = 0; i < el.children.length; i++) {
+        var ch = el.children[i];
+        if (ch === disc) continue;
+        if (ch.getBoundingClientRect().width > 6) { lab = ch; break; }
+      }
+      var cs = getComputedStyle(el);
+      var pl = parseFloat(cs.paddingLeft) || 0;
+      var pr = parseFloat(cs.paddingRight) || 0;
+      var dr = disc.getBoundingClientRect();
+      var room = er.width - pl - pr - dr.width;
+      // на узкой кнопке меняться местами негде — пусть просто заливается
+      if (!lab || !er.width || !dr.width || room < 40) {
+        el.style.removeProperty('--swa');
+        el.style.removeProperty('--swl');
+        return;
+      }
+      var gp = Math.max(10, Math.min(18, Math.round(er.width * 0.035)));
+      var dtx = Math.max(-room, Math.min(0, pl - (dr.left - er.left)));
+      var ltx = Math.max(0, Math.min(room,
+        (pl + dr.width + gp) - (lab.getBoundingClientRect().left - er.left)));
+      disc.setAttribute('data-swa', '1');
+      lab.setAttribute('data-swl', '1');
+      el.style.setProperty('--swa', dtx.toFixed(1) + 'px');
+      el.style.setProperty('--swl', ltx.toFixed(1) + 'px');
+    });
+  }
+  B.sweepGeo = sweepGeo;
+
+  /* data-on ставится на наведение и на фокус с клавиатуры: заливка — это
+     основной отклик кнопки, и человек без мыши не должен его лишаться. */
+  on(d, 'pointerover', function (e) {
+    var t = e.target.closest && e.target.closest('[data-sw]');
+    if (t) t.setAttribute('data-on', '');
+  });
+  on(d, 'pointerout', function (e) {
+    var t = e.target.closest && e.target.closest('[data-sw]');
+    if (t && !t.contains(e.relatedTarget)) t.removeAttribute('data-on');
+  });
+  on(d, 'focusin', function (e) {
+    var t = e.target.closest && e.target.closest('[data-sw]');
+    if (t) t.setAttribute('data-on', '');
+  });
+  on(d, 'focusout', function (e) {
+    var t = e.target.closest && e.target.closest('[data-sw]');
+    if (t) t.removeAttribute('data-on');
+  });
+
+  var geoRaf = 0;
+  B.onResize(function () {
+    if (geoRaf) return;
+    geoRaf = requestAnimationFrame(function () { geoRaf = 0; sweepGeo(); });
+  });
+
+  /* ══════════════════════════════════════════════ 3 · ИСКРЫ КЛИКА ═════ */
+  /* Семь тонких планок разлетаются от точки нажатия. Живут на своём узле
+     поверх всего, ничего не измеряют и удаляются по таймеру — поэтому не
+     стоят ни кадра после того, как отыграли. */
+
+  function sparks(x, y) {
+    if (E.reduce || E.lite) return;
+    var host = d.createElement('div');
+    host.setAttribute('aria-hidden', 'true');
+    host.style.cssText = 'position:fixed;left:' + x + 'px;top:' + y +
+      'px;width:0;height:0;z-index:9998;pointer-events:none';
+    for (var i = 0; i < 7; i++) {
+      var a = (i / 7) * 360 + (Math.random() * 16 - 8);
+      var sp = d.createElement('span');
+      sp.style.cssText = 'position:absolute;left:0;top:0;width:' +
+        (8 + Math.random() * 6).toFixed(1) +
+        'px;height:1.4px;border-radius:2px;background:rgba(242,235,221,.8);' +
+        'transform-origin:0 50%;opacity:0;animation:lb-spark ' +
+        (520 + Math.random() * 160).toFixed(0) +
+        'ms cubic-bezier(.16,.84,.24,1) forwards';
+      sp.style.setProperty('--a', a.toFixed(1) + 'deg');
+      host.appendChild(sp);
+    }
+    d.body.appendChild(host);
+    setTimeout(function () { if (host.parentNode) host.parentNode.removeChild(host); }, 760);
+  }
+  B.sparks = sparks;
+
+  on(w, 'pointerdown', function (e) {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    if (e.target.closest && e.target.closest('input,textarea,[data-sel]')) return;
+    if (!root.classList.contains('landed')) return;
+    sparks(e.clientX, e.clientY);
+  }, { passive: true });
+
+  /* ════════════════════════════════════════════════ 4 · ПРЕЛОАДЕР ════ */
+  /* Знак не гаснет и не сменяется — он физически уезжает в шапку. Смещение
+     и масштаб считаются от реальных прямоугольников обоих логотипов, чтобы
+     перелёт заканчивался ровно там, где стоит логотип шапки. */
+
+  var intro = $('#intro'), introLogo = $('#introLogo'), bar = $('#introBar');
+  var headLogo = $('#headLogo');
+
+  function flyToHeader() {
+    if (!introLogo || !headLogo) return;
+    var a = introLogo.getBoundingClientRect();
+    var b = headLogo.getBoundingClientRect();
+    if (!a.width || !b.width) return;
+    root.style.setProperty('--fx', ((b.left + b.width / 2) - (a.left + a.width / 2)).toFixed(1) + 'px');
+    root.style.setProperty('--fy', ((b.top + b.height / 2) - (a.top + a.height / 2)).toFixed(1) + 'px');
+    root.style.setProperty('--fs', (b.width / a.width).toFixed(4));
+    root.classList.add('flying');
+  }
+
+  B.introFill = function (p) {
+    if (bar) bar.style.transform = 'scaleX(' + clamp(p, 0, 1).toFixed(3) + ')';
+  };
+
+  /* Порядок посадки: полоса дошла до конца → знак летит в шапку → занавес
+     гаснет → капсулы шапки проявляются. Пауза между перелётом и снятием
+     занавеса нужна, иначе знак исчезает на полпути. */
+  B.introLand = function () {
+    if (root.classList.contains('landed')) return;
+    root.classList.add('ready');
+    flyToHeader();
+    setTimeout(function () {
+      root.classList.add('landed');
+      sweepGeo();
+      paintNav();
+      if (intro) setTimeout(function () { intro.hidden = true; }, 1000);
+    }, 620);
+  };
+
+  // страховка: если что-то пойдёт не так, занавес всё равно уйдёт
+  setTimeout(function () { B.introLand(); }, 9000);
+
+  /* Человек начал листать, не дожидаясь — это тоже согласие идти дальше. */
+  on(w, 'scroll', function () {
+    if (!root.classList.contains('landed') && w.scrollY > 80) B.introLand();
+  }, { passive: true });
+
+  /* ═════════════════════════════════════════════════════ сборка ══════ */
+
+  B.ready(function () {
+    sweepGeo();
+    paintNav();
+  });
+  w.addEventListener('baza:ready', function () {
+    sweepGeo();
+    paintNav();
+  });
+  // шрифты меняют ширину подписей — геометрию надо пересчитать после загрузки
+  if (d.fonts && d.fonts.ready) d.fonts.ready.then(function () { sweepGeo(); paintNav(); });
 })(window, document);

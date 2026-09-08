@@ -280,77 +280,10 @@ ul,ol{padding:0;list-style:none}
 /* --------------------------------------------------------------------------
    Header
    -------------------------------------------------------------------------- */
-#head{
-  position:fixed;top:0;left:0;right:0;z-index:var(--z-head);
-  height:var(--head-h);
-  display:flex;align-items:center;
-  padding-inline:var(--gut);
-  pointer-events:none;
-  /* colour is re-themed per universe by js (--head-fg) */
-  color:var(--head-fg,var(--cream));
-  transition:color .55s var(--e-io),transform .5s var(--e-out),opacity .4s ease;
-}
-#head>*{pointer-events:auto}
-#head.is-hidden{transform:translate3d(0,-118%,0);opacity:0}
-
-.head__row{
-  display:flex;align-items:center;gap:14px;
-  width:100%;max-width:var(--maxw);margin-inline:auto;
-}
-.head__brand{display:flex;align-items:center;gap:10px;flex:0 0 auto}
-.head__brand img{
-  width:auto;height:clamp(15px,1.75vh,19px);display:block;
-  /* logo art is cream; recolour with the header theme */
-  filter:var(--head-logo-filter,none);
-  transition:filter .55s var(--e-io);
-}
-.head__pod{
-  display:flex;align-items:center;gap:2px;
-  margin-inline:auto;
-  padding:5px;border-radius:999px;
-  border:1px solid currentColor;
-  background:var(--head-pod-bg,rgba(10,10,10,.42));
-  -webkit-backdrop-filter:blur(14px) saturate(1.3);
-  backdrop-filter:blur(14px) saturate(1.3);
-  transition:background .55s var(--e-io),border-color .55s var(--e-io),opacity .4s ease;
-  opacity:.999;
-}
-.head__pod{border-color:color-mix(in srgb,currentColor 22%,transparent)}
-.head__link{
-  position:relative;
-  padding:.56em 1.05em;border-radius:999px;
-  font-size:13px;font-weight:600;letter-spacing:-.01em;
-  white-space:nowrap;
-  color:color-mix(in srgb,currentColor 66%,transparent);
-  transition:color .3s var(--e-out);
-}
-.head__link::before{
-  content:'';position:absolute;inset:0;border-radius:999px;
-  background:currentColor;opacity:0;transform:scale(.86);
-  transition:opacity .34s var(--e-out),transform .34s var(--e-out);
-}
-.head__link span{position:relative;z-index:1}
-@media (hover:hover){.head__link:hover{color:currentColor}}
-.head__link.is-on{color:currentColor}
-.head__link.is-on::before{opacity:.13;transform:none}
-
-.head__cta{flex:0 0 auto}
-.head__burger{
-  display:none;flex:0 0 auto;
-  width:42px;height:42px;border-radius:999px;
-  border:1px solid color-mix(in srgb,currentColor 24%,transparent);
-  background:var(--head-pod-bg,rgba(10,10,10,.42));
-  -webkit-backdrop-filter:blur(14px);backdrop-filter:blur(14px);
-  place-items:center;
-}
-.head__burger i{
-  display:block;width:16px;height:1.5px;background:currentColor;border-radius:2px;
-  transition:transform .4s var(--e-out),opacity .25s ease;
-}
-.head__burger i+i{margin-top:4.5px}
-body.menu-open .head__burger i:nth-child(1){transform:translateY(6px) rotate(45deg)}
-body.menu-open .head__burger i:nth-child(2){opacity:0}
-body.menu-open .head__burger i:nth-child(3){transform:translateY(-6px) rotate(-45deg)}
+/* Шапка целиком перенесена из боевой сборки и живёт в 03-craft.css.
+   Старые правила убраны не как мусор, а потому что имена классов те же:
+   прежний .head__pod центрировал себя автоотступами и утаскивал новую
+   капсулу с логотипом на середину строки, под навигацию. */
 
 /* scroll progress hairline */
 #prog{
@@ -386,11 +319,7 @@ body.menu-open .menu__link{opacity:1;transform:none;transition-delay:var(--md,0m
 .menu__foot{margin-top:auto;padding-top:26px;display:flex;flex-wrap:wrap;gap:12px}
 
 @media (max-width:900px){
-  .head__pod{display:none}
-  .head__burger{display:grid}
-  .head__cta{display:none}
-  .head__row{justify-content:space-between}
-  .head__brand{margin-right:auto}
+  /* узкий экран: раскладку капсул держит 03-craft.css */
 }
 
 /* --------------------------------------------------------------------------

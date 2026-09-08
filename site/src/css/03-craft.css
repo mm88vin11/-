@@ -1,128 +1,309 @@
 /* ==========================================================================
-   БАЗА — craft: курсор, буквы, шапка, лента.
-   Всё анимируемое здесь — только transform и opacity.
+   БАЗА — хром, перенесённый из боевой сборки.
+
+   Прелоадер, шапка, кнопки и бегущие строки взяты из старого билда как есть:
+   там они были доведены, и переизобретать их заново означало терять то, что
+   уже работало. Значения — длительности, кривые, проценты — перенесены
+   дословно; переписана только обвязка, потому что старый билд был на React,
+   а этот на обычном скрипте.
    ========================================================================== */
 
-/* ═══════════════════════════════════════════════════ 1 · КУРСОР ═══════ */
-/* Системный курсор прячется только там, где его заменяет наш, и только на
-   устройстве с настоящей мышью. Спрятать его на тач-экране или под
-   клавиатурой — значит отобрать указатель и ничего не дать взамен. */
-html.has-cur,
-html.has-cur a,
-html.has-cur button,
-html.has-cur [role="button"],
-html.has-cur label,
-html.has-cur summary{ cursor:none }
-/* Поля ввода — исключение: там курсор несёт смысл (каретка, выделение). */
-html.has-cur input,
-html.has-cur textarea,
-html.has-cur [data-sel]{ cursor:auto }
+/* ─────────────────────────────────────────────────────────── кейфреймы ─── */
 
-.cur{
-  position:fixed;inset:0;z-index:2147483000;
-  pointer-events:none;opacity:0;
-  contain:strict;
-}
-.cur__dot,.cur__ring{
-  position:absolute;top:0;left:0;
-  border-radius:50%;
-  will-change:transform;
-}
-.cur__dot{
-  width:6px;height:6px;
-  background:var(--cream,#f2ebdd);
-}
-.cur__ring{
-  width:34px;height:34px;
-  border:1px solid color-mix(in srgb,var(--cream,#f2ebdd) 46%,transparent);
-  transition:border-color .35s var(--e-io),background-color .35s var(--e-io);
-}
-/* Над интерактивом кольцо наливается — это подтверждение цели ещё до клика. */
-.cur.is-hot .cur__ring{
-  border-color:color-mix(in srgb,var(--cream,#f2ebdd) 82%,transparent);
-  background:color-mix(in srgb,var(--cream,#f2ebdd) 9%,transparent);
-}
-/* Над порталом курсор становится инструментом, а не указателем. */
-.cur.is-draw .cur__ring{
-  border-color:rgba(255,168,64,.9);
-  background:rgba(255,140,40,.10);
-}
-.cur.is-draw .cur__dot{background:#ffb04a}
-
-.cur__label{
-  position:absolute;top:0;left:0;
-  font-family:var(--f-mono);font-size:9px;letter-spacing:.22em;
-  text-transform:uppercase;color:var(--cream-70,rgba(242,235,221,.7));
-  white-space:nowrap;opacity:0;
-  transition:opacity .3s var(--e-io);
-  will-change:transform;
-}
-.cur.is-labelled .cur__label{opacity:1}
-
-/* Курсор — украшение. Ни клавиатура, ни грубый указатель, ни выключенная
-   анимация его не получают, и системный указатель тогда остаётся на месте. */
-@media (pointer:coarse),(prefers-reduced-motion:reduce){
-  .cur{display:none}
-  html.has-cur,html.has-cur *{cursor:auto}
-  html.has-cur a,html.has-cur button,
-  html.has-cur [role="button"],html.has-cur label{cursor:pointer}
+@keyframes lb-fly-l { 0% { transform: translate3d(-124%,0,0); opacity: 0 } 16% { opacity: 1 } 100% { transform: translate3d(0,0,0); opacity: 1 } }
+@keyframes lb-fly-r { 0% { transform: translate3d(124%,0,0);  opacity: 0 } 16% { opacity: 1 } 100% { transform: translate3d(0,0,0); opacity: 1 } }
+@keyframes lb-pour-up { from { transform: translate3d(0,100%,0) }  to { transform: translate3d(0,0,0) } }
+@keyframes lb-pour-in { from { transform: translate3d(0,-100%,0) } to { transform: translate3d(0,0,0) } }
+@keyframes lb-msg  { 0% { opacity: 0 } 100% { opacity: 1 } }
+@keyframes lb-run     { from { transform: translate3d(0,0,0) }    to { transform: translate3d(-50%,0,0) } }
+@keyframes lb-run-rev { from { transform: translate3d(-50%,0,0) } to { transform: translate3d(0,0,0) } }
+/* Искра клика: тонкая планка выезжает от точки нажатия и растягивается. */
+@keyframes lb-spark {
+  0%   { opacity: 0; transform: rotate(var(--a)) translateX(7px)  scaleX(.3) }
+  26%  { opacity: 1 }
+  100% { opacity: 0; transform: rotate(var(--a)) translateX(34px) scaleX(1) }
 }
 
-/* ═════════════════════════════════════════════ 2 · БУКВЫ ЗАГОЛОВКОВ ══ */
-/* Буквы вылетают из-под собственной строки с наклоном по X, слева направо.
+/* ═══════════════════════════════════════════════════ 1 · ПРЕЛОАДЕР ═════ */
+/* Две части логотипа влетают с разных сторон, наливаются светом снизу вверх
+   (нижняя раньше верхней — вода поднимается), затем весь знак улетает в
+   шапку и становится её логотипом. «Налив» — это не фильтр: под яркой копией
+   лежит тусклая, а яркую подрезает контейнер, который выезжает снизу. */
 
-   Про `perspective`: он создаёт 3D-контекст, и каждая буква внутри становится
-   слоем, который композитор пересобирает каждый кадр — вечно, даже когда
-   заголовок далеко за экраном. На всех заголовках сразу это ровно вдвое
-   роняло частоту. Поэтому контекст живёт только на время проигрыша: класс
-   .is-flat снимает и перспективу, и трансформации, и заголовок снова
-   становится обычным текстом. */
-.split .ch{
-  display:inline-block;
-  transform:translate3d(0,.52em,0);
-  opacity:0;
+#intro{
+  position:fixed;inset:0;z-index:var(--z-load,60);
+  background-color:#0a0a0a;
+  background-image:
+    radial-gradient(78% 62% at 50% 38%, rgba(10,10,10,.28) 0%, rgba(10,10,10,.72) 62%, rgba(10,10,10,.92) 100%),
+    radial-gradient(60% 60% at 22% 8%,  rgba(242,235,221,.05), rgba(242,235,221,0) 68%),
+    radial-gradient(56% 56% at 86% 94%, rgba(242,235,221,.032), rgba(242,235,221,0) 68%);
+  opacity:1;visibility:visible;
+  transition:opacity 880ms cubic-bezier(.16,.84,.24,1) 60ms, visibility 0s linear 940ms;
 }
-.split.is-lit .ch{
-  transform:none;opacity:1;
-  transition:transform .62s cubic-bezier(.16,.84,.24,1),
-             opacity  .44s cubic-bezier(.16,.84,.24,1);
-  transition-delay:calc(var(--i) * 15ms);
-}
-/* Отыграло — складываем сцену. */
-.split.is-flat .ch{ transform:none;opacity:1;transition:none }
+html.landed #intro{opacity:0;visibility:hidden;pointer-events:none}
 
-@media (prefers-reduced-motion:reduce){
-  .split .ch{transform:none;opacity:1}
+#introLogo{
+  position:fixed;left:50%;top:50%;
+  width:min(560px,68vw);aspect-ratio:2.6141;z-index:calc(var(--z-load,60) + 4);
+  transform:translate(-50%,calc(-50% - 14px));
+  transform-origin:center center;
+  will-change:transform;backface-visibility:hidden;
+}
+html.landed #introLogo{
+  opacity:0;visibility:hidden;
+  transition:opacity 380ms ease 160ms, visibility 0s linear 560ms;
+}
+/* Перелёт в шапку: смещение и масштаб считает скрипт и кладёт в переменные. */
+html.flying #introLogo{
+  transform:translate(calc(-50% + var(--fx,0px)), calc(-50% - 14px + var(--fy,0px))) scale(var(--fs,.18));
+  transition:transform 760ms cubic-bezier(.62,0,.16,1), opacity 380ms ease 160ms;
 }
 
-/* ═══════════════════════════════════════════════════ 3 · ШАПКА ═══════ */
-/* На пути вниз шапка ужимается в капсулу, на пути вверх раскрывается.
-   Меняются только transform и прозрачность фона — раскладка не трогается,
-   поэтому под шапкой ничего не прыгает. */
+.lb-part{position:absolute;left:0;right:0;will-change:transform;backface-visibility:hidden}
+.lb-part--eto { top:0;    height:38.7%; animation:lb-fly-l 620ms cubic-bezier(.17,.88,.22,1)  40ms both }
+.lb-part--baza{ top:38.7%;height:61.3%; animation:lb-fly-r 620ms cubic-bezier(.17,.88,.22,1) 100ms both }
+.lb-ghost{position:absolute;inset:0;width:100%;height:100%;opacity:.22;pointer-events:none}
+.lb-water{position:absolute;inset:0;overflow:hidden;will-change:transform}
+.lb-lit  {position:absolute;inset:0;width:100%;height:100%;will-change:transform}
+.lb-part--baza .lb-water{ animation:lb-pour-up 380ms cubic-bezier(.32,.06,.24,1) 660ms both }
+.lb-part--baza .lb-lit  { animation:lb-pour-in 380ms cubic-bezier(.32,.06,.24,1) 660ms both }
+.lb-part--eto  .lb-water{ animation:lb-pour-up 420ms cubic-bezier(.32,.06,.24,1) 980ms both }
+.lb-part--eto  .lb-lit  { animation:lb-pour-in 420ms cubic-bezier(.32,.06,.24,1) 980ms both }
+
+#introMsg{
+  position:fixed;left:0;right:0;z-index:calc(var(--z-load,60) + 4);
+  top:calc(50% + min(560px,68vw) / 2.6141 / 2 + 24px);
+  display:flex;flex-direction:column;align-items:center;gap:24px;
+  padding:0 14px;pointer-events:none;
+  transition:opacity 420ms cubic-bezier(.16,.84,.24,1);
+}
+html.ready #introMsg{opacity:0}
+#introRail{
+  display:block;width:min(190px,42vw);height:2px;border-radius:999px;
+  overflow:hidden;background:rgba(242,235,221,.12);
+  animation:lb-msg 460ms cubic-bezier(.16,.84,.24,1) 260ms both;
+}
+#introBar{
+  display:block;height:100%;width:100%;border-radius:999px;background:#f2ebdd;
+  transform:scaleX(0);transform-origin:0 50%;
+  transition:transform 220ms cubic-bezier(.16,.84,.24,1);
+}
+
+/* ═══════════════════════════════════════════════════════ 2 · ШАПКА ═════ */
+/* Три отдельные капсулы: лого с соцсетями, навигация по центру, кнопка
+   справа. Каждая на своей стеклянной подложке — так шапка не перекрывает
+   страницу сплошной полосой. */
+
 #head{
-  transition:transform .55s var(--e-io),background-color .55s var(--e-io),
-             backdrop-filter .55s var(--e-io);
+  position:fixed;top:16px;left:0;right:0;z-index:var(--z-head,40);
+  pointer-events:none;display:flex;justify-content:center;
+  padding:0 clamp(18px,3.2vw,44px);box-sizing:border-box;
+  background:none;backdrop-filter:none;-webkit-backdrop-filter:none;border:0;
 }
-#head.is-tight{ transform:translate3d(0,-100%,0) }
-/* Пункты и кнопка не должны уезжать вместе с шапкой рывком: они уходят
-   чуть раньше, и движение читается как одно, а не как два. */
-#head.is-tight .head__row{ transition-delay:0s }
+@media (max-width:900px){ #head{top:12px} }
 
-.head__pod{ position:relative }
-.head__thread{
-  position:absolute;left:0;bottom:6px;height:1px;width:0;
-  background:currentColor;opacity:0;
-  border-radius:2px;
-  transition:transform .42s var(--e-out),width .42s var(--e-out),opacity .3s ease;
-  will-change:transform,width;
+.head__row{
+  position:relative;box-sizing:border-box;pointer-events:none;
+  width:100%;max-width:calc(1320px - 2 * clamp(18px,3.2vw,44px));
+  display:flex;align-items:center;justify-content:space-between;
+  gap:18px;
+}
+@media (max-width:900px){ .head__row{gap:10px} }
+
+/* Общая стеклянная подложка капсул. */
+.lb-skin{
+  position:absolute;inset:0;border-radius:999px;box-sizing:border-box;
   pointer-events:none;
+  background-color:rgba(13,13,13,.42);
+  border:1px solid rgba(242,235,221,.1);
+  backdrop-filter:blur(20px) saturate(150%);
+  -webkit-backdrop-filter:blur(20px) saturate(150%);
+  box-shadow:inset 0 1px 0 rgba(242,235,221,.15),
+             inset 0 -1px 0 rgba(0,0,0,.28),
+             0 14px 44px rgba(0,0,0,.38);
+  opacity:0;transition:opacity 620ms ease;
 }
-.head__pod.is-threaded .head__thread{opacity:.55}
+@media (max-width:900px){
+  .lb-skin{backdrop-filter:blur(13px) saturate(140%);-webkit-backdrop-filter:blur(13px) saturate(140%)}
+}
+html.landed .lb-skin{opacity:1}
 
-/* ══════════════════════════════════════════ 4 · БЕГУЩАЯ СТРОКА ══════ */
-/* Пока лентой управляет скрипт, её собственная CSS-анимация должна молчать —
-   иначе двигают оба, и строка дрожит. */
-.tick__run.is-driven{
-  animation:none!important;
-  will-change:transform;
+.head__pod,.head__ctaPod{
+  position:relative;z-index:5;box-sizing:border-box;pointer-events:auto;flex:0 0 auto;
+  display:flex;align-items:center;height:56px;border-radius:999px;
+}
+@media (max-width:900px){ .head__pod,.head__ctaPod{height:52px} }
+.head__pod{gap:6px;padding:0 8px 0 20px}
+@media (max-width:900px){ .head__pod{gap:4px;padding:0 16px} }
+.head__ctaPod{justify-content:flex-end;gap:0;padding:5px}
+@media (max-width:900px){ .head__ctaPod{gap:5px} }
+
+/* Тот же замок, что и в прелоадере (пропорция 2.61) — иначе перелёт знака
+   заканчивался бы не на своём месте. */
+.head__brand img{width:auto;height:26px;display:block}
+@media (max-width:900px){ .head__brand img{height:22px} }
+.head__div{
+  position:relative;z-index:3;flex:0 0 auto;width:1px;height:19px;
+  margin:0 7px;border-radius:1px;
+  background:linear-gradient(180deg,rgba(242,235,221,.02),rgba(242,235,221,.28),rgba(242,235,221,.02));
+  opacity:0;transition:opacity 520ms ease 260ms;
+}
+html.landed .head__div{opacity:1}
+@media (max-width:900px){ .head__div{display:none} }
+
+.head__soc{display:flex;align-items:center;gap:2px}
+@media (max-width:900px){ .head__soc{display:none} }
+.head__soc a{
+  display:grid;place-items:center;width:34px;height:34px;border-radius:999px;
+  color:rgba(242,235,221,.72);
+  transition:background-color 240ms ease,color 240ms ease,transform 240ms cubic-bezier(.16,.84,.24,1);
+}
+.head__soc a:hover{background:#0a0a0a;color:#f2ebdd;transform:scale(1.07)}
+
+/* ── навигация с чернильной пилюлей ────────────────────────────────────── */
+.head__nav{
+  position:absolute;left:50%;top:0;z-index:2;box-sizing:border-box;
+  display:flex;align-items:center;justify-content:center;gap:2px;
+  height:56px;padding:0 7px;border-radius:999px;
+  pointer-events:auto;white-space:nowrap;
+  transform:translate3d(-50%,0,0);
+  opacity:0;transition:opacity 620ms ease;
+}
+html.landed .head__nav{opacity:1}
+@media (max-width:1100px){ .head__nav{padding:0 3px} }
+@media (max-width:900px){ .head__nav{display:none} }
+
+/* Пилюля — единственный носитель состояния. Она едет, а слово темнеет ровно
+   там, где она его накрыла: у каждого пункта лежит вторая, тёмная копия
+   текста, и её подрезают по границам пилюли. Поэтому буква может быть
+   наполовину тёмной — этого не даёт ни один вариант с простым :hover. */
+.head__ink{
+  position:absolute;left:0;top:50%;z-index:1;pointer-events:none;
+  width:0;height:42px;margin-top:-21px;border-radius:999px;
+  background:#f2ebdd;opacity:0;
+  will-change:transform,width;
+  box-shadow:0 6px 18px rgba(0,0,0,.28);
+  transition:opacity 300ms ease;
+}
+.head__nav.is-inked .head__ink{opacity:1}
+
+.head__link{
+  position:relative;z-index:2;
+  display:flex;align-items:center;justify-content:center;height:42px;
+  padding:0 14px;border-radius:999px;line-height:1;
+  font-family:var(--f-sans);
+  font-size:11.5px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;
+  color:rgba(242,235,221,.58);white-space:nowrap;user-select:none;
+  overflow:hidden;cursor:pointer;
+  transition:color 380ms ease;
+}
+@media (max-width:1100px){ .head__link{padding:0 9px;font-size:11px} }
+.head__link.is-here{color:rgba(242,235,221,.92)}
+.head__link > span{display:block;line-height:1.1em}
+/* Тёмный дубль, который подрезает пилюля. */
+.head__link .lb-dark{
+  position:absolute;left:0;top:0;right:0;bottom:0;z-index:3;pointer-events:none;
+  display:flex;align-items:center;justify-content:center;
+  padding:inherit;color:#0a0a0a;
+  clip-path:inset(0 100% 0 0);
+}
+
+.head__burger{
+  display:none;flex:0 0 auto;width:44px;height:44px;border-radius:999px;
+  place-items:center;position:relative;
+}
+@media (max-width:900px){ .head__burger{display:grid} }
+.head__burger i{
+  display:block;width:17px;height:1.6px;background:currentColor;border-radius:2px;
+  transition:transform 420ms cubic-bezier(.16,.84,.24,1),opacity 200ms ease;
+}
+.head__burger i + i{margin-top:5px}
+body.menu-open .head__burger i:first-child{transform:translateY(3.3px) rotate(45deg)}
+body.menu-open .head__burger i:last-child {transform:translateY(-3.3px) rotate(-45deg)}
+
+/* ══════════════════════════════════ 3 · КНОПКИ: ЗАЛИВКА НАЕЗДОМ ═══════ */
+/* Наведение на любую кнопку: заливка наезжает слева до конца, кружок со
+   стрелкой уходит к левому краю, подпись встаёт справа от него. Ход считает
+   скрипт и кладёт в --swa/--swl. Уходя, заливка гаснет и отскакивает —
+   обратного проезда не видно, потому что transform возвращается мгновенно,
+   но с задержкой в 250 мс, когда прозрачность уже на нуле. */
+[data-sw]{
+  position:relative;overflow:hidden;isolation:isolate;
+  -webkit-tap-highlight-color:transparent;
+  transition:border-color 260ms cubic-bezier(.16,.84,.24,1),
+             box-shadow  260ms cubic-bezier(.16,.84,.24,1),
+             background-color 220ms ease, color 220ms ease;
+}
+[data-sw]::before{
+  content:'';position:absolute;left:0;right:0;top:0;bottom:0;z-index:0;pointer-events:none;
+  opacity:0;transform:translate3d(-100.5%,0,0);
+  transition:transform 0s linear 250ms, opacity 190ms ease;
+}
+[data-sw] > *{position:relative;z-index:1}
+[data-sw="dark"]::before { background:#0a0a0a }
+[data-sw="light"]::before{ background:#f2ebdd }
+[data-sw][data-on]::before{
+  opacity:1;transform:translate3d(0,0,0);
+  transition:transform 560ms cubic-bezier(.16,.84,.24,1), opacity 150ms ease;
+}
+/* Потомки со своим color не наследуют инверсию — красим и их, иначе подпись
+   остаётся цветом заливки и пропадает. */
+[data-sw="dark"][data-on],  [data-sw="dark"][data-on] * { color:#f2ebdd!important }
+[data-sw="light"][data-on], [data-sw="light"][data-on] *{ color:#0a0a0a!important }
+[data-sw="dark"][data-on]  [data-swa], [data-sw="dark"][data-on]  [data-swa] *{ background:#f2ebdd;color:#0a0a0a!important }
+[data-sw="light"][data-on] [data-swa], [data-sw="light"][data-on] [data-swa] *{ background:#0a0a0a;color:#f2ebdd!important }
+[data-swa]{ transition:transform 340ms cubic-bezier(.16,.84,.24,1), background 300ms ease, color 300ms ease }
+[data-ar],[data-swa],[data-swl]{ transition:transform 340ms cubic-bezier(.16,.84,.24,1) }
+[data-on] [data-ar="1"]   { transform:translateX(-4px) }
+[data-on] [data-ar="out"] { transform:translate(2.5px,-2.5px) }
+[data-on] [data-ar="up"]  { transform:translateY(-3px) }
+[data-on] [data-ar="back"]{ transform:translateX(-4px) }
+[data-sw][data-on] [data-swa]{ transform:translateX(var(--swa,-6px)) }
+[data-sw][data-on] [data-swl]{ transform:translateX(var(--swl,0px)) }
+
+/* Нажатие — короткое проседание, ровно как в старой сборке. */
+[data-press]:active{
+  transform:scale(.992)!important;
+  transition:transform 90ms cubic-bezier(.16,.84,.24,1)!important;
+}
+
+/* ═══════════════════════════════════════════ 4 · БЕГУЩИЕ СТРОКИ ═══════ */
+/* Две ленты навстречу друг другу: крупная кремовая по тёмному и мелкая
+   тёмная по кремовой плашке. Края первой растворяются маской, поэтому
+   строка не обрывается о край экрана. Наведение останавливает обе. */
+.mqrow{position:relative;padding:clamp(30px,4.6vh,62px) 0 0;border-top:1px solid rgba(242,235,221,.09)}
+.mqrow__clip{
+  overflow:hidden;
+  -webkit-mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);
+          mask-image:linear-gradient(90deg,transparent,#000 9%,#000 91%,transparent);
+}
+.mqrow__bar{margin-top:clamp(18px,2.4vh,30px);overflow:hidden;background:#f2ebdd}
+.mqrun{
+  display:flex;align-items:center;width:max-content;
+  will-change:transform;transform:translateZ(0);
+}
+.mqrun--a{animation:lb-run 62s linear infinite}
+.mqrun--b{animation:lb-run-rev 78s linear infinite;padding:1.15em 0}
+.mqrow:hover .mqrun{animation-play-state:paused}
+.mqitem{
+  display:flex;flex:0 0 auto;align-items:center;padding-right:.34em;
+  font-family:var(--f-sans);
+  font-size:clamp(30px,4.6vw,74px);line-height:1;letter-spacing:-.045em;
+  white-space:nowrap;color:#f2ebdd;font-weight:600;
+}
+.mqitem i{
+  flex:0 0 auto;width:.62em;height:.62em;margin:0 .34em;border-radius:999px;
+  background:currentColor;opacity:.34;
+}
+.mqitem--sm{
+  font-size:clamp(11.5px,1.25vw,15px);letter-spacing:.2em;color:#0a0a0a;font-weight:600;
+  padding-right:0;
+}
+.mqitem--sm i{width:4px;height:4px;margin:0 1.4em;opacity:.4}
+
+/* ═══════════════════════════════════════════════════════ 5 · ПРОЧЕЕ ═══ */
+@media (prefers-reduced-motion:reduce){
+  .mqrun,.lb-part,.lb-water,.lb-lit{animation:none!important}
+  .lb-water{position:static}
+  #introLogo,html.flying #introLogo{transition:none}
 }

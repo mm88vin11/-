@@ -298,13 +298,17 @@
 
     /* pointerdown, not click: the feedback has to land under the finger at
        the moment of contact, not after the browser has decided it was a tap */
+    /* Пуск от нажатия убран: по всей странице теперь работают искры из
+       боевой сборки (13-craft.js), а этот более тяжёлый залп остаётся
+       доступен секциям, которым он нужен по смыслу — блокам Марио, порталу.
+       Два отклика на одно нажатие читались бы как сбой. */
     w.addEventListener('pointerdown', function (ev) {
       if (ev.pointerType === 'mouse' && ev.button !== 0) return;
-      // a burst on top of a text selection drag is noise
       if (ev.target.closest('input,textarea,[data-sel]')) return;
-      var strong = !!ev.target.closest('button,a,.pill,.mblock,.udl,.nope,.stc,.socc');
-      burst(ev.clientX, ev.clientY, strong ? 1.4 : 0.85);
-      if (strong) B.buzz(9);
+      var strong = ev.target.closest('.mblock,.udl,.nope,.pill');
+      if (!strong) return;
+      burst(ev.clientX, ev.clientY, 1.4);
+      B.buzz(9);
     }, { passive: true });
 
     B.burst = burst;

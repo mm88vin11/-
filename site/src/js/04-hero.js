@@ -46,10 +46,8 @@
   var pending = new Array(TOTAL);
   var seeded = 0, decoded = 0, revealed = false;
 
-  var boot = d.getElementById('boot');
-  var bootFill = d.getElementById('bootFill');
-  var bootPct = d.getElementById('bootPct');
-  var bootLabel = d.getElementById('bootLabel');
+  /* Прелоадер живёт в 13-craft.js: лента только сообщает ему прогресс и
+     момент готовности, а он сам решает, как улететь в шапку. */
 
   var cv = d.getElementById('heroC');
   var poster = d.getElementById('heroPoster');
@@ -125,14 +123,7 @@
   /* ──────────────────────────────────────────────────────────── прелоадер ── */
 
   function bumpBoot() {
-    var p = Math.min(seeded / SEED, 1);
-    if (bootFill) bootFill.style.transform = 'scaleX(' + p.toFixed(3) + ')';
-    if (bootPct) bootPct.textContent = Math.round(p * 100) + '%';
-    if (bootLabel) {
-      bootLabel.textContent = p < .35 ? 'собираем сцену'
-        : p < .75 ? 'раскладываем кадры'
-          : 'почти на месте';
-    }
+    if (B.introFill) B.introFill(Math.min(seeded / SEED, 1));
   }
 
   function seed() {
@@ -186,16 +177,14 @@
   function reveal() {
     if (revealed) return;
     revealed = true;
-    if (bootFill) bootFill.style.transform = 'scaleX(1)';
-    if (bootPct) bootPct.textContent = '100%';
+    if (B.introFill) B.introFill(1);
     fit();
     draw(0, true);
 
     setTimeout(function () {
-      if (boot) boot.classList.add('is-gone');
       d.documentElement.classList.add('booted');
       if (poster) poster.classList.add('is-off');
-      setTimeout(function () { if (boot) boot.hidden = true; }, 900);
+      if (B.introLand) B.introLand();
       w.dispatchEvent(new CustomEvent('baza:ready'));
       fill();
     }, 220);

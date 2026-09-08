@@ -9,6 +9,17 @@ const { chromium } = require('playwright');
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
+const { execFileSync } = require('child_process');
+
+/* Собираем перед проверкой и падаем, если сборка не прошла. Раньше неудачный
+   запуск из другого каталога оставлял в dist прошлую сборку, и стенд честно
+   мерил вчерашний код. */
+try {
+  execFileSync('python3', [path.join(__dirname, 'bundle.py'), '--folder'], { stdio: 'pipe' });
+} catch (e) {
+  console.error('build failed:\n' + (e.stderr || e.stdout || e.message).toString());
+  process.exit(2);
+}
 
 const ROOT = path.resolve(__dirname, '..');
 const SITE = path.join(ROOT, 'dist', 'site');

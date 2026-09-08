@@ -1,0 +1,128 @@
+/* ==========================================================================
+   БАЗА — craft: курсор, буквы, шапка, лента.
+   Всё анимируемое здесь — только transform и opacity.
+   ========================================================================== */
+
+/* ═══════════════════════════════════════════════════ 1 · КУРСОР ═══════ */
+/* Системный курсор прячется только там, где его заменяет наш, и только на
+   устройстве с настоящей мышью. Спрятать его на тач-экране или под
+   клавиатурой — значит отобрать указатель и ничего не дать взамен. */
+html.has-cur,
+html.has-cur a,
+html.has-cur button,
+html.has-cur [role="button"],
+html.has-cur label,
+html.has-cur summary{ cursor:none }
+/* Поля ввода — исключение: там курсор несёт смысл (каретка, выделение). */
+html.has-cur input,
+html.has-cur textarea,
+html.has-cur [data-sel]{ cursor:auto }
+
+.cur{
+  position:fixed;inset:0;z-index:2147483000;
+  pointer-events:none;opacity:0;
+  contain:strict;
+}
+.cur__dot,.cur__ring{
+  position:absolute;top:0;left:0;
+  border-radius:50%;
+  will-change:transform;
+}
+.cur__dot{
+  width:6px;height:6px;
+  background:var(--cream,#f2ebdd);
+}
+.cur__ring{
+  width:34px;height:34px;
+  border:1px solid color-mix(in srgb,var(--cream,#f2ebdd) 46%,transparent);
+  transition:border-color .35s var(--e-io),background-color .35s var(--e-io);
+}
+/* Над интерактивом кольцо наливается — это подтверждение цели ещё до клика. */
+.cur.is-hot .cur__ring{
+  border-color:color-mix(in srgb,var(--cream,#f2ebdd) 82%,transparent);
+  background:color-mix(in srgb,var(--cream,#f2ebdd) 9%,transparent);
+}
+/* Над порталом курсор становится инструментом, а не указателем. */
+.cur.is-draw .cur__ring{
+  border-color:rgba(255,168,64,.9);
+  background:rgba(255,140,40,.10);
+}
+.cur.is-draw .cur__dot{background:#ffb04a}
+
+.cur__label{
+  position:absolute;top:0;left:0;
+  font-family:var(--f-mono);font-size:9px;letter-spacing:.22em;
+  text-transform:uppercase;color:var(--cream-70,rgba(242,235,221,.7));
+  white-space:nowrap;opacity:0;
+  transition:opacity .3s var(--e-io);
+  will-change:transform;
+}
+.cur.is-labelled .cur__label{opacity:1}
+
+/* Курсор — украшение. Ни клавиатура, ни грубый указатель, ни выключенная
+   анимация его не получают, и системный указатель тогда остаётся на месте. */
+@media (pointer:coarse),(prefers-reduced-motion:reduce){
+  .cur{display:none}
+  html.has-cur,html.has-cur *{cursor:auto}
+  html.has-cur a,html.has-cur button,
+  html.has-cur [role="button"],html.has-cur label{cursor:pointer}
+}
+
+/* ═════════════════════════════════════════════ 2 · БУКВЫ ЗАГОЛОВКОВ ══ */
+/* Буквы вылетают из-под собственной строки с наклоном по X, слева направо.
+
+   Про `perspective`: он создаёт 3D-контекст, и каждая буква внутри становится
+   слоем, который композитор пересобирает каждый кадр — вечно, даже когда
+   заголовок далеко за экраном. На всех заголовках сразу это ровно вдвое
+   роняло частоту. Поэтому контекст живёт только на время проигрыша: класс
+   .is-flat снимает и перспективу, и трансформации, и заголовок снова
+   становится обычным текстом. */
+.split .ch{
+  display:inline-block;
+  transform:translate3d(0,.52em,0);
+  opacity:0;
+}
+.split.is-lit .ch{
+  transform:none;opacity:1;
+  transition:transform .62s cubic-bezier(.16,.84,.24,1),
+             opacity  .44s cubic-bezier(.16,.84,.24,1);
+  transition-delay:calc(var(--i) * 15ms);
+}
+/* Отыграло — складываем сцену. */
+.split.is-flat .ch{ transform:none;opacity:1;transition:none }
+
+@media (prefers-reduced-motion:reduce){
+  .split .ch{transform:none;opacity:1}
+}
+
+/* ═══════════════════════════════════════════════════ 3 · ШАПКА ═══════ */
+/* На пути вниз шапка ужимается в капсулу, на пути вверх раскрывается.
+   Меняются только transform и прозрачность фона — раскладка не трогается,
+   поэтому под шапкой ничего не прыгает. */
+#head{
+  transition:transform .55s var(--e-io),background-color .55s var(--e-io),
+             backdrop-filter .55s var(--e-io);
+}
+#head.is-tight{ transform:translate3d(0,-100%,0) }
+/* Пункты и кнопка не должны уезжать вместе с шапкой рывком: они уходят
+   чуть раньше, и движение читается как одно, а не как два. */
+#head.is-tight .head__row{ transition-delay:0s }
+
+.head__pod{ position:relative }
+.head__thread{
+  position:absolute;left:0;bottom:6px;height:1px;width:0;
+  background:currentColor;opacity:0;
+  border-radius:2px;
+  transition:transform .42s var(--e-out),width .42s var(--e-out),opacity .3s ease;
+  will-change:transform,width;
+  pointer-events:none;
+}
+.head__pod.is-threaded .head__thread{opacity:.55}
+
+/* ══════════════════════════════════════════ 4 · БЕГУЩАЯ СТРОКА ══════ */
+/* Пока лентой управляет скрипт, её собственная CSS-анимация должна молчать —
+   иначе двигают оба, и строка дрожит. */
+.tick__run.is-driven{
+  animation:none!important;
+  will-change:transform;
+}

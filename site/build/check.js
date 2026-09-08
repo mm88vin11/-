@@ -103,11 +103,18 @@ const only = (process.argv.find(a => a.startsWith('--only=')) || '').split('=')[
       const tick = (t) => { gaps.push(t - last); last = t; raf = requestAnimationFrame(tick); };
       raf = requestAnimationFrame(tick);
 
+      /* Скорость прокрутки — человеческая, 900 px/сек. Прошлый вариант шагал
+         по трети экрана каждые 34 мс, то есть примерно в двадцать раз быстрее,
+         чем это физически делает человек: под такой нагрузкой любая страница
+         показывает две трети «длинных» кадров, и число говорит о стенде, а не о
+         сайте. */
       const total = document.body.scrollHeight;
-      const step = Math.max(60, Math.round(vh * 0.35));
-      for (let y = 0; y < total; y += step) {
+      const t0 = performance.now();
+      let y = 0;
+      while (performance.now() - t0 < 12000 && y < total) {
+        y += 900 / 60;
         window.scrollTo(0, y);
-        await new Promise(r => setTimeout(r, 34));
+        await new Promise(r => requestAnimationFrame(r));
       }
       window.scrollTo(0, 0);
       await new Promise(r => setTimeout(r, 120));
@@ -187,8 +194,11 @@ const only = (process.argv.find(a => a.startsWith('--only=')) || '').split('=')[
     console.log(`\n── ${vp.name} (${vp.width}×${vp.height} @${vp.dsf}x)${vp.touch ? ' touch' : ''}`);
     console.log(`   page height ${height}px`);
     if (pacing) {
-      console.log(`   frames p50 ${pacing.p50}ms · p95 ${pacing.p95}ms · worst ${pacing.worst}ms` +
-        ` · over 33ms: ${pacing.over33}/${pacing.frames}`);
+      const pct = (100 * pacing.over33 / pacing.frames).toFixed(0);
+      console.log(`   long frames (>33ms): ${pacing.over33}/${pacing.frames} (${pct}%)` +
+        `  · p95 ${pacing.p95}ms · worst ${pacing.worst}ms`);
+      console.log(`   (p50 ${pacing.p50}ms — sits on the 16.7/33.3 boundary, so it flips` +
+        ` between identical builds; judge by the long-frame share)`);
     }
     if (overflow) console.log(`   ✗ page scrolls sideways by ${overflow.over}px → ${overflow.who.join(', ')}`);
     if (errors.length) {

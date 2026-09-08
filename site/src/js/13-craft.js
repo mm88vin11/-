@@ -18,22 +18,39 @@
 
   var root = d.documentElement;
 
-  /* ═════════════════════════════════════ 1 · ЧЕРНИЛЬНАЯ ПИЛЮЛЯ ════════ */
+  /* ═════════════════════════════════════════════════════ 1 · ШАПКА ═══ */
+  /* Разметка шапки — отрендеренный DOM боевой сборки. Здесь только динамика,
+     формулы перенесены оттуда же.
 
-  var nav = $('#headNav'), ink = $('#headInk');
-  var items = nav ? $$('.head__link', nav) : [];
-  var inkS = null, hover = null, active = 'pain';
+     Главное, что она делает: наверху страницы три капсулы СЛИПАЮТСЯ в одну —
+     лого с соцсетями едет вправо, кнопка влево, их собственные подложки
+     гаснут, а вместо них проявляется одна общая; навигации при этом нет.
+     Стоит отлистать на ~140 px — капсулы расходятся, и навигация проступает.
+     Раньше я это состояние принял за наложение и «чинил», разводя капсулы по
+     краям, — то есть ломал ровно то, что задумано. */
 
-  /* Тёмный дубль текста у каждого пункта. Строится один раз: он и есть тот
-     слой, который подрезается по кромке пилюли. */
+  var head = $('#head'), row = $('#headRow'), shell = $('#headShell');
+  var pod = $('#headPod'), podSkin = $('#headPodSkin'), soc = $('#headSoc');
+  var navPod = $('#headNav'), navSkin = $('#headNavSkin'), ink = $('#headInk');
+  var ctaPod = $('#headCtaPod'), ctaSkin = $('#headCtaSkin'), logo = $('#headLogo');
+  var items = navPod ? $$('a[data-k]', navPod) : [];
+
+  var hm = null, hIn = 0, mg = null, inkS = null, hover = null, active = 'pain';
+
+  function measure() {
+    if (!row || !pod || !ctaPod) return;
+    hm = {
+      row: Math.round(row.clientWidth),
+      left: Math.round(pod.offsetWidth),
+      right: Math.round(ctaPod.offsetWidth)
+    };
+  }
+
+  /* Тёмный дубль слова у каждого пункта уже есть в перенесённой разметке —
+     второй span. Именно его подрезает пилюля. */
   items.forEach(function (el) {
-    if ($('.lb-dark', el)) return;
-    var dk = d.createElement('span');
-    dk.className = 'lb-dark';
-    dk.setAttribute('aria-hidden', 'true');
-    dk.innerHTML = '<span>' + (el.textContent || '').trim() + '</span>';
-    el.appendChild(dk);
-    el.__dk = dk;
+    var sp = el.children;
+    el.__dk = sp.length > 1 ? sp[1] : null;
   });
 
   function inkPaint() {
@@ -42,9 +59,6 @@
     if (ink.__wv !== wv) { ink.__wv = wv; ink.style.width = wv; }
     var tv = 'translate3d(' + inkS.x.toFixed(1) + 'px,0,0)';
     if (ink.__tv !== tv) { ink.__tv = tv; ink.style.transform = tv; }
-
-    /* Подрезка тёмной копии по пересечению с пилюлей. Именно из-за неё буква
-       может быть тёмной наполовину — эффект, ради которого всё и затевалось. */
     var a0 = inkS.x, a1 = inkS.x + inkS.w;
     for (var i = 0; i < items.length; i++) {
       var el = items[i], dk = el.__dk;
@@ -53,11 +67,7 @@
       var l = Math.max(0, Math.min(b1 - b0, a0 - b0));
       var r = Math.max(0, Math.min(b1 - b0, b1 - a1));
       var cv = 'inset(0px ' + r.toFixed(1) + 'px 0px ' + l.toFixed(1) + 'px)';
-      if (dk.__cv !== cv) {
-        dk.__cv = cv;
-        dk.style.clipPath = cv;
-        dk.style.webkitClipPath = cv;
-      }
+      if (dk.__cv !== cv) { dk.__cv = cv; dk.style.clipPath = cv; dk.style.webkitClipPath = cv; }
     }
   }
 
@@ -67,53 +77,138 @@
     for (var i = 0; i < items.length; i++) {
       var el = items[i];
       if (el.getAttribute('data-k') === key) hit = el;
-      el.classList.toggle('is-here', el.getAttribute('data-k') === active);
+      var c = el.getAttribute('data-k') === active
+        ? 'rgba(242,235,221,0.92)' : 'rgba(242,235,221,0.58)';
+      if (el.__c !== c) { el.__c = c; el.style.color = c; }
     }
     if (!hit || !hit.offsetWidth) return;
     var x = hit.offsetLeft, wd = hit.offsetWidth;
     if (!inkS) { inkS = { x: x, w: wd, tx: x, tw: wd }; inkPaint(); }
     else { inkS.tx = x; inkS.tw = wd; }
-    if (nav) nav.classList.add('is-inked');
   }
 
-  if (nav && ink) {
-    items.forEach(function (el) {
-      on(el, 'pointerenter', function () { hover = el.getAttribute('data-k'); paintNav(); });
-    });
-    on(nav, 'pointerleave', function () { hover = null; paintNav(); });
+  items.forEach(function (el) {
+    on(el, 'pointerenter', function () { hover = el.getAttribute('data-k'); paintNav(); });
+  });
+  if (navPod) on(navPod, 'pointerleave', function () { hover = null; paintNav(); });
 
-    /* Догоняющее движение — экспоненциальное сглаживание, независимое от
-       частоты кадров: на 120 Гц пилюля едет ровно столько же, сколько на 60. */
-    B.ticker.add(function (sy, dt) {
-      if (!inkS) return;
-      if (inkS.x === inkS.tx && inkS.w === inkS.tw) return;
-      var a = 1 - Math.exp(-clamp(dt || 1 / 60, 0.008, 0.06) / 0.105);
-      inkS.x += (inkS.tx - inkS.x) * a;
-      inkS.w += (inkS.tw - inkS.w) * a;
+  var SPY = [
+    { k: 'pain', sel: '#pain' }, { k: 'services', sel: '#services' },
+    { k: 'cases', sel: '#cases' }, { k: 'pricing', sel: '#pricing' },
+    { k: 'atlas', sel: '#atlas' }, { k: 'brief', sel: '#brief' }
+  ];
+
+  var noTr = false;
+  function setT(el, v) { if (el && el.__t !== v) { el.__t = v; el.style.transform = v; } }
+  function setO(el, v) {
+    if (!el) return;
+    var q = v.toFixed(3);
+    if (el.__o !== q) { el.__o = q; el.style.opacity = q; }
+  }
+
+  var landedAt = null;
+
+  function headerTick(sy, dt) {
+    if (!row) return;
+    dt = Math.max(0.008, Math.min(0.064, dt || 0.016));
+    var landed = root.classList.contains('landed');
+    var menuOn = d.body.classList.contains('menu-open');
+    var narrow = w.innerWidth < 900;
+
+    // проявление шапки после посадки
+    var kIn = 1 - Math.exp(-dt / 0.2);
+    if (landed) {
+      hIn += (1 - hIn) * kIn;
+      if (hIn > 0.9985) hIn = 1;
+      if (landedAt == null) landedAt = performance.now();
+      // на слабом кадре разгон считался бы по числу кадров, а не по времени
+      if (performance.now() - landedAt > 700) hIn = 1;
+    } else { hIn = 0; landedAt = null; }
+
+    setO(logo, menuOn ? 1 : hIn);
+    setO(soc, menuOn ? 0 : hIn);
+
+    var a = (landed ? 1 : 0) * (menuOn ? 0 : 1) * hIn;
+    if (!hm) measure();
+    var canMerge = !!(landed && !narrow && !menuOn && hm && hm.row > 0);
+    var mT = canMerge ? Math.max(0, Math.min(1, 1 - (sy - 6) / 132)) : 0;
+    if (mg == null) mg = mT;
+    mg += (mT - mg) * (1 - Math.exp(-dt / 0.26));
+    if (Math.abs(mT - mg) < 0.0012) mg = mT;
+    var m = mg;
+    var em = m * m * m * (m * (m * 6 - 15) + 10);     // smootherstep
+
+    var total = hm ? hm.left + hm.right + 2 : 0;
+    var slack = hm ? Math.max(0, Math.round((hm.row - total) / 2)) : 0;
+    var sh = slack * em;
+
+    // перенесённый DOM приезжает со своими transition — их надо снять один раз,
+    // иначе каждый кадр борется с доводкой браузера
+    if (!noTr) {
+      noTr = true;
+      [pod, ctaPod, podSkin, ctaSkin, shell, navPod, navSkin, ink]
+        .concat(items).forEach(function (el) { if (el) el.style.transition = 'none'; });
+    }
+
+    var rise = (1 - hIn) * -7;
+    setT(pod, 'translate3d(' + sh.toFixed(2) + 'px,' + rise.toFixed(2) + 'px,0)');
+    setT(ctaPod, 'translate3d(' + (-sh).toFixed(2) + 'px,' + rise.toFixed(2) + 'px,0)');
+    setO(ctaPod, a);
+    setO(podSkin, a * (1 - em));
+    setO(ctaSkin, a * (1 - em));
+
+    if (shell) {
+      if (shell.style.visibility !== 'visible') shell.style.visibility = 'visible';
+      var wv = (canMerge ? (total + (hm.row - total) * (1 - em)) : 0).toFixed(1) + 'px';
+      if (shell.style.width !== wv) shell.style.width = wv;
+      setO(shell, a * em);
+    }
+
+    var navA = narrow ? 0 : a * (1 - em);
+    setO(navPod, navA);
+    if (navPod) {
+      var pe = navA > 0.9 ? 'auto' : 'none';
+      if (navPod.style.pointerEvents !== pe) navPod.style.pointerEvents = pe;
+      setT(navPod, 'translate3d(-50%,0,0) translateX(' +
+        (hm ? (hm.left - hm.right) / 2 * em : 0).toFixed(2) + 'px)');
+    }
+    setO(navSkin, navA);
+    setO(ink, navA);
+
+    var off = narrow || !landed || menuOn;
+    for (var i = 0; i < items.length; i++) {
+      var pI = Math.max(0, Math.min(1, ((1 - em) - i * 0.03) / 0.88));
+      var e2 = pI * pI * (3 - 2 * pI);
+      setO(items[i], off ? 0 : e2);
+      setT(items[i], 'translate3d(0,' + (-2.4 * (1 - e2)).toFixed(2) + 'px,0)');
+    }
+
+    // чернильная пилюля догоняет цель
+    if (inkS && (inkS.x !== inkS.tx || inkS.w !== inkS.tw)) {
+      var ai = 1 - Math.exp(-dt / 0.105);
+      inkS.x += (inkS.tx - inkS.x) * ai;
+      inkS.w += (inkS.tw - inkS.w) * ai;
       if (Math.abs(inkS.tx - inkS.x) + Math.abs(inkS.tw - inkS.w) < 0.2) {
         inkS.x = inkS.tx; inkS.w = inkS.tw;
       }
       inkPaint();
-    }, 86);
+    }
 
-    /* Активный раздел ведём по тем же секциям, что и остальная страница. */
-    var SPY = [
-      { k: 'pain', sel: '#pain' }, { k: 'services', sel: '#services' },
-      { k: 'cases', sel: '#cases' }, { k: 'pricing', sel: '#pricing' },
-      { k: 'atlas', sel: '#atlas' }, { k: 'brief', sel: '#brief' }
-    ];
-    B.ticker.add(function (sy) {
-      var line = sy + w.innerHeight * 0.34, act = SPY[0].k;
-      for (var i = 0; i < SPY.length; i++) {
-        var el = SPY[i].el || (SPY[i].el = $(SPY[i].sel));
-        if (!el) continue;
-        if (sy + el.getBoundingClientRect().top <= line) act = SPY[i].k;
-      }
-      if (act !== active) { active = act; paintNav(); }
-    }, 85);
+    // активный раздел
+    var line = sy + w.innerHeight * 0.34, act = SPY[0].k;
+    for (var j = 0; j < SPY.length; j++) {
+      var el2 = SPY[j].el || (SPY[j].el = $(SPY[j].sel));
+      if (!el2) continue;
+      if (sy + el2.getBoundingClientRect().top <= line) act = SPY[j].k;
+    }
+    if (act !== active) { active = act; paintNav(); }
+  }
 
-    B.onResize(function () { inkS = null; paintNav(); });
-    w.addEventListener('baza:ready', paintNav);
+  if (head) {
+    measure();
+    B.ticker.add(headerTick, 86);
+    B.onResize(function () { hm = null; inkS = null; measure(); paintNav(); });
+    w.addEventListener('baza:ready', function () { measure(); paintNav(); });
   }
 
   /* ═══════════════════════════════════════ 2 · ГЕОМЕТРИЯ ЗАЛИВКИ ══════ */
@@ -252,6 +347,7 @@
     flyToHeader();
     setTimeout(function () {
       root.classList.add('landed');
+      measure();
       sweepGeo();
       paintNav();
       if (intro) setTimeout(function () { intro.hidden = true; }, 1000);
@@ -268,14 +364,8 @@
 
   /* ═════════════════════════════════════════════════════ сборка ══════ */
 
-  B.ready(function () {
-    sweepGeo();
-    paintNav();
-  });
-  w.addEventListener('baza:ready', function () {
-    sweepGeo();
-    paintNav();
-  });
+  B.ready(function () { measure(); sweepGeo(); paintNav(); });
+  w.addEventListener('baza:ready', function () { sweepGeo(); });
   // шрифты меняют ширину подписей — геометрию надо пересчитать после загрузки
-  if (d.fonts && d.fonts.ready) d.fonts.ready.then(function () { sweepGeo(); paintNav(); });
+  if (d.fonts && d.fonts.ready) d.fonts.ready.then(function () { measure(); sweepGeo(); paintNav(); });
 })(window, document);

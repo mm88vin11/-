@@ -45,7 +45,6 @@
 .mario__stage {
   position: relative;
   margin-top: clamp(30px, 3.1vw, 58px);
-  min-height: clamp(240px, 18.6vw, 320px);
 }
 /* The row is capped rather than stretched: `aspect-ratio` cannot keep a block
    square while a `1fr` column is free to grow to a quarter of a 1320px page. */
@@ -53,13 +52,16 @@
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: clamp(10px, 1.6vw, 22px);
-  align-items: end;
-  max-width: 620px;
+  align-items: start;
   position: relative; z-index: 2;
 }
-@media (max-width: 640px) {
-  .mario__blocks { grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 340px; }
-}
+@media (max-width: 780px) { .mario__blocks { grid-template-columns: repeat(2, 1fr); gap: 14px; } }
+
+/* Block and its reveal share a cell. The reveal used to be absolutely
+   positioned under the button, which meant nothing downstream reserved room
+   for it and the tally below simply printed over the top of four open blocks. */
+.blkcell { display: grid; gap: 12px; align-content: start; }
+.blkcell .blk { max-width: 148px; }
 
 .blk {
   position: relative;
@@ -89,25 +91,25 @@
 .mario__coins { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
 
 .blk__say {
-  position: absolute; left: 0; right: 0; top: calc(100% + 12px);
-  padding: 12px 14px;
-  border-radius: 10px;
+  padding: 13px 15px;
+  border-radius: 12px;
   background: rgba(10, 10, 10, .88);
   color: var(--cream);
-  font-size: clamp(12px, 1.2vw, 14px);
-  line-height: 1.36; font-weight: 600;
+  font-size: clamp(12px, 1.15vw, 14px);
+  line-height: 1.4; font-weight: 500;
   text-align: left;
-  opacity: 0; transform: translateY(-8px);
-  transition: opacity 380ms ease, transform 460ms var(--e-out);
-  pointer-events: none;
+  opacity: 0; transform: translateY(-10px);
+  transition: opacity 420ms ease, transform 520ms var(--e-out);
 }
-.blk.is-done .blk__say { opacity: 1; transform: none; }
+.blkcell.is-done .blk__say { opacity: 1; transform: none; }
 .blk__say b { display: block; color: #ffd93b; font-family: var(--f-mono); font-size: 11px; margin-bottom: 4px; }
 
 /* ——— the ground, and Mario himself ——— */
+/* The ground closes the world instead of floating two screens below it — the
+   old gap is what made the scenery look bolted on from nowhere. */
 .mario__ground {
   position: relative; z-index: 3;
-  margin-top: clamp(150px, 11.8vw, 220px);
+  margin-top: clamp(56px, 6vw, 96px);
   height: 84px;
   image-rendering: pixelated;
 }
@@ -146,8 +148,14 @@
   --w-line: rgba(93, 255, 155, .2);
   --w-acc: #5dff9b;
 }
-#mxRain { position: absolute; inset: 0; z-index: -1; opacity: .34; }
-.uni--matrix.is-red #mxRain { opacity: .6; }
+/* `inset: 0` alone will not stretch a <canvas>: it is a replaced element, so
+   `width: auto` resolves to the intrinsic 300x150 and the rain ends up in a
+   postage stamp in the corner. The size has to be stated. */
+#mxRain {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  z-index: -1; opacity: .5;
+}
+.uni--matrix.is-red #mxRain { opacity: .8; }
 .uni--matrix::after {
   content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
   background: radial-gradient(78% 62% at 50% 44%, transparent 40%, #04070a 100%);

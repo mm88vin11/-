@@ -94,9 +94,48 @@ read only when a task needs it.
 To refresh it against a newer Motion, re-derive from the tag rather than editing
 by hand — the export surface is the source of truth.
 
+## The site
+
+`index.html` at the repo root is the built БАЗА landing page: one self-contained
+file, ~5.8 MB, no network at runtime. Open it directly — `file://` works.
+
+It is a build artefact. The sources are in `site/`:
+
+```
+site/src/*.css      seven stylesheets, concatenated in filename order
+site/src/10-body.html   the markup
+site/src/2*.js      core runtime + one module per group of worlds
+site/assets/        subset fonts, the wordmark, and the 144-frame hero reel
+site/build.py       inlines all of the above into index.html
+```
+
+Rebuild with:
+
+```bash
+python3 site/build.py
+```
+
+The build inlines the fonts and every image as `data:` URIs and appends the
+hero frame array *after* the scripts, so the page is interactive before the
+browser parses five megabytes of base64. The reel is handed to the runtime
+through `window.__seqReady` rather than read from `window.__SEQ` directly,
+because at script-evaluation time it does not exist yet.
+
+Two constraints are worth knowing before editing the CSS:
+
+- **Nothing vertical is measured in `vh`.** A phone's address bar retracts as
+  you scroll and every `vh`-based height changes with it, which is what made
+  the page appear to jump and reload. Full-height boxes use `svh`; fluid
+  spacing is keyed to `vw`.
+- **Canvases need an explicit `width`/`height` in CSS.** `position: absolute;
+  inset: 0` does not stretch a replaced element — it keeps the intrinsic
+  300×150 and the effect ends up in the corner.
+
 ## Layout
 
 ```
+index.html          the built site
+site/               its sources and build script
 .claude/skills/     10 skills
 .mcp.json           21st.dev MCP server (key via ${TWENTYFIRST_API_KEY})
 .env.example        template for the key

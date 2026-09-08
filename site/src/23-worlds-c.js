@@ -293,7 +293,9 @@ var Clock = K.Clock, clamp = K.clamp, lerp = K.lerp, rnd = K.rnd, Snd = K.Snd, R
     ring.classList.add('is-open');
     sec.classList.add('ring-open');
     Snd.craft();
-    K.toast('Портал открыт. Загляните внутрь — там уже светло.');
+    /* No toast here on purpose: a portal tearing open in front of you does not
+       need a caption, and a cream pill over the cream far side is invisible
+       anyway. */
   }
   skip.addEventListener('click', function () {
     for (var i = 0; i < BUCKETS; i++) hitB[i] = 1;

@@ -77,16 +77,3 @@ body.is-live .hero__prog { opacity: 1; }
 body.hero-out .hero__out > .wrap > * { opacity: 1; transform: none; }
 body.hero-out .hero__out > .wrap > *:nth-child(2) { transition-delay: 80ms; }
 body.hero-out .hero__out > .wrap > *:nth-child(3) { transition-delay: 160ms; }
-
-/* ─────────────────────────────────────────────────────── world transitions ──
-
-   Each world hands over with a shape, not a fade: the shape belongs to the
-   world being entered, so the seam reads as a door rather than a cut.        */
-
-.seam {
-  position: relative; z-index: 3;
-  height: clamp(60px, 5.6vw, 120px);
-  margin-top: -1px; margin-bottom: -1px;
-  pointer-events: none;
-}
-.seam svg { width: 100%; height: 100%; display: block; }

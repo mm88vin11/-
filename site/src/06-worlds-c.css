@@ -70,9 +70,6 @@
 }
 .onion.is-done .onion__hint { opacity: 0; }
 
-/* peeled skins pile up at the bottom instead of vanishing */
-.onion__pile { position: absolute; left: 0; right: 0; bottom: -14px; height: 60px; pointer-events: none; }
-
 /* ——— what each layer reveals ——— */
 .swamp__list { display: grid; gap: 10px; }
 .layer {

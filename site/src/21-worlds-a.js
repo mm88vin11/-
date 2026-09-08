@@ -62,21 +62,23 @@ function sprite(cv, map, pal, scale) {
   /* ——— build the four blocks ——— */
   var hit = 0, coins = 0, leak = 0;
   PAIN.forEach(function (p, i) {
-    var b = D.createElement('button');
-    b.className = 'blk';
-    b.type = 'button';
-    b.setAttribute('aria-label', 'Блок: ' + p.k);
-    b.innerHTML = '<canvas width="128" height="128"></canvas>' +
-      '<span class="blk__say"><b>' + p.k + '</b>' + p.say + '</span>';
-    host.appendChild(b);
-    var cv = b.querySelector('canvas');
+    var cell = D.createElement('div');
+    cell.className = 'blkcell';
+    cell.innerHTML =
+      '<button class="blk" type="button" aria-label="Блок: ' + p.k + '">' +
+        '<canvas width="128" height="128"></canvas>' +
+      '</button>' +
+      '<p class="blk__say"><b>' + p.k + '</b>' + p.say + '</p>';
+    host.appendChild(cell);
+    var b = cell.querySelector('.blk'), cv = cell.querySelector('canvas');
     sprite(cv, QBLOCK, PAL, 8);
-    b.addEventListener('click', function () { bump(b, cv, p, i); });
+    b.addEventListener('click', function () { bump(cell, b, cv, p); });
   });
 
-  function bump(b, cv, p, i) {
-    if (b.classList.contains('is-done')) return;
-    b.classList.add('is-done', 'is-hit');
+  function bump(cell, b, cv, p) {
+    if (cell.classList.contains('is-done')) return;
+    cell.classList.add('is-done');
+    b.classList.add('is-hit');
     setTimeout(function () { b.classList.remove('is-hit'); }, 320);
     sprite(cv, UBLOCK, PAL, 8);
     Snd.bump(); setTimeout(function () { Snd.coin(); }, 60);

@@ -278,10 +278,6 @@ em, .em {
   color: var(--w-fg);
   overflow: clip;
 }
-.uni__bg {
-  position: absolute; inset: 0; z-index: -2;
-  pointer-events: none;
-}
 .uni__head .plate { margin-bottom: clamp(14px, 1.1vw, 22px); }
 .uni__head .lead  { margin-top: clamp(16px, 1.4vw, 26px); }
 

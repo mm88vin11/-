@@ -325,10 +325,6 @@ em, .em {
   color: var(--w-fg);
   overflow: clip;
 }
-.uni__bg {
-  position: absolute; inset: 0; z-index: -2;
-  pointer-events: none;
-}
 .uni__head .plate { margin-bottom: clamp(14px, 1.1vw, 22px); }
 .uni__head .lead  { margin-top: clamp(16px, 1.4vw, 26px); }
 
@@ -756,19 +752,6 @@ body.hero-out .hero__out > .wrap > * { opacity: 1; transform: none; }
 body.hero-out .hero__out > .wrap > *:nth-child(2) { transition-delay: 80ms; }
 body.hero-out .hero__out > .wrap > *:nth-child(3) { transition-delay: 160ms; }
 
-/* ─────────────────────────────────────────────────────── world transitions ──
-
-   Each world hands over with a shape, not a fade: the shape belongs to the
-   world being entered, so the seam reads as a door rather than a cut.        */
-
-.seam {
-  position: relative; z-index: 3;
-  height: clamp(60px, 5.6vw, 120px);
-  margin-top: -1px; margin-bottom: -1px;
-  pointer-events: none;
-}
-.seam svg { width: 100%; height: 100%; display: block; }
-
 /* ═══════════════════════════════════════════════════════════════════════════
    БАЗА — 04 · worlds 01–03
    01 Mario     · where the money leaks
@@ -816,7 +799,6 @@ body.hero-out .hero__out > .wrap > *:nth-child(3) { transition-delay: 160ms; }
 .mario__stage {
   position: relative;
   margin-top: clamp(30px, 3.1vw, 58px);
-  min-height: clamp(240px, 18.6vw, 320px);
 }
 /* The row is capped rather than stretched: `aspect-ratio` cannot keep a block
    square while a `1fr` column is free to grow to a quarter of a 1320px page. */
@@ -824,13 +806,16 @@ body.hero-out .hero__out > .wrap > *:nth-child(3) { transition-delay: 160ms; }
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: clamp(10px, 1.6vw, 22px);
-  align-items: end;
-  max-width: 620px;
+  align-items: start;
   position: relative; z-index: 2;
 }
-@media (max-width: 640px) {
-  .mario__blocks { grid-template-columns: repeat(2, 1fr); gap: 12px; max-width: 340px; }
-}
+@media (max-width: 780px) { .mario__blocks { grid-template-columns: repeat(2, 1fr); gap: 14px; } }
+
+/* Block and its reveal share a cell. The reveal used to be absolutely
+   positioned under the button, which meant nothing downstream reserved room
+   for it and the tally below simply printed over the top of four open blocks. */
+.blkcell { display: grid; gap: 12px; align-content: start; }
+.blkcell .blk { max-width: 148px; }
 
 .blk {
   position: relative;
@@ -860,25 +845,25 @@ body.hero-out .hero__out > .wrap > *:nth-child(3) { transition-delay: 160ms; }
 .mario__coins { position: absolute; inset: 0; z-index: 4; pointer-events: none; }
 
 .blk__say {
-  position: absolute; left: 0; right: 0; top: calc(100% + 12px);
-  padding: 12px 14px;
-  border-radius: 10px;
+  padding: 13px 15px;
+  border-radius: 12px;
   background: rgba(10, 10, 10, .88);
   color: var(--cream);
-  font-size: clamp(12px, 1.2vw, 14px);
-  line-height: 1.36; font-weight: 600;
+  font-size: clamp(12px, 1.15vw, 14px);
+  line-height: 1.4; font-weight: 500;
   text-align: left;
-  opacity: 0; transform: translateY(-8px);
-  transition: opacity 380ms ease, transform 460ms var(--e-out);
-  pointer-events: none;
+  opacity: 0; transform: translateY(-10px);
+  transition: opacity 420ms ease, transform 520ms var(--e-out);
 }
-.blk.is-done .blk__say { opacity: 1; transform: none; }
+.blkcell.is-done .blk__say { opacity: 1; transform: none; }
 .blk__say b { display: block; color: #ffd93b; font-family: var(--f-mono); font-size: 11px; margin-bottom: 4px; }
 
 /* ——— the ground, and Mario himself ——— */
+/* The ground closes the world instead of floating two screens below it — the
+   old gap is what made the scenery look bolted on from nowhere. */
 .mario__ground {
   position: relative; z-index: 3;
-  margin-top: clamp(150px, 11.8vw, 220px);
+  margin-top: clamp(56px, 6vw, 96px);
   height: 84px;
   image-rendering: pixelated;
 }
@@ -917,8 +902,14 @@ body.hero-out .hero__out > .wrap > *:nth-child(3) { transition-delay: 160ms; }
   --w-line: rgba(93, 255, 155, .2);
   --w-acc: #5dff9b;
 }
-#mxRain { position: absolute; inset: 0; z-index: -1; opacity: .34; }
-.uni--matrix.is-red #mxRain { opacity: .6; }
+/* `inset: 0` alone will not stretch a <canvas>: it is a replaced element, so
+   `width: auto` resolves to the intrinsic 300x150 and the rain ends up in a
+   postage stamp in the corner. The size has to be stated. */
+#mxRain {
+  position: absolute; inset: 0; width: 100%; height: 100%;
+  z-index: -1; opacity: .5;
+}
+.uni--matrix.is-red #mxRain { opacity: .8; }
 .uni--matrix::after {
   content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
   background: radial-gradient(78% 62% at 50% 44%, transparent 40%, #04070a 100%);
@@ -1678,9 +1669,6 @@ body.hero-out .hero__out > .wrap > *:nth-child(3) { transition-delay: 160ms; }
 }
 .onion.is-done .onion__hint { opacity: 0; }
 
-/* peeled skins pile up at the bottom instead of vanishing */
-.onion__pile { position: absolute; left: 0; right: 0; bottom: -14px; height: 60px; pointer-events: none; }
-
 /* ——— what each layer reveals ——— */
 .swamp__list { display: grid; gap: 10px; }
 .layer {
@@ -2164,7 +2152,8 @@ body.hero-out .hero__out > .wrap > *:nth-child(3) { transition-delay: 160ms; }
   display: grid;
   grid-template-rows: 1fr auto;
 }
-#stars { position: absolute; inset: 0; z-index: 0; }
+/* explicit size for the same reason as the rain canvas */
+#stars { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 0; }
 
 .crawl__stage {
   position: relative; z-index: 1;
@@ -2607,8 +2596,7 @@ body.is-live #snd { opacity: 1; transform: none; pointer-events: auto; }
 
     <div class="swamp__grid">
       <div class="onion" id="onion">
-        <div class="onion__pile" aria-hidden="true"></div>
-        <p class="onion__hint" id="onionHint">снимите слой</p>
+            <p class="onion__hint" id="onionHint">снимите слой</p>
       </div>
       <ul class="swamp__list" id="swampList"></ul>
     </div>
@@ -3383,21 +3371,23 @@ function sprite(cv, map, pal, scale) {
   /* ——— build the four blocks ——— */
   var hit = 0, coins = 0, leak = 0;
   PAIN.forEach(function (p, i) {
-    var b = D.createElement('button');
-    b.className = 'blk';
-    b.type = 'button';
-    b.setAttribute('aria-label', 'Блок: ' + p.k);
-    b.innerHTML = '<canvas width="128" height="128"></canvas>' +
-      '<span class="blk__say"><b>' + p.k + '</b>' + p.say + '</span>';
-    host.appendChild(b);
-    var cv = b.querySelector('canvas');
+    var cell = D.createElement('div');
+    cell.className = 'blkcell';
+    cell.innerHTML =
+      '<button class="blk" type="button" aria-label="Блок: ' + p.k + '">' +
+        '<canvas width="128" height="128"></canvas>' +
+      '</button>' +
+      '<p class="blk__say"><b>' + p.k + '</b>' + p.say + '</p>';
+    host.appendChild(cell);
+    var b = cell.querySelector('.blk'), cv = cell.querySelector('canvas');
     sprite(cv, QBLOCK, PAL, 8);
-    b.addEventListener('click', function () { bump(b, cv, p, i); });
+    b.addEventListener('click', function () { bump(cell, b, cv, p); });
   });
 
-  function bump(b, cv, p, i) {
-    if (b.classList.contains('is-done')) return;
-    b.classList.add('is-done', 'is-hit');
+  function bump(cell, b, cv, p) {
+    if (cell.classList.contains('is-done')) return;
+    cell.classList.add('is-done');
+    b.classList.add('is-hit');
     setTimeout(function () { b.classList.remove('is-hit'); }, 320);
     sprite(cv, UBLOCK, PAL, 8);
     Snd.bump(); setTimeout(function () { Snd.coin(); }, 60);
@@ -4625,7 +4615,9 @@ var Clock = K.Clock, clamp = K.clamp, lerp = K.lerp, rnd = K.rnd, Snd = K.Snd, R
     ring.classList.add('is-open');
     sec.classList.add('ring-open');
     Snd.craft();
-    K.toast('Портал открыт. Загляните внутрь — там уже светло.');
+    /* No toast here on purpose: a portal tearing open in front of you does not
+       need a caption, and a cream pill over the cream far side is invisible
+       anyway. */
   }
   skip.addEventListener('click', function () {
     for (var i = 0; i < BUCKETS; i++) hitB[i] = 1;

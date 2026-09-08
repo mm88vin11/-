@@ -19,9 +19,22 @@
     shrek: [170, 230, 90], strange: [255, 168, 70], brief: [242, 235, 221],
     upside: [235, 60, 80], stars: [255, 232, 31]
   };
-  function accent() {
-    return ACCENT[d.documentElement.getAttribute('data-uni-now')] || ACCENT.hero;
+  function uniNow() {
+    return d.documentElement.getAttribute('data-uni-now') || 'hero';
   }
+  function accent() { return ACCENT[uniNow()] || ACCENT.hero; }
+
+  /* Форма брызг у каждой вселенной своя. Один и тот же кружок во всех девяти
+     мирах — это и есть та самая «одинаковость», из-за которой интерактив не
+     чувствуется: нажатие в мире Марио обязано быть монетой, в Матрице —
+     символом, в Тетрисе — квадратом. Стоит это ноль: форма выбирается один
+     раз на нажатие, дальше рисуется тот же цикл частиц. */
+  var SHAPE = {
+    mario: 'coin', matrix: 'glyph', tetris: 'block', strange: 'spark',
+    stars: 'star', upside: 'ash', shrek: 'blob', tiktok: 'heart',
+    flappy: 'feather'
+  };
+  var GLYPHS = 'アカサタナハマヤラ01アイウエオ0110';
 
   /* ==================================================== 1 · boot field === */
   /* A drifting field of specks that pulls itself into the wordmark as the
@@ -103,6 +116,7 @@
     function burst(x, y, strength) {
       if (E.reduce) return;
       var c = accent();
+      var sh = SHAPE[uniNow()] || 'dot';
       var st = strength || 1;
       var n = Math.round((E.lite ? 14 : 24) * st);
       for (var i = 0; i < n; i++) {
@@ -115,7 +129,11 @@
           x: x, y: y,
           vx: Math.cos(a) * v, vy: Math.sin(a) * v - 40,
           life: 0, max: 0.40 + Math.random() * 0.50,
-          r: (fast ? 1.2 : 2.0) + Math.random() * 2.6, c: c
+          r: (fast ? 1.2 : 2.0) + Math.random() * 2.6, c: c,
+          sh: sh,
+          rot: Math.random() * 6.2832,
+          spin: (Math.random() - .5) * 14,
+          g: GLYPHS[(Math.random() * GLYPHS.length) | 0]
         });
       }
       // two rings a beat apart: the second one is what makes a tap feel like
@@ -176,10 +194,103 @@
         o.x += o.vx * dt;
         o.y += o.vy * dt;
         var pa = (1 - k) * (1 - k * 0.4);
-        ctx.fillStyle = 'rgba(' + o.c[0] + ',' + o.c[1] + ',' + o.c[2] + ',' + pa.toFixed(3) + ')';
-        ctx.beginPath();
-        ctx.arc(o.x, o.y, o.r * (1 - k * 0.45), 0, 6.2832);
-        ctx.fill();
+        var col = 'rgba(' + o.c[0] + ',' + o.c[1] + ',' + o.c[2] + ',' + pa.toFixed(3) + ')';
+        var rr = o.r * (1 - k * 0.45);
+        ctx.fillStyle = col;
+        o.rot += o.spin * dt;
+
+        switch (o.sh) {
+          case 'coin':
+            /* Монета «крутится»: ширина ходит по косинусу, поэтому диск то
+               становится ребром, то разворачивается — тот же приём, что в
+               спрайте из игры, только без спрайта. */
+            var wq = Math.abs(Math.cos(o.rot)) * rr * 1.6 + 0.6;
+            ctx.beginPath();
+            ctx.ellipse(o.x, o.y, wq, rr * 1.6, 0, 0, 6.2832);
+            ctx.fill();
+            ctx.strokeStyle = 'rgba(255,255,255,' + (pa * .5).toFixed(3) + ')';
+            ctx.lineWidth = .8; ctx.stroke();
+            break;
+          case 'glyph':
+            ctx.save();
+            ctx.translate(o.x, o.y);
+            ctx.font = '700 ' + (rr * 3.4).toFixed(1) + 'px monospace';
+            ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+            ctx.fillText(o.g, 0, 0);
+            ctx.restore();
+            break;
+          case 'block':
+            ctx.save();
+            ctx.translate(o.x, o.y); ctx.rotate(o.rot);
+            var bs = rr * 1.7;
+            ctx.fillRect(-bs / 2, -bs / 2, bs, bs);
+            ctx.strokeStyle = 'rgba(255,255,255,' + (pa * .45).toFixed(3) + ')';
+            ctx.lineWidth = 1; ctx.strokeRect(-bs / 2, -bs / 2, bs, bs);
+            ctx.restore();
+            break;
+          case 'spark':
+            // искра вытянута вдоль собственной скорости — так она читается
+            // как след, а не как точка
+            var sp = Math.hypot(o.vx, o.vy) || 1;
+            ctx.strokeStyle = col;
+            ctx.lineWidth = rr * .9;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.moveTo(o.x, o.y);
+            ctx.lineTo(o.x - o.vx / sp * rr * 4, o.y - o.vy / sp * rr * 4);
+            ctx.stroke();
+            break;
+          case 'star':
+            ctx.save();
+            ctx.translate(o.x, o.y); ctx.rotate(o.rot);
+            ctx.beginPath();
+            for (var sI = 0; sI < 4; sI++) {
+              var aa = sI * 1.5708;
+              ctx.lineTo(Math.cos(aa) * rr * 2.2, Math.sin(aa) * rr * 2.2);
+              ctx.lineTo(Math.cos(aa + .785) * rr * .55, Math.sin(aa + .785) * rr * .55);
+            }
+            ctx.closePath(); ctx.fill();
+            ctx.restore();
+            break;
+          case 'ash':
+            // пепел Изнанки падает вверх
+            o.vy -= 900 * dt;
+            ctx.globalAlpha = pa * .8;
+            ctx.beginPath(); ctx.arc(o.x, o.y, rr * .8, 0, 6.2832); ctx.fill();
+            ctx.globalAlpha = 1;
+            break;
+          case 'blob':
+            ctx.save();
+            ctx.translate(o.x, o.y); ctx.rotate(o.rot);
+            ctx.beginPath();
+            ctx.ellipse(0, 0, rr * 1.5, rr * 1.05, 0, 0, 6.2832);
+            ctx.fill();
+            ctx.restore();
+            break;
+          case 'heart':
+            ctx.save();
+            ctx.translate(o.x, o.y); ctx.rotate(o.rot * .3);
+            var hs = rr * .9;
+            ctx.beginPath();
+            ctx.moveTo(0, hs);
+            ctx.bezierCurveTo(-hs * 2, -hs * .4, -hs * .7, -hs * 1.7, 0, -hs * .55);
+            ctx.bezierCurveTo(hs * .7, -hs * 1.7, hs * 2, -hs * .4, 0, hs);
+            ctx.fill();
+            ctx.restore();
+            break;
+          case 'feather':
+            ctx.save();
+            ctx.translate(o.x, o.y); ctx.rotate(o.rot * .5);
+            ctx.beginPath();
+            ctx.ellipse(0, 0, rr * 2.1, rr * .62, 0, 0, 6.2832);
+            ctx.fill();
+            ctx.restore();
+            break;
+          default:
+            ctx.beginPath();
+            ctx.arc(o.x, o.y, rr, 0, 6.2832);
+            ctx.fill();
+        }
       }
 
       if (!parts.length && !rings.length) stop();

@@ -212,6 +212,14 @@ const only = (process.argv.find(a => a.startsWith('--only=')) || '').split('=')[
   await browser.close();
   srv.close();
   fs.writeFileSync(path.join(ROOT, 'dist', 'check-report.json'), JSON.stringify(report, null, 1));
+  /* Про высокий DPR. Headless Chromium растеризует на процессоре, поэтому
+     число длинных кадров здесь следует за количеством пикселей, а не за
+     сайтом: одна и та же страница даёт 1-3% на @1x и упирается в потолок на
+     @2x/@3x. На живом устройстве канвасы композитятся видеокартой. Судить о
+     плавности по @1x-строкам; @2x полезен только чтобы поймать ошибки и
+     боковой скролл. */
+  console.log('\nПлавность судится по @1x-строкам: на @2x/@3x headless-браузер' +
+    ' растеризует на CPU, и счётчик упирается в число пикселей, а не в сайт.');
   console.log(failures ? `\n✗ ${failures} viewport(s) with problems` : '\n✓ all viewports clean');
   process.exit(failures ? 1 : 0);
 })();

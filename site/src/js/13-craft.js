@@ -182,8 +182,13 @@
     el.setAttribute('aria-hidden', 'false');
     el.classList.add('split');
 
+    /* Задержка растёт с индексом, но не бесконечно. На заголовке в 75 знаков
+       линейный шаг давал больше секунды одного только разбега: человек,
+       листающий быстро, успевал увидеть заголовок недорисованным. После
+       двадцать шестого знака волна догоняет сама себя, и любой заголовок
+       собирается меньше чем за полсекунды. */
     var chars = $$('.ch', el);
-    chars.forEach(function (c, i) { c.style.setProperty('--i', i); });
+    chars.forEach(function (c, i) { c.style.setProperty('--i', Math.min(i, 26)); });
     el.style.setProperty('--n', chars.length);
   }
 
@@ -202,7 +207,7 @@
     if (!el.classList.contains('split')) return;   // слишком длинный — пропущен
     requestAnimationFrame(function () {
       el.classList.add('is-lit');
-      var chars = $$('.ch', el).length;
+      var chars = Math.min($$('.ch', el).length, 26);
       setTimeout(function () { el.classList.add('is-flat'); },
         SPLIT_MS + chars * 15);
     });

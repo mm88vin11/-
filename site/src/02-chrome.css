@@ -1,0 +1,326 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   БАЗА — 02 · chrome
+   Intro loader, fixed header, mobile menu, metrics tape.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ─────────────────────────────────────────────────────────── intro loader ──
+
+   The old build animated the wordmark into place while the wordmark was still
+   downloading, so the logo arrived after its own entrance. Here both halves
+   are decoded first (`img.decode()`), and only then does `is-ready` unlock the
+   animation. Until that flips there is nothing on screen to be early.        */
+
+#load {
+  position: fixed; inset: 0; z-index: 90;
+  display: grid; place-items: center;
+  background: var(--ink);
+  transition: opacity 700ms var(--e-out), visibility 0s linear 700ms;
+}
+#load.is-gone { opacity: 0; visibility: hidden; pointer-events: none; }
+
+.load__mark {
+  position: relative;
+  width: min(74vw, 460px);
+  opacity: 0;
+  transition: opacity 260ms ease;
+}
+#load.is-ready .load__mark { opacity: 1; }
+
+.load__part { position: relative; overflow: hidden; display: block; }
+.load__part + .load__part { margin-top: .06em; }
+.load__part img {
+  display: block; width: 100%; height: auto;
+  transform: translate3d(0, 108%, 0);
+}
+#load.is-ready .load__part img {
+  animation: mark-in 1080ms var(--e-out) forwards;
+}
+#load.is-ready .load__part:nth-child(2) img { animation-delay: 110ms; }
+
+@keyframes mark-in { to { transform: translate3d(0, 0, 0); } }
+
+/* Progress is the reel preloading, not a fake timer. */
+.load__bar {
+  position: absolute; left: 0; bottom: -26px;
+  height: 2px; width: 100%;
+  background: var(--cream-08);
+  overflow: hidden; border-radius: 2px;
+}
+.load__bar i {
+  display: block; height: 100%; width: 100%;
+  background: var(--cream);
+  transform: scaleX(var(--p, 0)); transform-origin: 0 50%;
+  transition: transform 340ms var(--e-out);
+}
+.load__pct {
+  position: absolute; right: 0; bottom: -52px;
+  font-family: var(--f-mono); font-size: 11px; font-weight: 700;
+  letter-spacing: .04em; color: var(--cream-32);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ──────────────────────────────────────────────────────────────── header ──
+
+   Built mobile-first so it cannot be clipped: the row is a grid of
+   [logo | spacer | actions] that never exceeds the viewport, the top inset
+   respects the notch, and the desktop nav is added only once there is room
+   for it.                                                                    */
+
+#head {
+  position: fixed; z-index: 40;
+  top: max(10px, env(safe-area-inset-top));
+  left: 0; right: 0;
+  display: flex; justify-content: center;
+  padding-inline: max(12px, env(safe-area-inset-left), env(safe-area-inset-right));
+  pointer-events: none;
+}
+.head__row {
+  position: relative;
+  display: flex; align-items: center; gap: 10px;
+  width: 100%;
+  max-width: calc(var(--maxw) - 2 * var(--gut));
+  min-width: 0;
+}
+
+.pod {
+  position: relative;
+  display: flex; align-items: center;
+  height: 52px;
+  padding: 0 6px 0 16px;
+  border-radius: 999px;
+  pointer-events: auto;
+  min-width: 0;
+  background: rgba(12, 12, 12, .62);
+  box-shadow: inset 0 0 0 1px rgba(242, 235, 221, .1),
+              0 12px 34px rgba(0, 0, 0, .42);
+  /* A single 12px blur, not the 20px-plus frosted slab that generated pages
+     reach for. Enough to separate the bar from a moving reel, not enough to
+     read as the effect itself. */
+  -webkit-backdrop-filter: blur(12px) saturate(130%);
+  backdrop-filter: blur(12px) saturate(130%);
+}
+.pod--logo { flex: 0 1 auto; padding-right: 16px; }
+.pod__logo { display: flex; align-items: center; height: 100%; }
+.pod__logo img {
+  height: 20px; width: auto;
+  opacity: 0;
+  transition: opacity 420ms ease;
+}
+body.is-live .pod__logo img { opacity: 1; }
+
+.head__spacer { flex: 1 1 auto; min-width: 0; }
+
+.head__acts {
+  display: flex; align-items: center; gap: 8px;
+  flex: 0 0 auto; pointer-events: auto;
+}
+
+.icobtn {
+  display: grid; place-items: center;
+  width: 40px; height: 40px; flex: 0 0 auto;
+  border-radius: 999px;
+  color: var(--cream-72);
+  box-shadow: inset 0 0 0 1px rgba(242, 235, 221, .12);
+  transition: color 240ms ease, box-shadow 240ms ease, transform 300ms var(--e-out);
+}
+.icobtn:hover { color: var(--cream); box-shadow: inset 0 0 0 1px rgba(242, 235, 221, .34); }
+.icobtn:active { transform: scale(.94); }
+
+.burger { position: relative; width: 40px; height: 40px; }
+.burger i {
+  position: absolute; left: 11px; width: 18px; height: 1.6px;
+  border-radius: 2px; background: currentColor;
+  transition: transform 460ms var(--e-out), opacity 220ms ease;
+}
+.burger i:nth-child(1) { top: 16px; }
+.burger i:nth-child(2) { top: 22px; }
+body.menu-open .burger i:nth-child(1) { transform: translateY(3px) rotate(45deg); }
+body.menu-open .burger i:nth-child(2) { transform: translateY(-3px) rotate(-45deg); }
+
+/* Desktop nav: only mounted where it fits. */
+.head__nav { display: none; }
+@media (min-width: 900px) {
+  .head__nav {
+    position: absolute; left: 50%; top: 0;
+    transform: translateX(-50%);
+    display: flex; align-items: center; gap: 2px;
+    height: 52px; padding: 0 6px;
+    border-radius: 999px;
+    pointer-events: auto;
+    background: rgba(12, 12, 12, .62);
+    box-shadow: inset 0 0 0 1px rgba(242, 235, 221, .1),
+                0 12px 34px rgba(0, 0, 0, .42);
+    -webkit-backdrop-filter: blur(12px) saturate(130%);
+    backdrop-filter: blur(12px) saturate(130%);
+    opacity: 0; visibility: hidden;
+    transition: opacity 420ms ease, visibility 0s linear 420ms;
+  }
+  body.is-scrolled .head__nav { opacity: 1; visibility: visible; transition-delay: 0s; }
+  .head__nav a {
+    position: relative; z-index: 2;
+    display: flex; align-items: center;
+    height: 38px; padding: 0 13px;
+    border-radius: 999px;
+    font-family: var(--f-mono);
+    font-size: 11px; font-weight: 700;
+    letter-spacing: .03em; text-transform: uppercase;
+    color: var(--cream-52); white-space: nowrap;
+    transition: color 260ms ease;
+  }
+  .head__nav a:hover, .head__nav a.is-on { color: var(--cream); }
+  .head__ink {
+    position: absolute; left: 0; top: 7px; z-index: 1;
+    height: 38px; border-radius: 999px;
+    background: rgba(242, 235, 221, .1);
+    opacity: 0;
+    transition: transform 520ms var(--e-out), width 520ms var(--e-out), opacity 260ms ease;
+    will-change: transform, width;
+  }
+  .head__nav.has-ink .head__ink { opacity: 1; }
+  .head__cta { display: inline-flex !important; }
+}
+.head__cta { display: none; }
+
+/* ───────────────────────────────────────────────────────────── mobile menu ── */
+
+#menu {
+  position: fixed; inset: 0; z-index: 39;
+  display: flex; flex-direction: column; justify-content: center;
+  padding: calc(env(safe-area-inset-top) + 92px) var(--gut)
+           calc(env(safe-area-inset-bottom) + 28px);
+  background: var(--cream); color: var(--ink);
+  clip-path: circle(0px at calc(100% - 44px) 44px);
+  transition: clip-path 760ms var(--e-out);
+  visibility: hidden;
+  overscroll-behavior: contain;
+  overflow-y: auto;
+}
+body.menu-open #menu { clip-path: circle(160% at calc(100% - 44px) 44px); visibility: visible; }
+
+.menu__list { display: flex; flex-direction: column; }
+.menu__list a {
+  display: flex; align-items: baseline; gap: 14px;
+  padding: clamp(10px, 1.1vw, 18px) 0;
+  border-top: 1px solid rgba(10, 10, 10, .1);
+  font-size: clamp(23px, 6.4vw, 34px);
+  font-weight: 800; letter-spacing: -.038em;
+  opacity: 0; transform: translateY(20px);
+  transition: opacity 520ms ease, transform 640ms var(--e-out);
+}
+.menu__list a:first-child { border-top: none; }
+body.menu-open .menu__list a { opacity: 1; transform: none; }
+.menu__list a span {
+  font-family: var(--f-mono); font-size: 11px; font-weight: 700;
+  color: rgba(10, 10, 10, .38); letter-spacing: 0;
+}
+.menu__foot {
+  margin-top: clamp(20px, 2.1vw, 36px);
+  display: flex; flex-wrap: wrap; gap: 10px;
+  opacity: 0; transition: opacity 520ms ease 320ms;
+}
+body.menu-open .menu__foot { opacity: 1; }
+.menu__foot .btn { --w-acc: var(--ink); --w-bg: var(--cream); }
+.menu__foot .btn--ghost { --w-fg: var(--ink); --w-line: rgba(10,10,10,.18); }
+
+/* ──────────────────────────────────────────────────────────── metrics tape ──
+
+   Ported wholesale from the previous build: the fixed bar with the client
+   growth numbers, the ▲/▼ colouring, the drag-to-scrub marquee and the
+   "how we count this" card behind the question mark.                        */
+
+#tape {
+  position: fixed; left: 0; right: 0; bottom: 0; z-index: 30;
+  display: flex; align-items: center;
+  height: calc(var(--tapeh) + env(safe-area-inset-bottom));
+  padding-bottom: env(safe-area-inset-bottom);
+  --tapeh: 40px;
+  background: rgba(10, 10, 10, .74);
+  border-top: 1px solid rgba(242, 235, 221, .12);
+  -webkit-backdrop-filter: blur(18px) saturate(150%);
+  backdrop-filter: blur(18px) saturate(150%);
+  transform: translateY(110%);
+  transition: transform 900ms var(--e-out);
+  contain: layout paint;
+}
+body.is-live #tape { transform: none; }
+@media (max-width: 700px) { #tape { --tapeh: 34px; } }
+
+.tape__q {
+  flex: 0 0 auto; display: grid; place-items: center;
+  width: 22px; height: 22px; margin-left: 10px;
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 1px rgba(242, 235, 221, .26);
+  font-family: var(--f-mono); font-size: 11px; font-weight: 700;
+  color: var(--cream-72);
+  transition: color 220ms ease, box-shadow 220ms ease;
+}
+.tape__q:hover { color: var(--cream); box-shadow: inset 0 0 0 1px var(--cream); }
+.tape__k {
+  flex: 0 0 auto; margin-left: 10px;
+  font-family: var(--f-mono); font-size: 11px; font-weight: 700;
+  letter-spacing: .02em; color: var(--cream-52); white-space: nowrap;
+}
+@media (max-width: 700px) { .tape__k { display: none; } }
+
+.tape__mask {
+  position: relative; flex: 1 1 auto; min-width: 0; height: 100%;
+  margin-left: 12px; overflow: hidden;
+  border-left: 1px solid rgba(242, 235, 221, .1);
+  cursor: grab; touch-action: pan-y;
+  -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 76px, #000 calc(100% - 48px), transparent 100%);
+  mask-image: linear-gradient(90deg, transparent 0, #000 76px, #000 calc(100% - 48px), transparent 100%);
+}
+.tape__mask.is-drag { cursor: grabbing; }
+.tape__run {
+  display: flex; align-items: center; height: 100%;
+  width: max-content; will-change: transform;
+}
+.tape__m {
+  display: inline-flex; align-items: center; gap: 8px;
+  flex: 0 0 auto; height: 100%; padding-left: 28px; line-height: 1;
+}
+@media (max-width: 700px) { .tape__m { padding-left: 18px; gap: 7px; } }
+.tape__mk {
+  font-size: 12px; font-weight: 700; letter-spacing: -.008em;
+  color: rgba(242, 235, 221, .92); white-space: nowrap;
+}
+.tape__mv {
+  display: flex; align-items: center; gap: 4px;
+  font-size: 12px; font-weight: 700; letter-spacing: -.012em;
+  font-variant-numeric: tabular-nums; white-space: nowrap;
+}
+.tape__mv svg { width: 7px; height: 6px; }
+.tape__m--up   .tape__mv { color: #5ff09a; }
+.tape__m--down .tape__mv { color: #ff6a52; }
+@media (max-width: 700px) { .tape__mk, .tape__mv { font-size: 11px; } }
+
+.tape__card {
+  position: fixed; left: max(12px, env(safe-area-inset-left));
+  right: max(12px, env(safe-area-inset-right));
+  bottom: calc(var(--barh) + 12px);
+  z-index: 31;
+  max-width: 420px;
+  padding: 20px;
+  border-radius: 20px;
+  background: var(--cream); color: var(--ink);
+  box-shadow: 0 26px 70px rgba(0, 0, 0, .56);
+  opacity: 0; transform: translateY(12px) scale(.98);
+  visibility: hidden;
+  transition: opacity 320ms ease, transform 440ms var(--e-out), visibility 0s linear 320ms;
+}
+.tape__card.is-open { opacity: 1; transform: none; visibility: visible; transition-delay: 0s; }
+.tape__card h4 { font-size: 16px; font-weight: 800; letter-spacing: -.02em; }
+.tape__card p {
+  margin-top: 8px; font-size: 13.5px; line-height: 1.5;
+  color: rgba(10, 10, 10, .66);
+}
+.tape__x {
+  position: absolute; top: 12px; right: 12px;
+  width: 28px; height: 28px; display: grid; place-items: center;
+  border-radius: 999px; color: rgba(10, 10, 10, .5);
+}
+.tape__x:hover { color: var(--ink); background: rgba(10, 10, 10, .07); }
+
+/* Content clears the tape once it is up. */
+body.is-live { --barh: 40px; }
+@media (max-width: 700px) { body.is-live { --barh: 34px; } }

@@ -1,0 +1,303 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   БАЗА — 01 · foundation
+   Tokens, reset, mobile hardening, shared primitives.
+
+   Two rules govern everything below.
+
+   1. Nothing vertical is measured against the viewport's height. A phone's
+      address bar retracts as you scroll, and every `100vh` box grows by that
+      much the instant it does — which is the lurch the previous build had.
+      Full-height boxes therefore use `100svh` (the *small* viewport, defined
+      with the chrome shown, so it never moves), and fluid spacing is keyed to
+      `vw` rather than `vh` for the same reason. `--vh` is written by script,
+      and only when the *width* changes: a toolbar sliding away is not a
+      resize.
+   2. Nothing scales under a finger. `touch-action` is declared once, globally,
+      and widened only where a surface genuinely pans.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  /* ——— brand constants ——— */
+  --ink:        #0a0a0a;
+  --cream:      #f2ebdd;
+  --cream-72:   rgba(242, 235, 221, .72);
+  --cream-52:   rgba(242, 235, 221, .52);
+  --cream-32:   rgba(242, 235, 221, .32);
+  --cream-14:   rgba(242, 235, 221, .14);
+  --cream-08:   rgba(242, 235, 221, .08);
+
+  /* ——— per-world surface (every <section> overrides these) ——— */
+  --w-bg:   var(--ink);
+  --w-fg:   var(--cream);
+  --w-dim:  var(--cream-52);
+  --w-line: var(--cream-14);
+  --w-acc:  var(--cream);
+
+  /* ——— type ——— */
+  --f-sans:  'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --f-mono:  'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --f-pixel: 'Press Start 2P', 'Courier New', monospace;
+  --f-chunk: 'Russo One', 'Arial Black', Impact, sans-serif;
+
+  /* ——— rhythm ——— */
+  --gut:  clamp(18px, 3.2vw, 44px);
+  --maxw: 1320px;
+  --sec:  clamp(84px, 7.4vw, 168px);
+
+  /* ——— easing ——— */
+  --e-out:  cubic-bezier(.16, .84, .24, 1);
+  --e-in:   cubic-bezier(.7, 0, .84, 0);
+  --e-soft: cubic-bezier(.33, 1, .68, 1);
+  --e-back: cubic-bezier(.34, 1.56, .64, 1);
+
+  /* written by JS on width change only — never on toolbar slide */
+  --vh: 1vh;
+  --barh: 0px;
+
+  color-scheme: dark;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+html {
+  /* The page owns its scroll. Rubber-banding at either end used to hand the
+     scroll to the browser chrome, which is what made the whole layout lurch. */
+  overscroll-behavior: none;
+  scroll-behavior: auto;
+  background: var(--ink);
+  height: 100%;
+}
+
+body {
+  margin: 0;
+  min-height: 100svh;
+  background: var(--ink);
+  color: var(--cream);
+  font-family: var(--f-sans);
+  font-weight: 500;
+  font-size: 16px;
+  line-height: 1.5;
+  letter-spacing: -.011em;
+  overflow-x: clip;
+  /* `manipulation` drops the 300ms double-tap-to-zoom watch. That watch is the
+     "screen jumps on tap" the brief describes: the browser holds the tap, then
+     commits it late, and the page appears to twitch. */
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-variant-ligatures: none;
+}
+
+/* Text is selectable where text is the point, and nowhere else — dragging a
+   game board should not paint half the section blue. */
+body { -webkit-user-select: none; user-select: none; }
+p, li, h1, h2, h3, h4, blockquote, input, textarea, [data-sel] {
+  -webkit-user-select: text; user-select: text;
+}
+
+img, svg, canvas, video { display: block; max-width: 100%; }
+img { -webkit-user-drag: none; user-select: none; -webkit-touch-callout: none; }
+
+a { color: inherit; text-decoration: none; }
+button, input, textarea, select {
+  font: inherit; color: inherit; margin: 0;
+  background: none; border: none; border-radius: 0;
+  -webkit-appearance: none; appearance: none;
+}
+button { cursor: pointer; touch-action: manipulation; }
+input, textarea { cursor: text; }
+:focus { outline: none; }
+:focus-visible {
+  outline: 2px solid var(--w-acc);
+  outline-offset: 3px;
+  border-radius: 4px;
+}
+
+h1, h2, h3, h4, p, figure, ul, ol { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+
+/* ─────────────────────────────────────────────────────────── primitives ── */
+
+.wrap {
+  position: relative;
+  width: 100%;
+  max-width: var(--maxw);
+  margin-inline: auto;
+  padding-inline: var(--gut);
+}
+
+.vh {
+  position: absolute; width: 1px; height: 1px;
+  margin: -1px; padding: 0; overflow: hidden;
+  clip: rect(0 0 0 0); clip-path: inset(50%); white-space: nowrap;
+}
+
+/* The world plate. Replaces the pill-badge-above-the-headline that every
+   generated landing page opens with: this one carries the world's number and
+   name, so it is wayfinding rather than decoration. */
+.plate {
+  display: inline-flex; align-items: baseline; gap: .62em;
+  font-family: var(--f-mono);
+  font-size: clamp(10px, 1.02vw, 11.5px);
+  font-weight: 700;
+  /* modest tracking — wide-set caps are the single loudest generated-page tell */
+  letter-spacing: .04em;
+  text-transform: uppercase;
+  color: var(--w-dim);
+}
+.plate b {
+  font-weight: 700;
+  color: var(--w-acc);
+  font-variant-numeric: tabular-nums;
+}
+.plate i {
+  width: 2.4em; height: 1px; align-self: center;
+  background: currentColor; opacity: .34; font-style: normal;
+}
+
+/* Measure is set on the heading itself, in `ch` — which resolves against the
+   heading's own size, not the 16px it would inherit from a wrapper. Putting
+   the limit on the wrapper is how a 68px headline ends up in a 240px column
+   with half the screen empty beside it. */
+.h-xl {
+  font-size: clamp(34px, 7.4vw, 96px);
+  line-height: .95; letter-spacing: -.045em; font-weight: 800;
+  max-width: 17ch; text-wrap: balance;
+}
+.h-lg {
+  font-size: clamp(28px, 5.4vw, 68px);
+  line-height: 1.02; letter-spacing: -.04em; font-weight: 800;
+  max-width: 19ch; text-wrap: balance;
+}
+.h-md {
+  font-size: clamp(21px, 2.9vw, 34px);
+  line-height: 1.14; letter-spacing: -.032em; font-weight: 700;
+  max-width: 24ch; text-wrap: balance;
+}
+
+/* The accent word. Not an italic serif — that pairing is the most-copied
+   generated-headline move there is. This is the outline already used on the
+   brand's own marquee, so the emphasis comes from the house, not from a font
+   the model happens to like. */
+em, .em {
+  font-style: normal;
+  font-weight: 800;
+  color: transparent;
+  /* `-webkit-text-stroke` straddles the outline, half of it falling inward.
+     Manrope ExtraBold has tight apertures, so anything heavier than about
+     1/60th of the size closes the counters of "е", "в" and "а" and the word
+     grows a bar through the middle. Scaled in `em` with a 1px floor so small
+     type still shows an edge. */
+  -webkit-text-stroke: max(1px, .016em) var(--w-acc);
+  paint-order: stroke fill;
+  /* The stroke is painted outside the glyph, so display tracking this tight
+     welds neighbouring letters into each other — at 68px the crossbars of
+     "ш" and "е" merge into a single rule through the word. The tracking has
+     to be given back, and a little more than the stroke takes. */
+  letter-spacing: .03em;
+}
+@supports not (-webkit-text-stroke: 1px red) {
+  em, .em { color: var(--w-acc); -webkit-text-stroke: 0; }
+}
+
+.lead {
+  max-width: 54ch;
+  font-size: clamp(15.5px, 1.62vw, 20px);
+  line-height: 1.55; font-weight: 500;
+  color: var(--w-dim);
+  text-wrap: pretty;
+}
+.fine {
+  max-width: 62ch;
+  font-size: clamp(12.5px, 1.15vw, 14px);
+  line-height: 1.5; font-weight: 500;
+  color: var(--w-dim); opacity: .82;
+  text-wrap: pretty;
+}
+
+/* ─────────────────────────────────────────────────────────────── buttons ── */
+
+.btn {
+  position: relative;
+  display: inline-flex; align-items: center; justify-content: center;
+  gap: .66em;
+  min-height: 54px;
+  padding: 0 clamp(22px, 2.6vw, 32px);
+  border-radius: 999px;
+  font-size: clamp(14px, 1.35vw, 16px);
+  font-weight: 700; letter-spacing: -.014em;
+  white-space: nowrap;
+  background: var(--w-acc);
+  color: var(--w-bg);
+  overflow: hidden;
+  isolation: isolate;
+  transition: transform 420ms var(--e-out), box-shadow 420ms var(--e-out),
+              opacity 240ms ease;
+  will-change: transform;
+}
+.btn::after {
+  content: ''; position: absolute; inset: 0; z-index: -1;
+  background: currentColor; opacity: 0;
+  transition: opacity 300ms ease;
+}
+.btn:hover { transform: translateY(-2px); box-shadow: 0 16px 40px rgba(0,0,0,.42); }
+.btn:active { transform: translateY(0) scale(.985); }
+.btn--ghost {
+  background: transparent; color: var(--w-fg);
+  box-shadow: inset 0 0 0 1px var(--w-line);
+}
+.btn--ghost:hover { box-shadow: inset 0 0 0 1px var(--w-acc), 0 16px 40px rgba(0,0,0,.32); }
+.btn svg { flex: 0 0 auto; }
+.btn--sm { min-height: 42px; padding: 0 18px; font-size: 13.5px; }
+
+/* ───────────────────────────────────────────────────────── reveal system ── */
+
+/* One shared entrance. Elements start slightly low and blurred-out on the
+   y-axis only; the observer flips a single attribute. No per-element listener,
+   no stagger computed in JS. */
+[data-rise] {
+  opacity: 0;
+  transform: translate3d(0, var(--rise-d, 22px), 0);
+  transition: opacity 760ms var(--e-out) var(--rise-t, 0ms),
+              transform 900ms var(--e-out) var(--rise-t, 0ms);
+  will-change: opacity, transform;
+}
+[data-rise].is-in { opacity: 1; transform: none; }
+
+/* ───────────────────────────────────────────────────────── world shells ── */
+
+.uni {
+  position: relative;
+  isolation: isolate;
+  padding-block: var(--sec);
+  background: var(--w-bg);
+  color: var(--w-fg);
+  overflow: clip;
+}
+.uni__bg {
+  position: absolute; inset: 0; z-index: -2;
+  pointer-events: none;
+}
+.uni__head .plate { margin-bottom: clamp(14px, 1.1vw, 22px); }
+.uni__head .lead  { margin-top: clamp(16px, 1.4vw, 26px); }
+
+/* ─────────────────────────────────────────── motion / input preferences ── */
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+    scroll-behavior: auto !important;
+  }
+  [data-rise] { opacity: 1 !important; transform: none !important; }
+}
+
+/* Coarse pointers get no hover-only affordance left dangling. */
+@media (hover: none) {
+  .btn:hover { transform: none; box-shadow: none; }
+}

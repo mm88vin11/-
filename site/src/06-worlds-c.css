@@ -1,0 +1,390 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   БАЗА — 06 · worlds 07–11
+   07 Swamp  · ogres have layers, so does a handover
+   08 Portal · you cut the circle, the circle opens the next world
+   09 Light  · the world on the other side (brief lives here)
+   10 Upside · the basement
+   11 Crawl  · credits
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═════════════════════════════════════════════════════ 07 · БОЛОТО · ОГР ══ */
+
+.uni--swamp {
+  --w-bg: #1d3b18;
+  --w-fg: #f4f7e8;
+  --w-dim: rgba(244, 247, 232, .6);
+  --w-line: rgba(244, 247, 232, .16);
+  --w-acc: #b4d84a;
+}
+.swamp__bg { position: absolute; inset: 0; z-index: -1; }
+.swamp__bg canvas { width: 100%; height: 100%; }
+
+/* the hand-painted sign that opens the swamp */
+.sign {
+  /* a block of its own: the plate above it is an inline-flex row, and an
+     inline sign simply parks itself on the end of that row */
+  display: block; width: fit-content;
+  margin: clamp(14px, 1.2vw, 20px) 0 clamp(18px, 1.6vw, 30px);
+  padding: 12px 22px;
+  background: linear-gradient(#7a5230, #5e3d22);
+  border-radius: 4px;
+  transform: rotate(-2.4deg);
+  box-shadow: 0 12px 30px rgba(0, 0, 0, .42), inset 0 2px 0 rgba(255, 255, 255, .14);
+  font-family: var(--f-chunk);
+  font-size: clamp(12px, 1.5vw, 16px);
+  letter-spacing: .06em; color: #f6e7c8;
+  text-shadow: 1px 1px 0 rgba(0, 0, 0, .45);
+}
+
+.swamp__grid {
+  display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr);
+  gap: clamp(28px, 5vw, 64px); align-items: start;
+  margin-top: clamp(34px, 3.3vw, 60px);
+}
+@media (max-width: 900px) { .swamp__grid { grid-template-columns: 1fr; } }
+
+/* ——— the onion ——— */
+.onion {
+  position: relative;
+  width: min(320px, 72vw); margin: 0 auto clamp(30px, 2.5vw, 44px);
+  aspect-ratio: 1;
+  touch-action: manipulation;
+}
+.onion svg { width: 100%; height: 100%; overflow: visible; }
+.onion__layer {
+  cursor: pointer;
+  transition: transform 720ms var(--e-out), opacity 620ms ease;
+  transform-box: fill-box; transform-origin: 50% 100%;
+}
+.onion__layer.is-off {
+  transform: rotate(var(--peel, -46deg)) translate(var(--px, -30%), var(--py, 44%));
+  opacity: 0;
+  pointer-events: none;
+}
+.onion__hint {
+  position: absolute; left: 50%; bottom: -6px;
+  transform: translateX(-50%);
+  font-family: var(--f-mono); font-size: 11.5px; font-weight: 700;
+  color: var(--w-dim); white-space: nowrap;
+  transition: opacity 400ms ease;
+}
+.onion.is-done .onion__hint { opacity: 0; }
+
+/* peeled skins pile up at the bottom instead of vanishing */
+.onion__pile { position: absolute; left: 0; right: 0; bottom: -14px; height: 60px; pointer-events: none; }
+
+/* ——— what each layer reveals ——— */
+.swamp__list { display: grid; gap: 10px; }
+.layer {
+  display: grid; grid-template-columns: 30px minmax(0, 1fr);
+  gap: 16px; align-items: start;
+  padding: 16px 18px; border-radius: 16px;
+  background: rgba(0, 0, 0, .24);
+  box-shadow: inset 0 0 0 1px var(--w-line);
+  /* dimmed, not hidden: an unpeeled row still has to be readable, otherwise
+     the section looks broken rather than merely unopened */
+  opacity: .58;
+  transition: opacity 520ms ease, background 520ms ease, transform 620ms var(--e-out);
+}
+.layer.is-on {
+  opacity: 1; background: rgba(180, 216, 74, .1);
+  box-shadow: inset 0 0 0 1px rgba(180, 216, 74, .4);
+}
+.layer__n {
+  display: grid; place-items: center;
+  width: 30px; height: 30px; border-radius: 999px;
+  font-family: var(--f-mono); font-size: 12px; font-weight: 700;
+  color: var(--w-bg); background: var(--w-dim);
+  transition: background 420ms ease;
+}
+.layer.is-on .layer__n { background: var(--w-acc); }
+.layer b { font-size: 15.5px; font-weight: 700; letter-spacing: -.024em; }
+.layer p { margin-top: 5px; font-size: 13.5px; line-height: 1.46; color: var(--w-dim); }
+
+/* the one joke that earns its keep */
+.swamp__tune {
+  display: inline-flex; align-items: center; gap: 9px;
+  margin-top: clamp(24px, 2.1vw, 36px);
+  padding: 10px 16px; border-radius: 999px;
+  font-size: 13px; font-weight: 600; color: var(--w-dim);
+  box-shadow: inset 0 0 0 1px var(--w-line);
+  transition: color 240ms ease, box-shadow 240ms ease;
+}
+.swamp__tune:hover { color: var(--w-fg); box-shadow: inset 0 0 0 1px var(--w-acc); }
+.swamp__tune svg { flex: 0 0 auto; }
+.swamp__tune.is-on { color: var(--w-acc); }
+
+/* ═════════════════════════════════════════════════════ 08 · ПОРТАЛ ══════ */
+
+.uni--portal {
+  --w-bg: #0a0710;
+  --w-fg: #f2ebdd;
+  --w-dim: rgba(242, 235, 221, .54);
+  --w-line: rgba(242, 235, 221, .12);
+  --w-acc: #ff9a3c;
+  /* The section is tall on purpose: the ring wants room, and the step-through
+     needs somewhere to travel from. */
+  padding-bottom: clamp(60px, 5.6vw, 120px);
+}
+.portal__embers { position: absolute; inset: 0; z-index: -1; }
+.portal__embers canvas { width: 100%; height: 100%; }
+
+.ring {
+  position: relative;
+  width: min(500px, 82vw);
+  margin: clamp(26px, 2.5vw, 46px) auto 0;
+  aspect-ratio: 1;
+  touch-action: none;      /* the finger is drawing here, not scrolling */
+  cursor: crosshair;
+}
+.ring canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+#ptWorld { z-index: 1; }   /* the far side, masked to whatever arc you've cut */
+#ptSpark { z-index: 2; }   /* the rim */
+
+.ring__say {
+  position: absolute; left: 50%; top: 50%; z-index: 3;
+  transform: translate(-50%, -50%);
+  width: min(80%, 30ch); text-align: center;
+  font-family: var(--f-mono); font-size: clamp(11.5px, 1.3vw, 13.5px);
+  line-height: 1.6; color: var(--w-dim);
+  pointer-events: none;
+  transition: opacity 420ms ease;
+}
+.ring.is-open .ring__say { opacity: 0; }
+.ring__say i {
+  display: block; margin-bottom: 10px; font-style: normal;
+  font-size: 26px; color: var(--w-acc); opacity: .8;
+  animation: ring-breathe 3.4s ease-in-out infinite;
+}
+@keyframes ring-breathe { 50% { opacity: .3; transform: scale(.94); } }
+
+/* progress on the arc you've actually drawn */
+.ring__pct {
+  position: absolute; left: 50%; bottom: -34px; z-index: 3;
+  transform: translateX(-50%);
+  font-family: var(--f-mono); font-size: 11px; font-weight: 700;
+  color: var(--w-acc); font-variant-numeric: tabular-nums;
+  opacity: 0; transition: opacity 260ms ease;
+}
+.ring.is-drawing .ring__pct { opacity: 1; }
+
+.portal__acts {
+  display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;
+  margin-top: clamp(52px, 4.3vw, 84px);
+}
+.portal__step {
+  opacity: 0; transform: translateY(14px) scale(.96);
+  pointer-events: none;
+  transition: opacity 520ms ease, transform 640ms var(--e-back);
+}
+.ring-open .portal__step { opacity: 1; transform: none; pointer-events: auto; }
+.portal__skip {
+  font-family: var(--f-mono); font-size: 12.5px; font-weight: 700;
+  color: var(--w-dim); border-bottom: 1px solid currentColor; padding-bottom: 2px;
+  align-self: center;
+  transition: color 240ms ease;
+}
+.portal__skip:hover { color: var(--w-fg); }
+
+/* The step-through. One circular wipe carries the whole page from the dark
+   side to the light one — the portal does not show you the next world, it
+   becomes it. */
+#wipe {
+  position: fixed; inset: 0; z-index: 80;
+  pointer-events: none;
+  background: #f2ebdd;
+  clip-path: circle(0px at var(--wx, 50%) var(--wy, 50%));
+  visibility: hidden;
+}
+#wipe.is-go {
+  visibility: visible;
+  animation: wipe-open 1150ms var(--e-out) forwards;
+}
+@keyframes wipe-open {
+  from { clip-path: circle(0px at var(--wx, 50%) var(--wy, 50%)); }
+  to   { clip-path: circle(170% at var(--wx, 50%) var(--wy, 50%)); }
+}
+#wipe.is-clear { animation: wipe-clear 520ms ease 60ms forwards; }
+@keyframes wipe-clear { to { opacity: 0; visibility: hidden; } }
+
+/* ═══════════════════════════════════════════════════ 09 · СВЕТЛЫЙ МИР ══ */
+
+.uni--light {
+  --w-bg: #f2ebdd;
+  --w-fg: #0a0a0a;
+  --w-dim: rgba(10, 10, 10, .58);
+  --w-line: rgba(10, 10, 10, .13);
+  --w-acc: #0a0a0a;
+  color-scheme: light;
+}
+.uni--light .btn { color: var(--cream); }
+.light__sun {
+  position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(64% 44% at 50% -6%, rgba(255, 210, 130, .5), transparent 68%),
+    radial-gradient(50% 40% at 88% 12%, rgba(255, 176, 90, .28), transparent 72%);
+}
+
+/* the cities line, carried over from the previous build */
+.cities { margin-top: clamp(30px, 2.9vw, 52px); }
+.cities__k {
+  font-family: var(--f-mono); font-size: 11px; font-weight: 700;
+  letter-spacing: .03em; color: var(--w-dim); margin-bottom: 14px;
+}
+.cities__mask {
+  position: relative; overflow: hidden;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+.cities__run {
+  display: flex; align-items: center; width: max-content;
+  animation: cities-run 64s linear infinite;
+  will-change: transform;
+}
+.cities__mask:hover .cities__run { animation-play-state: paused; }
+@keyframes cities-run { to { transform: translateX(-50%); } }
+.city {
+  flex: 0 0 auto; display: inline-flex; align-items: baseline; gap: 8px;
+  padding: 9px 16px; margin-right: 8px;
+  border-radius: 999px;
+  font-size: 14px; font-weight: 700; letter-spacing: -.02em;
+  color: var(--w-fg);
+  box-shadow: inset 0 0 0 1px var(--w-line);
+  white-space: nowrap;
+  transition: background 240ms ease, box-shadow 240ms ease;
+}
+.city:hover { background: rgba(10, 10, 10, .05); box-shadow: inset 0 0 0 1px rgba(10,10,10,.3); }
+.city time {
+  font-family: var(--f-mono); font-size: 11px; font-weight: 700;
+  color: var(--w-dim); font-variant-numeric: tabular-nums;
+}
+.cities__fine { margin-top: 14px; }
+
+/* who we turn down */
+.filter { margin-top: clamp(56px, 5vw, 100px); }
+.filter__list {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: clamp(10px, 1.6vw, 16px);
+  margin-top: clamp(20px, 1.9vw, 30px);
+}
+.filter__list li {
+  display: grid; grid-template-columns: 20px minmax(0, 1fr); gap: 13px;
+  padding: 17px 19px; border-radius: 15px;
+  background: rgba(10, 10, 10, .035);
+  font-size: 14.5px; line-height: 1.44; font-weight: 600;
+}
+.filter__list li svg { margin-top: 3px; color: #c0392b; }
+
+/* ——— the brief ——— */
+.brief { margin-top: clamp(60px, 5.6vw, 116px); }
+.brief__box {
+  margin-top: clamp(24px, 2.2vw, 40px);
+  padding: clamp(22px, 3.4vw, 40px);
+  border-radius: 26px;
+  background: #fff;
+  box-shadow: 0 30px 80px rgba(10, 10, 10, .1), inset 0 0 0 1px rgba(10, 10, 10, .07);
+}
+.brief__step { display: none; }
+.brief__step.is-on { display: block; animation: step-in 520ms var(--e-out); }
+@keyframes step-in { from { opacity: 0; transform: translateY(16px); } }
+.brief__q { margin-bottom: clamp(20px, 1.9vw, 28px); }
+.brief__q > p {
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  font-size: 15px; font-weight: 700; letter-spacing: -.022em; margin-bottom: 12px;
+}
+.brief__q > p em {
+  -webkit-text-stroke: 0; color: var(--w-dim);
+  font-family: var(--f-mono); font-size: 10.5px; font-weight: 700;
+}
+.uni--light .chip { color: var(--w-dim); box-shadow: inset 0 0 0 1px var(--w-line); }
+.uni--light .chip:hover { color: var(--w-fg); }
+.uni--light .chip[aria-pressed="true"] { background: var(--ink); color: var(--cream); box-shadow: none; }
+
+.brief__calc {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 20px;
+  padding: 18px 20px; margin: 6px 0 22px;
+  border-radius: 16px; background: rgba(10, 10, 10, .045);
+}
+.brief__calc u {
+  text-decoration: none; font-family: var(--f-mono);
+  font-size: 10.5px; font-weight: 700; letter-spacing: .03em;
+  color: var(--w-dim); text-transform: uppercase; width: 100%;
+}
+.brief__calc b { font-size: clamp(21px, 3vw, 30px); font-weight: 800; letter-spacing: -.04em; font-variant-numeric: tabular-nums; }
+.brief__calc span { font-family: var(--f-mono); font-size: 13px; font-weight: 700; color: var(--w-dim); }
+
+.field { display: grid; gap: 7px; margin-bottom: 16px; }
+.field label {
+  font-family: var(--f-mono); font-size: 10.5px; font-weight: 700;
+  letter-spacing: .03em; text-transform: uppercase; color: var(--w-dim);
+}
+.field input, .field textarea {
+  width: 100%; padding: 15px 17px;
+  border-radius: 13px;
+  /* 16px keeps iOS from zooming the viewport when the caret lands */
+  font-size: 16px; font-weight: 600; letter-spacing: -.014em;
+  background: rgba(10, 10, 10, .04);
+  box-shadow: inset 0 0 0 1px var(--w-line);
+  transition: box-shadow 240ms ease, background 240ms ease;
+}
+.field textarea { min-height: 106px; resize: vertical; line-height: 1.5; }
+.field input::placeholder, .field textarea::placeholder { color: rgba(10, 10, 10, .3); font-weight: 500; }
+.field input:focus, .field textarea:focus {
+  background: #fff; box-shadow: inset 0 0 0 1.5px var(--ink);
+}
+.field.is-bad input { box-shadow: inset 0 0 0 1.5px #c0392b; }
+
+.agree {
+  display: grid; grid-template-columns: 22px minmax(0, 1fr); gap: 12px;
+  align-items: start; margin: 4px 0 20px;
+  font-size: 12.5px; line-height: 1.45; color: var(--w-dim);
+  text-align: left;
+}
+.agree i {
+  width: 22px; height: 22px; border-radius: 7px; margin-top: 1px;
+  box-shadow: inset 0 0 0 1.5px var(--w-line);
+  display: grid; place-items: center;
+  transition: background 220ms ease, box-shadow 220ms ease;
+}
+.agree[aria-pressed="true"] i { background: var(--ink); box-shadow: inset 0 0 0 1.5px var(--ink); }
+.agree i svg { opacity: 0; color: var(--cream); transition: opacity 200ms ease; }
+.agree[aria-pressed="true"] i svg { opacity: 1; }
+.agree a { text-decoration: underline; text-underline-offset: 2px; }
+
+.brief__acts { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+.brief__back {
+  font-family: var(--f-mono); font-size: 12.5px; font-weight: 700;
+  color: var(--w-dim); transition: color 220ms ease;
+}
+.brief__back:hover { color: var(--w-fg); }
+
+.brief__done { display: none; text-align: center; padding: clamp(20px, 2.5vw, 40px) 0; }
+.brief__done.is-on { display: block; animation: step-in 620ms var(--e-out); }
+.brief__done h3 { font-size: clamp(24px, 3.6vw, 38px); font-weight: 800; letter-spacing: -.04em; }
+.brief__done p { margin: 14px auto 0; max-width: 40ch; color: var(--w-dim); line-height: 1.55; }
+
+/* the "forward this to whoever signs off" card */
+.fwd {
+  margin-top: clamp(24px, 2.1vw, 36px);
+  padding: clamp(20px, 2.8vw, 28px);
+  border-radius: 20px;
+  background: rgba(10, 10, 10, .05);
+  display: grid; gap: 12px;
+}
+.fwd b { font-size: 16px; font-weight: 800; letter-spacing: -.026em; }
+.fwd p { font-size: 13.5px; line-height: 1.48; color: var(--w-dim); max-width: 52ch; }
+
+/* the reasons column beside the form */
+.brief__grid {
+  display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, .85fr);
+  gap: clamp(24px, 4vw, 56px); align-items: start;
+}
+@media (max-width: 900px) { .brief__grid { grid-template-columns: 1fr; } }
+.brief__why { display: grid; gap: 2px; }
+.brief__why li { padding: 16px 0; border-top: 1px solid var(--w-line); }
+.brief__why li:first-child { border-top: none; }
+.brief__why b {
+  display: block; font-family: var(--f-mono); font-size: 10.5px; font-weight: 700;
+  letter-spacing: .03em; text-transform: uppercase; color: var(--w-dim); margin-bottom: 6px;
+}
+.brief__why p { font-size: 14.5px; line-height: 1.48; }

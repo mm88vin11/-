@@ -1,0 +1,284 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   БАЗА — 07 · worlds 10–11 + footer
+   10 Upside · the basement, the alphabet wall
+   11 Crawl  · the credits
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ═══════════════════════════════════════════════════ 10 · ИЗНАНКА ══════ */
+
+.uni--upside {
+  --w-bg: #070a10;
+  --w-fg: #cfdce8;
+  --w-dim: rgba(207, 220, 232, .48);
+  --w-line: rgba(207, 220, 232, .12);
+  --w-acc: #ff3b30;
+}
+.ud__air { position: absolute; inset: 0; z-index: -1; }
+.ud__air canvas { width: 100%; height: 100%; }
+/* the cold blue haze the other side is lit by */
+.uni--upside::after {
+  content: ''; position: absolute; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(60% 44% at 50% 8%, rgba(40, 90, 150, .3), transparent 70%),
+    linear-gradient(180deg, rgba(7, 10, 16, 0) 40%, rgba(7, 10, 16, .9) 100%);
+}
+.ud__h { max-width: 20ch; }
+.ud__h em { -webkit-text-stroke-color: #ff3b30; }
+
+/* ——— the alphabet wall ——— */
+.wall {
+  position: relative;
+  margin-top: clamp(38px, 3.7vw, 68px);
+  padding: clamp(22px, 3.4vw, 40px) clamp(16px, 2.4vw, 28px) clamp(18px, 2.6vw, 30px);
+  border-radius: 6px;
+  background:
+    repeating-linear-gradient(92deg, rgba(255,255,255,.014) 0 3px, transparent 3px 9px),
+    linear-gradient(#1b1d18, #14160f);
+  box-shadow: inset 0 0 0 1px rgba(207, 220, 232, .07),
+              inset 0 30px 60px rgba(0, 0, 0, .5);
+  overflow: hidden;
+}
+.wall__row {
+  display: flex; flex-wrap: wrap; gap: clamp(4px, .9vw, 12px);
+  justify-content: center;
+}
+.ltr {
+  position: relative;
+  display: grid; place-items: center;
+  width: clamp(26px, 3.1vw, 42px);
+  padding-top: clamp(16px, 2vw, 24px);
+}
+/* the bulb */
+.ltr::before {
+  content: ''; position: absolute; top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: clamp(7px, .82vw, 10px); aspect-ratio: 1;
+  border-radius: 999px;
+  background: #2a2f28;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, .5);
+  transition: background 240ms ease, box-shadow 300ms ease;
+}
+.ltr.is-lit::before {
+  background: var(--bulb, #ffcf6a);
+  box-shadow: 0 0 10px 3px var(--bulb, #ffcf6a), 0 0 26px 8px color-mix(in srgb, var(--bulb, #ffcf6a) 45%, transparent);
+  animation: bulb-flick 2.6s ease-in-out infinite;
+}
+@keyframes bulb-flick { 42% { opacity: 1; } 46% { opacity: .55; } 50% { opacity: 1; } }
+.ltr b {
+  font-family: var(--f-chunk);
+  font-size: clamp(14px, 1.8vw, 24px);
+  color: rgba(207, 220, 232, .22);
+  transition: color 300ms ease, text-shadow 300ms ease;
+}
+.ltr.is-lit b { color: #f0e2c6; text-shadow: 0 0 14px rgba(255, 207, 106, .7); }
+
+/* The wire the bulbs hang from. It sits at z-index 0, not -1: `.wall` is
+   positioned but sets no z-index of its own, so it opens no stacking context
+   and a negative child would paint behind the wall's own background. */
+.wall__wire { position: absolute; left: 0; right: 0; top: 0; height: 100%; pointer-events: none; z-index: 0; }
+
+.wall__acts {
+  display: flex; flex-wrap: wrap; gap: 12px; align-items: center;
+  margin-top: clamp(22px, 1.9vw, 30px);
+}
+.wall__read {
+  font-family: var(--f-mono); font-size: clamp(13px, 1.5vw, 16px);
+  font-weight: 700; letter-spacing: .18em;
+  color: var(--w-acc); min-height: 1.6em;
+  font-variant-numeric: tabular-nums;
+}
+
+/* ——— the reward ——— */
+.ud__gift {
+  margin-top: clamp(38px, 3.7vw, 68px);
+  padding: clamp(22px, 3.4vw, 38px);
+  border-radius: 22px;
+  background: rgba(255, 59, 48, .06);
+  box-shadow: inset 0 0 0 1px rgba(255, 59, 48, .28);
+  max-width: 62ch;
+}
+.ud__gift h3 { font-size: clamp(19px, 2.4vw, 26px); font-weight: 800; letter-spacing: -.03em; }
+.ud__gift p { margin-top: 12px; font-size: 14.5px; line-height: 1.55; color: var(--w-dim); }
+.ud__gift .fine { margin-top: 10px; }
+.ud__code {
+  display: inline-flex; align-items: center; gap: 10px;
+  margin: 18px 0 4px; padding: 12px 18px;
+  border-radius: 12px;
+  background: rgba(0, 0, 0, .4);
+  box-shadow: inset 0 0 0 1px rgba(255, 59, 48, .4);
+  font-family: var(--f-mono); font-size: 15px; font-weight: 700;
+  letter-spacing: .2em; color: #fff;
+}
+.ud__acts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 18px; }
+
+/* the button you were told not to press */
+.nope {
+  margin-top: clamp(38px, 3.7vw, 64px);
+  display: inline-flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.nope button {
+  padding: 16px 34px; border-radius: 14px;
+  font-family: var(--f-chunk); font-size: clamp(14px, 1.7vw, 19px);
+  letter-spacing: .06em; color: #fff;
+  background: linear-gradient(#c0392b, #8e2a1f);
+  box-shadow: 0 8px 0 #5e1c15, 0 18px 34px rgba(0, 0, 0, .5);
+  transition: transform 120ms ease, box-shadow 120ms ease;
+}
+.nope button:active { transform: translateY(6px); box-shadow: 0 2px 0 #5e1c15, 0 10px 20px rgba(0,0,0,.5); }
+.nope span { font-family: var(--f-mono); font-size: 11px; color: var(--w-dim); }
+
+/* the socials */
+.socials {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: clamp(10px, 1.6vw, 16px);
+  margin-top: clamp(46px, 4.3vw, 84px);
+}
+.soc {
+  display: grid; grid-template-columns: 40px minmax(0, 1fr) 20px;
+  gap: 15px; align-items: center;
+  padding: 18px 20px; border-radius: 16px;
+  background: rgba(207, 220, 232, .04);
+  box-shadow: inset 0 0 0 1px var(--w-line);
+  transition: background 300ms ease, box-shadow 300ms ease, transform 380ms var(--e-out);
+}
+.soc:hover { background: rgba(207, 220, 232, .075); transform: translateY(-3px); }
+.soc__ico {
+  display: grid; place-items: center;
+  width: 40px; height: 40px; border-radius: 12px;
+  background: var(--sc, rgba(207,220,232,.1)); color: #fff;
+}
+.soc b { display: block; font-size: 15px; font-weight: 700; letter-spacing: -.024em; }
+.soc p { margin-top: 3px; font-size: 12.5px; line-height: 1.4; color: var(--w-dim); }
+.soc svg:last-child { color: var(--w-dim); transition: transform 340ms var(--e-out); }
+.soc:hover svg:last-child { transform: translateX(4px); }
+
+/* ═══════════════════════════════════════════════════════ 11 · ТИТРЫ ════ */
+
+.uni--crawl {
+  --w-bg: #000;
+  --w-fg: #ffe81f;
+  --w-dim: rgba(255, 232, 31, .62);
+  --w-line: rgba(255, 232, 31, .2);
+  --w-acc: #ffe81f;
+  padding-block: 0;
+  min-height: 100svh;
+  display: grid;
+  grid-template-rows: 1fr auto;
+}
+#stars { position: absolute; inset: 0; z-index: 0; }
+
+.crawl__stage {
+  position: relative; z-index: 1;
+  overflow: hidden;
+  perspective: 380px;
+  perspective-origin: 50% 0%;
+  min-height: min(84svh, 720px);
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 26%, #000 74%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 26%, #000 74%, transparent 100%);
+}
+.crawl__deck {
+  position: absolute; left: 50%; top: 100%;
+  width: min(760px, 88vw);
+  transform-origin: 50% 0%;
+  transform: translateX(-50%) rotateX(58deg) translateZ(0) translateY(var(--cy, 0px));
+  text-align: center;
+  color: var(--w-acc);
+  will-change: transform;
+}
+.crawl__deck h3 {
+  font-family: var(--f-chunk);
+  font-size: clamp(26px, 5.4vw, 54px);
+  line-height: 1.1; letter-spacing: .01em;
+  margin-bottom: .5em;
+}
+.crawl__deck p {
+  font-size: clamp(15px, 2.3vw, 25px);
+  line-height: 1.5; font-weight: 700;
+  margin-bottom: 1.1em;
+  /* The original crawl is justified, but justified type inside a 760px deck at
+     25px opens word gaps you could park a landspeeder in. Centred keeps the
+     silhouette and loses the holes. */
+}
+.crawl__deck h4 {
+  font-family: var(--f-chunk);
+  font-size: clamp(15px, 2.4vw, 25px);
+  letter-spacing: .08em;
+  margin: 1.5em 0 .5em;
+}
+.crawl__deck ul { margin-bottom: 1.1em; }
+.crawl__deck li { font-size: clamp(14px, 2vw, 21px); font-weight: 700; line-height: 1.5; }
+
+.crawl__pre {
+  position: relative; z-index: 2;
+  padding-top: clamp(50px, 5.6vw, 100px);
+  text-align: center;
+  color: #4bd5ee;
+  font-size: clamp(14px, 2vw, 21px);
+  font-weight: 600;
+  opacity: 0; transition: opacity 1400ms ease;
+}
+.crawl__pre.is-in { opacity: 1; }
+
+/* the landing strip under the crawl */
+.foot {
+  position: relative; z-index: 3;
+  padding: clamp(30px, 3.1vw, 56px) 0 calc(clamp(30px, 3.1vw, 56px) + var(--barh));
+  background: #000;
+  border-top: 1px solid var(--w-line);
+}
+.foot__row {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+  gap: 20px;
+}
+.foot__mark { display: flex; align-items: center; gap: 14px; }
+.foot__mark img { height: 26px; width: auto; opacity: .9; }
+.foot__say {
+  font-family: var(--f-mono); font-size: 12px; font-weight: 700;
+  color: var(--w-dim); max-width: 34ch; line-height: 1.5;
+}
+.foot__legal {
+  margin-top: clamp(22px, 2.1vw, 34px);
+  padding-top: clamp(18px, 1.6vw, 26px);
+  border-top: 1px solid rgba(255, 232, 31, .12);
+  font-size: 11.5px; line-height: 1.6;
+  color: rgba(255, 232, 31, .42);
+  max-width: 92ch;
+}
+.foot__legal a { text-decoration: underline; text-underline-offset: 2px; }
+
+/* ────────────────────────────────────────────────────────── toasts ────── */
+
+#toast {
+  position: fixed; left: 50%; z-index: 70;
+  bottom: calc(var(--barh) + 18px + env(safe-area-inset-bottom));
+  transform: translate(-50%, 16px);
+  padding: 12px 20px; border-radius: 999px;
+  background: var(--cream); color: var(--ink);
+  font-size: 13.5px; font-weight: 700; letter-spacing: -.016em;
+  box-shadow: 0 18px 44px rgba(0, 0, 0, .45);
+  opacity: 0; pointer-events: none;
+  transition: opacity 280ms ease, transform 420ms var(--e-out);
+  max-width: calc(100vw - 32px); text-align: center;
+}
+#toast.is-on { opacity: 1; transform: translate(-50%, 0); }
+
+/* ─────────────────────────────────────── sound switch (opt-in, muted) ─── */
+
+#snd {
+  position: fixed; z-index: 33;
+  right: max(12px, env(safe-area-inset-right));
+  bottom: calc(var(--barh) + 14px + env(safe-area-inset-bottom));
+  width: 40px; height: 40px; border-radius: 999px;
+  display: grid; place-items: center;
+  background: rgba(12, 12, 12, .68);
+  color: var(--cream-52);
+  box-shadow: inset 0 0 0 1px rgba(242, 235, 221, .14);
+  -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px);
+  opacity: 0; transform: scale(.8); pointer-events: none;
+  transition: opacity 420ms ease, transform 460ms var(--e-back), color 240ms ease;
+}
+body.is-live #snd { opacity: 1; transform: none; pointer-events: auto; }
+#snd.is-on { color: var(--cream); }
+#snd .off { display: none; }
+#snd.is-on .off { display: block; }
+#snd.is-on .on { display: none; }

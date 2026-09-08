@@ -1,0 +1,598 @@
+<!-- ══════════════════════════════════════════════════════════ intro ═════ -->
+<div id="load" role="status" aria-label="Загрузка">
+  <div class="load__mark">
+    <span class="load__part"><img id="loadEto" src="__LOGO_ETO__" width="880" height="184" alt="" decoding="async"></span>
+    <span class="load__part"><img id="loadBaza" src="__LOGO_BAZA__" width="880" height="153" alt="ЭТО БАЗА" decoding="async"></span>
+    <span class="load__bar"><i id="loadBar"></i></span>
+    <span class="load__pct" id="loadPct">0%</span>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════════════════════════════ header ════ -->
+<header id="head">
+  <div class="head__row">
+    <div class="pod pod--logo">
+      <a class="pod__logo" href="#top" aria-label="ЭТО БАЗА — наверх">
+        <img id="headLogo" src="__LOGO_LOCKUP__" width="560" height="214" alt="ЭТО БАЗА" decoding="async">
+      </a>
+    </div>
+
+    <div class="head__spacer"></div>
+
+    <nav class="head__nav" id="headNav" aria-label="Разделы">
+      <span class="head__ink" id="headInk" aria-hidden="true"></span>
+      <a href="#pain"    data-k="pain">Боли</a>
+      <a href="#truth"   data-k="truth">Правда</a>
+      <a href="#craft"   data-k="craft">Услуги</a>
+      <a href="#cases"   data-k="cases">Кейсы</a>
+      <a href="#pricing" data-k="pricing">Цена</a>
+      <a href="#route"   data-k="route">Маршрут</a>
+      <a href="#portal"  data-k="portal">Портал</a>
+    </nav>
+
+    <div class="head__acts">
+      <a class="btn btn--sm head__cta" href="#brief" data-go="brief">Обсудить проект</a>
+      <button class="icobtn burger" id="burger" type="button"
+              aria-label="Меню" aria-expanded="false" aria-controls="menu">
+        <i></i><i></i>
+      </button>
+    </div>
+  </div>
+</header>
+
+<nav id="menu" aria-label="Меню сайта">
+  <div class="menu__list">
+    <a href="#pain"    data-go><span>01</span>Боли</a>
+    <a href="#truth"   data-go><span>02</span>Правда</a>
+    <a href="#craft"   data-go><span>03</span>Услуги</a>
+    <a href="#cases"   data-go><span>04</span>Кейсы</a>
+    <a href="#pricing" data-go><span>05</span>Цена</a>
+    <a href="#route"   data-go><span>06</span>Маршрут</a>
+    <a href="#gains"   data-go><span>07</span>Результат</a>
+    <a href="#portal"  data-go><span>08</span>Портал</a>
+    <a href="#brief"   data-go><span>09</span>Заявка</a>
+  </div>
+  <div class="menu__foot">
+    <a class="btn" href="#brief" data-go="brief">Обсудить проект</a>
+    <a class="btn btn--ghost" href="https://t.me/lllbaza" target="_blank" rel="noopener">Telegram</a>
+  </div>
+</nav>
+
+<main id="top">
+
+<!-- ══════════════════════════════════════════════════════════ 00 · HERO ══ -->
+<section class="hero" id="hero" aria-label="Разработка × Креатив">
+  <div class="hero__pin">
+    <img id="heroPoster" src="__POSTER__" width="1200" height="676"
+         alt="Разработка × Креатив" fetchpriority="high" decoding="async">
+    <canvas id="heroC" aria-hidden="true"></canvas>
+    <div class="hero__grain" aria-hidden="true"></div>
+    <div class="hero__vig" aria-hidden="true"></div>
+
+    <div class="hero__prog" aria-hidden="true"><i id="heroProg"></i></div>
+
+    <div class="hero__out">
+      <div class="wrap">
+        <p class="plate"><b>00</b><i></i>во что это обходится</p>
+        <h1 class="h-xl">Вы не владелец.<br>Вы самый дорогой<br><em>сотрудник</em> в своей компании.</h1>
+        <p class="lead">БАЗА — сайты, CRM, автоматизация и ИИ-боты для бизнеса, который держится на владельце.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 01 · МИР 1-1 ═════ -->
+<section class="uni uni--mario" id="pain" aria-labelledby="painH">
+  <div class="mario__sky" aria-hidden="true"></div>
+  <div class="mario__scene" id="marioScene" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <div class="mario__hud" aria-live="polite">
+      <div><b>БАЗА</b><span id="mCoins">×00</span></div>
+      <div><b>МИР</b><span>1-1</span></div>
+      <div><b>УТЕЧКА</b><span id="mLeak">0 ₽</span></div>
+    </div>
+
+    <header class="mario__head">
+      <p class="plate" data-rise><b>01</b><i></i>где вы теряете</p>
+      <h2 class="h-lg" id="painH" data-rise>Отметьте то,<br>что <em>узнаёте</em>.</h2>
+      <p class="lead" data-rise style="--rise-t:90ms">Стукните блок снизу, как в детстве. Внутри не монета — внутри ваши деньги, которые уходят каждый месяц.</p>
+    </header>
+
+    <div class="mario__stage">
+      <div class="mario__blocks" id="mBlocks"></div>
+      <div class="mario__coins" id="mCoinLayer" aria-hidden="true"></div>
+    </div>
+
+    <div class="mario__sum" id="mSum" aria-live="polite">
+      <p class="h-md">Четыре из четырёх — это не невезение, это архитектура.</p>
+      <p class="lead" style="color:rgba(242,235,221,.72);margin-top:14px">Она работает каждый месяц: пока дырка на месте, следующий рекламный бюджет приводит заявки ровно в неё. Дальше показываем, как её переписать.</p>
+      <p class="fine">Цифры усреднённые по нашим разборам малого бизнеса. Вашу считаем отдельно и до старта.</p>
+    </div>
+  </div>
+
+  <div class="mario__ground" aria-hidden="true"><canvas id="mGround"></canvas></div>
+  <div class="mario__guy" id="mGuy" aria-hidden="true"><canvas id="mGuyC"></canvas></div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 02 · МАТРИЦА ═════ -->
+<section class="uni uni--matrix" id="truth" aria-labelledby="truthH">
+  <canvas id="mxRain" aria-hidden="true"></canvas>
+
+  <div class="wrap">
+    <header class="uni__head mx__h">
+      <p class="plate" data-rise><b>02</b><i></i>кроличья нора</p>
+      <h2 class="h-lg" id="truthH" data-rise>Проблема не в вас.<br>Бизнес держится на людях там,<br>где должен держаться на <em>технологиях</em>.</h2>
+    </header>
+
+    <div class="mx__pills">
+      <button class="pill pill--blue" id="pillBlue" type="button">
+        <span class="pill__cap" aria-hidden="true"><i></i></span>
+        <b>Синяя</b>
+        <span>Закрыть вкладку. Завтра снова разбирать заявки руками.</span>
+      </button>
+      <button class="pill pill--red" id="pillRed" type="button">
+        <span class="pill__cap" aria-hidden="true"><i></i></span>
+        <b>Красная</b>
+        <span>Показать, где именно у вас утекают заявки. Займёт минуту.</span>
+      </button>
+    </div>
+
+    <div class="mx__blue">
+      <p class="mx__type" id="mxType"></p>
+      <button class="mx__again" id="mxAgain" type="button">…ладно, покажите красную</button>
+    </div>
+
+    <div class="mx__red" id="mxRed">
+      <p class="h-md">Покажите, как у вас сейчас приходит заявка.</p>
+      <p class="fine" style="margin-top:10px">Ничего не продаём в этом блоке. Просто отметьте, как есть.</p>
+      <div id="mxQs"></div>
+      <div class="mx__out" id="mxOut" aria-live="polite">
+        <div class="mx__flow" id="mxFlow"></div>
+        <p class="mx__verdict" id="mxVerdict"></p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 03 · ВЕРСТАК ═════ -->
+<section class="uni uni--craft" id="craft" aria-labelledby="craftH">
+  <div class="craft__bg" aria-hidden="true"><canvas id="craftBg"></canvas></div>
+
+  <div class="wrap">
+    <header class="uni__head">
+      <p class="plate" data-rise><b>03</b><i></i>верстак</p>
+      <h2 class="h-lg" id="craftH" data-rise>Что мы <em>делаем</em></h2>
+      <p class="lead" data-rise style="--rise-t:90ms">Не список услуг, а рецепты. Возьмите предмет с панели — верстак покажет, из чего он собирается и что вы получаете на выходе.</p>
+    </header>
+
+    <div class="craft__grid">
+      <div>
+        <div class="bench">
+          <p class="bench__t">Верстак</p>
+          <div class="bench__row">
+            <div class="bench__3" id="benchGrid"></div>
+            <svg class="bench__arrow" width="30" height="20" viewBox="0 0 30 20" fill="none" aria-hidden="true">
+              <path d="M0 8h18V3l11 7-11 7v-5H0z" fill="currentColor"/>
+            </svg>
+            <div class="slot slot--out" id="benchOut"><canvas width="64" height="64"></canvas></div>
+          </div>
+          <p class="bench__hint" id="benchHint">выберите предмет ниже</p>
+        </div>
+
+        <div class="hotbar" id="hotbar" role="tablist" aria-label="Услуги"></div>
+      </div>
+
+      <div class="craft__out" id="craftOut"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 04 · ЛЕНТА ═══════ -->
+<section class="uni uni--tok" id="cases" aria-labelledby="casesH">
+  <div class="tok__glow" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <header class="uni__head">
+      <p class="plate" data-rise><b>04</b><i></i>что уже запущено</p>
+      <h2 class="h-lg" id="casesH" data-rise>Пять запусков.<br>Листайте, как <em>привыкли</em>.</h2>
+    </header>
+
+    <div class="tok__grid">
+      <div class="tok__side">
+        <p class="lead">Никакого «портфолио в PDF». Тот же жест, что вы делаете тысячу раз в день — только на каждом экране цифра до и после.</p>
+        <div class="tok__dots" id="tokDots" role="tablist" aria-label="Кейсы"></div>
+      </div>
+
+      <div class="phone">
+        <div class="phone__screen">
+          <span class="phone__notch" aria-hidden="true"></span>
+          <div class="feed__bars" id="feedBars" aria-hidden="true"></div>
+          <div class="feed" id="feed" tabindex="0" aria-label="Лента кейсов"></div>
+          <div class="rail" id="feedRail" aria-hidden="true"></div>
+          <div class="feed__sound" aria-hidden="true">
+            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.6a4 4 0 1 0 2 3.4V7h4V3z"/></svg>
+            <b id="feedSound"></b>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 05 · ЦЕНА ════════ -->
+<section class="uni uni--tetris" id="pricing" aria-labelledby="priceH">
+  <div class="wrap">
+    <header class="uni__head">
+      <p class="plate" data-rise><b>05</b><i></i>сколько это стоит</p>
+      <h2 class="h-lg" id="priceH" data-rise>Цену мы <em>не прячем</em></h2>
+      <p class="lead" data-rise style="--rise-t:90ms">Но и не вешаем ценник на то, чего ещё не видели. Соберите объём сами: каждая включённая работа падает в стакан, а высота стакана и есть ваш бюджет.</p>
+    </header>
+
+    <div class="tt__grid">
+      <div>
+        <div class="well__hud">
+          <div>СЧЁТ<b id="ttScore">000000</b></div>
+          <div>ЛИНИИ<b id="ttLines">0</b></div>
+          <div>УРОВЕНЬ<b id="ttLevel">1</b></div>
+        </div>
+        <div class="well">
+          <canvas id="ttC"></canvas>
+          <span class="well__flash" id="ttFlash" aria-hidden="true"></span>
+        </div>
+      </div>
+
+      <div>
+        <div class="tt__scope" id="ttScope"></div>
+
+        <div class="tt__sum">
+          <p class="tt__price"><span id="ttPrice">0</span><small>тыс&nbsp;₽ — ориентир, не счёт</small></p>
+          <div class="tt__bars">
+            <div>СРОК <b id="ttTerm">—</b></div>
+            <div>КОМАНДА <b id="ttTeam">—</b></div>
+            <div>ПОДДЕРЖКА <b>1 месяц входит</b></div>
+          </div>
+          <p class="fine" id="ttSay">Ничего не выбрано. Включите хотя бы одну работу — стакан начнёт заполняться.</p>
+          <a class="btn" href="#brief" data-go="brief">Посчитать точную цифру<svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h13M12.5 6.5 18 12l-5.5 5.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 06 · МАРШРУТ ═════ -->
+<section class="uni uni--flux" id="route" aria-labelledby="routeH">
+  <div class="flux__road" aria-hidden="true"><canvas id="fluxRoad"></canvas></div>
+
+  <div class="wrap">
+    <header class="uni__head">
+      <p class="plate" data-rise><b>06</b><i></i>маршрут</p>
+      <h2 class="h-lg" id="routeH" data-rise>Три недели —<br>и вы <em>в другой дате</em></h2>
+      <p class="lead" data-rise style="--rise-t:90ms">Даты ниже настоящие: слева сегодняшняя, справа та, в которую вы приедете. Разгоняйтесь прокруткой — на 88 милях в час маршрут проявится целиком.</p>
+    </header>
+
+    <div class="circuits" data-rise>
+      <div class="circ">
+        <div class="circ__row circ--dest">
+          <span class="circ__lab">Пункт назначения</span>
+          <div class="circ__cells" id="circDest"></div>
+        </div>
+        <div class="circ__row circ--now">
+          <span class="circ__lab">Текущее время</span>
+          <div class="circ__cells" id="circNow"></div>
+        </div>
+        <div class="circ__row circ--last">
+          <span class="circ__lab">Последний выходной</span>
+          <div class="circ__cells" id="circLast"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="flux__row">
+      <div class="speedo">
+        <canvas id="speedo" width="360" height="220"></canvas>
+        <p class="speedo__v"><span id="speedoV">0</span><small>MPH</small></p>
+      </div>
+      <p class="flux__say" id="fluxSay">Дороги нам не нужны. Нужна <b>прокрутка</b>.</p>
+    </div>
+
+    <div class="stages" id="stages"></div>
+
+    <div class="flux__after">
+      <div class="slip"><b>Месяц сопровождения</b><p>Входит в проект. Смотрим на цифры и чиним то, что видно только на живом трафике.</p></div>
+      <div class="slip"><b>Второй контур</b><p>Когда сайт заработал, узкое место переезжает в отдел продаж. Тогда имеет смысл CRM или бот.</p></div>
+      <div class="slip"><b>Развитие по данным</b><p>Раз в квартал смотрим аналитику и решаем, что двигать дальше.</p></div>
+    </div>
+    <p class="fine" style="margin-top:20px">Мы не продаём это пакетом заранее и не зашиваем в договор. Просто говорим, когда придёт время следующего шага, а решаете вы.</p>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 07 · БОЛОТО ══════ -->
+<section class="uni uni--swamp" id="gains" aria-labelledby="gainsH">
+  <div class="swamp__bg" aria-hidden="true"><canvas id="swampBg"></canvas></div>
+
+  <div class="wrap">
+    <header class="uni__head">
+      <p class="plate" data-rise><b>07</b><i></i>что вы получаете</p>
+      <p class="sign" data-rise>ОСТОРОЖНО · ОГР</p>
+      <h2 class="h-lg" id="gainsH" data-rise>У огров есть слои.<br>У сдачи проекта — <em>тоже</em>.</h2>
+      <p class="lead" data-rise style="--rise-t:90ms">Снимайте по слою. Под каждым — то, что остаётся у вас после запуска, а не то, что красиво звучит в презентации.</p>
+    </header>
+
+    <div class="swamp__grid">
+      <div class="onion" id="onion">
+        <div class="onion__pile" aria-hidden="true"></div>
+        <p class="onion__hint" id="onionHint">снимите слой</p>
+      </div>
+      <ul class="swamp__list" id="swampList"></ul>
+    </div>
+
+    <button class="swamp__tune" id="swampTune" type="button">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+      кто-то однажды сказал мне…
+    </button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 08 · ПОРТАЛ ══════ -->
+<section class="uni uni--portal" id="portal" aria-labelledby="portalH">
+  <div class="portal__embers" aria-hidden="true"><canvas id="ptEmber"></canvas></div>
+
+  <div class="wrap">
+    <header class="uni__head">
+      <p class="plate" data-rise><b>08</b><i></i>другая сторона</p>
+      <h2 class="h-lg" id="portalH" data-rise>Есть мир, где бизнес<br>работает <em>без вас</em></h2>
+      <p class="lead" data-rise style="--rise-t:90ms">Он не воображаемый — в нём уже живут наши клиенты. Портал сам себя не откроет: обведите круг мышью или пальцем. Внутри кольца видно ту сторону, а кнопка перенесёт вас туда целиком.</p>
+    </header>
+
+    <div class="ring" id="ring" role="application" aria-label="Обведите круг, чтобы открыть портал">
+      <canvas id="ptWorld" aria-hidden="true"></canvas>
+      <canvas id="ptSpark" aria-hidden="true"></canvas>
+      <p class="ring__say" id="ringSay"><i>◯</i>обведите круг пальцем или мышью — и держите его открытым</p>
+      <p class="ring__pct" id="ringPct">0%</p>
+    </div>
+
+    <div class="portal__acts">
+      <button class="btn portal__step" id="ptGo" type="button">
+        Шагнуть на ту сторону
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h13M12.5 6.5 18 12l-5.5 5.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </button>
+      <button class="portal__skip" id="ptSkip" type="button">не хочу колдовать — просто откройте</button>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 09 · СВЕТЛЫЙ МИР ═ -->
+<section class="uni uni--light" id="brief" aria-labelledby="briefH">
+  <div class="light__sun" aria-hidden="true"></div>
+
+  <div class="wrap">
+    <header class="uni__head">
+      <p class="plate" data-rise><b>09</b><i></i>вы на той стороне</p>
+      <h2 class="h-lg" id="briefH" data-rise>Расскажите про задачу.<br>Вернёмся <em>с цифрами</em>, а не с вопросами.</h2>
+    </header>
+
+    <div class="cities">
+      <p class="cities__k">портал сюда открывали из</p>
+      <div class="cities__mask"><div class="cities__run" id="cityRun"></div></div>
+      <p class="fine cities__fine">Часовой пояс ни разу не был причиной сорванного срока. Время в скобках — местное, прямо сейчас.</p>
+    </div>
+
+    <div class="filter">
+      <p class="plate"><i></i>фильтр</p>
+      <h3 class="h-md" style="margin-top:12px" data-rise>Мы не возьмёмся, если…</h3>
+      <ul class="filter__list" id="filterList"></ul>
+      <p class="fine" style="margin-top:18px">Это не понты. В таких проектах мы не даём результат, за который берём деньги, и лучше сказать это до, а не после.</p>
+    </div>
+
+    <div class="brief">
+      <div class="brief__grid">
+        <div>
+          <div class="brief__box">
+            <!-- step 1 -->
+            <div class="brief__step is-on" id="bs1">
+              <div class="brief__q">
+                <p>Что нужно сделать <em>можно несколько</em></p>
+                <div class="chips" id="bWhat"></div>
+              </div>
+              <div class="brief__q">
+                <p>Когда стартуем</p>
+                <div class="chips" id="bWhen"></div>
+              </div>
+              <div class="brief__q">
+                <p>Что забирает больше всего сил <em>можно несколько</em></p>
+                <div class="chips" id="bPain"></div>
+              </div>
+
+              <div class="brief__calc" aria-live="polite">
+                <u>считаем прямо сейчас</u>
+                <b id="bPrice">—</b>
+                <span id="bTerm">срок ≈ —</span>
+              </div>
+
+              <div class="brief__acts">
+                <button class="btn" id="bNext" type="button">Дальше<svg width="15" height="15" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h13M12.5 6.5 18 12l-5.5 5.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+              </div>
+            </div>
+
+            <!-- step 2 -->
+            <form class="brief__step" id="bs2" novalidate>
+              <button class="brief__back" id="bBack" type="button">← назад к задаче</button>
+              <div style="height:18px"></div>
+              <div class="field"><label for="fName">Имя</label><input id="fName" name="name" autocomplete="name" placeholder="Как к вам обращаться"></div>
+              <div class="field"><label for="fTo">Куда вам ответить</label><input id="fTo" name="contact" autocomplete="email" placeholder="Telegram, почта или телефон"></div>
+              <div class="field"><label for="fMore">Пара слов о задаче <span style="text-transform:none">(необязательно)</span></label><textarea id="fMore" name="more" placeholder="Ссылка на текущий сайт, сроки, всё, что важно"></textarea></div>
+
+              <button class="agree" id="bAgree" type="button" aria-pressed="false">
+                <i><svg width="12" height="12" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12.5 9.5 18 20 6.5" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></i>
+                <span>Согласен с <a href="#brief">политикой конфиденциальности</a> и обработкой персональных данных.</span>
+              </button>
+
+              <div class="brief__acts">
+                <button class="btn" type="submit">Отправить заявку</button>
+                <a class="btn btn--ghost" href="https://t.me/lllbaza" target="_blank" rel="noopener">Лучше в Telegram</a>
+              </div>
+            </form>
+
+            <!-- done -->
+            <div class="brief__done" id="bsDone">
+              <h3>Заявка у нас.</h3>
+              <p>Первым сообщением придёт гипотеза, вилка бюджета и сроки. Отвечают те, кто будет делать, а не менеджер с пересказом.</p>
+              <div class="brief__acts" style="justify-content:center;margin-top:22px">
+                <a class="btn" href="https://t.me/lllbaza" target="_blank" rel="noopener">Продублировать в Telegram</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="fwd">
+            <b>Решение принимаете не вы один?</b>
+            <p>Заберите готовый текст для того, кто утверждает бюджет. Пересказ по памяти теряет половину смысла, а тут всё уже сформулировано.</p>
+            <div><button class="btn btn--ghost btn--sm" id="bFwd" type="button">Скопировать текст для руководства</button></div>
+          </div>
+        </div>
+
+        <ul class="brief__why">
+          <li><b>кто читает</b><p>Заявку читают те, кто будет делать. Ответ придёт от них.</p></li>
+          <li><b>что придёт в ответ</b><p>Гипотеза, вилка бюджета и сроки. Конкретными цифрами.</p></li>
+          <li><b>кого берём</b><p>Не всех. Не увидим, где вырастут цифры — честно откажем.</p></li>
+          <li><b>когда ответим</b><p>В течение рабочего дня. Если горит — в Telegram быстрее.</p></li>
+          <li><b>с чего начинаем</b><p>С разбора. Это отдельная небольшая работа со своей ценой, и она уходит в счёт проекта.</p></li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 10 · ИЗНАНКА ═════ -->
+<section class="uni uni--upside" id="basement" aria-labelledby="baseH">
+  <div class="ud__air" aria-hidden="true"><canvas id="udAir"></canvas></div>
+
+  <div class="wrap">
+    <header class="uni__head ud__h">
+      <p class="plate" data-rise><b>10</b><i></i>не смотрите вниз</p>
+      <h2 class="h-lg" id="baseH" data-rise>Вы домотали<br>до <em>изнанки</em>.</h2>
+      <p class="lead" data-rise style="--rise-t:90ms">Сюда доходит один из тридцати. Раз уж вы здесь — держите то, чего нет выше. Зажгите гирлянду, она сама скажет слово.</p>
+    </header>
+
+    <div class="wall">
+      <svg class="wall__wire" id="wallWire" aria-hidden="true" preserveAspectRatio="none"></svg>
+      <div class="wall__row" id="wallRow"></div>
+    </div>
+    <div class="wall__acts">
+      <button class="btn btn--ghost btn--sm" id="wallGo" type="button">Зажечь гирлянду</button>
+      <p class="wall__read" id="wallRead" aria-live="polite"></p>
+    </div>
+
+    <div class="ud__gift" id="udGift">
+      <h3>Разбор — вне очереди</h3>
+      <p>Разбор остаётся платным: он стоит своих денег, и его стоимость уходит в счёт проекта. Но обычно до него неделя-другая ожидания.</p>
+      <p>Скажите кодовое слово в заявке или в Telegram — и вас поставят в ближайшее окно, а не в конец списка.</p>
+      <p class="ud__code"><span id="udCode">••••••••</span></p>
+      <div class="ud__acts">
+        <button class="btn btn--ghost btn--sm" id="udCopy" type="button">Скопировать слово</button>
+        <a class="btn btn--sm" href="#brief" data-go="brief">Занять окно</a>
+      </div>
+    </div>
+
+    <div class="nope">
+      <button id="nope" type="button">НЕ НАЖИМАТЬ</button>
+      <span>серьёзно, не надо</span>
+    </div>
+
+    <h3 class="h-md" style="margin-top:clamp(56px,8vh,100px)">Возьмём вашу базу <em>на себя</em></h3>
+    <div class="socials">
+      <a class="soc" href="https://t.me/lllbaza" target="_blank" rel="noopener" style="--sc:#2aabee">
+        <span class="soc__ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.562 8.161-1.86 8.762c-.14.62-.508.77-1.03.48l-2.845-2.096-1.372 1.32c-.152.152-.279.279-.572.279l.205-2.897 5.276-4.767c.229-.204-.05-.318-.356-.114l-6.52 4.104-2.808-.878c-.61-.19-.622-.61.127-.903l10.98-4.232c.508-.185.953.114.775.942z"/></svg></span>
+        <span><b>Telegram</b><p>Новости, эксклюзив, розыгрыши и здоровые шутки.</p></span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h13M12.5 6.5 18 12l-5.5 5.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a class="soc" href="https://vk.com/lllbaza" target="_blank" rel="noopener" style="--sc:#0077ff">
+        <span class="soc__ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M13.16 18.03c-6.83 0-10.72-4.68-10.88-12.47h3.42c.11 5.72 2.63 8.14 4.63 8.64V5.56h3.22v4.93c1.97-.21 4.04-2.46 4.74-4.93h3.22c-.54 3.04-2.79 5.29-4.39 6.22 1.6.75 4.16 2.72 5.14 6.25h-3.55c-.76-2.37-2.65-4.2-5.16-4.45v4.45z"/></svg></span>
+        <span><b>ВКонтакте</b><p>То же самое — для тех, кому привычнее ВК.</p></span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h13M12.5 6.5 18 12l-5.5 5.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+      <a class="soc" href="https://instagram.com/lllbaza" target="_blank" rel="noopener" style="--sc:#d6266f">
+        <span class="soc__ico"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2.5" y="2.5" width="19" height="19" rx="5.4" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="12" r="4.3" stroke="currentColor" stroke-width="2"/><circle cx="17.6" cy="6.4" r="1.3" fill="currentColor"/></svg></span>
+        <span><b>Instagram</b><p>Работа изнутри, юмор и то, ради чего к нам приходят.</p></span>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h13M12.5 6.5 18 12l-5.5 5.5" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════ 11 · ТИТРЫ ═══════ -->
+<section class="uni uni--crawl" id="credits" aria-labelledby="credH">
+  <h2 class="vh" id="credH">Титры</h2>
+  <canvas id="stars" aria-hidden="true"></canvas>
+
+  <div class="crawl__stage">
+    <p class="crawl__pre" id="crawlPre">Давным-давно, в галактике далёкой-далёкой…</p>
+    <div class="crawl__deck" id="crawlDeck">
+      <h3>Эпизод VI<br>ВОЗВРАЩЕНИЕ ВЫХОДНОГО</h3>
+      <p>Вы дочитали сайт до конца. Это уже больше, чем делают 97% посетителей — и заметно больше, чем читает средний подрядчик в вашем брифе.</p>
+      <p>Пока вы листали, где-то там ваши заявки всё ещё лежали в трёх мессенджерах. Мы можем это закончить.</p>
+      <h4>В РОЛЯХ</h4>
+      <ul>
+        <li>Дизайн и интерфейсы — те, кто спорит из-за четырёх пикселей</li>
+        <li>Код и интеграции — те, кто спорит из-за четырёх миллисекунд</li>
+        <li>Боты и автоматизация — те, кто больше не отвечает на однотипные вопросы</li>
+        <li>Аналитика — тот, кто приносит плохие новости первым</li>
+      </ul>
+      <h4>ОСОБАЯ БЛАГОДАРНОСТЬ</h4>
+      <ul>
+        <li>Водопроводчику в красной кепке — за блоки, которые не жалко бить</li>
+        <li>Луковице — за напоминание, что слои есть у всех</li>
+        <li>Верстаку — за то, что рецепт видно до крафта</li>
+        <li>Машине времени — за честные 88 миль в час</li>
+        <li>Тому, кто всё-таки нажал «НЕ НАЖИМАТЬ»</li>
+      </ul>
+      <h4>СНЯТО БЕЗ УЧАСТИЯ</h4>
+      <p>Ни один дедлайн не пострадал. Все совпадения с вашим отделом продаж случайны. Скролл выполнен профессионалами: не повторяйте дома — повторяйте у себя на сайте.</p>
+      <h3 style="margin-top:1.4em">ЭТО БАЗА</h3>
+    </div>
+  </div>
+
+  <div class="foot">
+    <div class="wrap">
+      <div class="foot__row">
+        <a class="foot__mark" href="#top" aria-label="Наверх">
+          <img src="__LOGO_LOCKUP__" width="560" height="214" alt="ЭТО БАЗА" decoding="async">
+        </a>
+        <p class="foot__say">Титры кончились.<br>Ваш выходной — нет.</p>
+        <a class="btn" href="#brief" data-go="brief">Обсудить проект</a>
+      </div>
+      <p class="foot__legal">
+        © <span id="yr">2026</span> БАЗА · ИП Мирошниченко Владислав Андреевич.
+        Информация на сайте не является публичной офертой (ст. 437 ГК РФ).
+        Персональные данные обрабатываем по ФЗ № 152-ФЗ.
+        Все упомянутые вселенные, игры и фильмы принадлежат их правообладателям и использованы здесь как оммаж, а не как знак принадлежности.
+      </p>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<!-- ══════════════════════════════════════════════════════ metrics tape ══ -->
+<aside id="tape" aria-label="Рост показателей клиентов">
+  <button class="tape__q" id="tapeQ" type="button" aria-label="Как считаем">?</button>
+  <span class="tape__k">Рост показателей клиентов:</span>
+  <div class="tape__mask" id="tapeMask">
+    <div class="tape__run" id="tapeRun"></div>
+  </div>
+</aside>
+<div class="tape__card" id="tapeCard" role="region" aria-label="Как считаем рост показателей">
+  <button class="tape__x" id="tapeX" type="button" aria-label="Закрыть">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg>
+  </button>
+  <h4>Как считаем рост показателей</h4>
+  <p>Средние метрики за первые три месяца после запуска против того же периода до него. Берём проекты с полным пакетом работ и считаем по аналитике клиента, а не по ощущениям.</p>
+</div>
+
+<button id="snd" type="button" aria-label="Звук" aria-pressed="false">
+  <svg class="on" width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M11 5 6.5 9H3v6h3.5L11 19z" fill="currentColor"/><path d="M16 9.5a3.6 3.6 0 0 1 0 5M18.8 6.8a7.4 7.4 0 0 1 0 10.4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" opacity=".35"/></svg>
+  <svg class="off" width="17" height="17" viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M11 5 6.5 9H3v6h3.5L11 19z" fill="currentColor"/><path d="M16 9.5a3.6 3.6 0 0 1 0 5M18.8 6.8a7.4 7.4 0 0 1 0 10.4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></svg>
+</button>
+
+<div id="wipe" aria-hidden="true"></div>
+<div id="toast" role="status" aria-live="polite"></div>

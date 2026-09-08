@@ -36,6 +36,7 @@
   var items = navPod ? $$('a[data-k]', navPod) : [];
 
   var hm = null, hIn = 0, mg = null, inkS = null, hover = null, active = 'pain';
+  var spyY = null, spyH = -1, spyN = 0;
 
   function measure() {
     if (!row || !pod || !ctaPod) return;
@@ -92,10 +93,22 @@
   });
   if (navPod) on(navPod, 'pointerleave', function () { hover = null; paintNav(); });
 
+  /* Пунктов в меню шесть, а разделов на странице двенадцать. Следить только
+     за шестью нельзя: попав в «Маршрут» или «Болото», указатель застревал на
+     «Ценах» и показывал неправду. Поэтому каждому пункту отдан весь его
+     участок страницы, а не одна секция. */
   var SPY = [
-    { k: 'pain', sel: '#pain' }, { k: 'services', sel: '#services' },
-    { k: 'cases', sel: '#cases' }, { k: 'pricing', sel: '#pricing' },
-    { k: 'atlas', sel: '#atlas' }, { k: 'brief', sel: '#brief' }
+    { k: 'pain', sel: '#pain' },
+    { k: 'pain', sel: '#truth' },
+    { k: 'services', sel: '#services' },
+    { k: 'cases', sel: '#cases' },
+    { k: 'pricing', sel: '#pricing' },
+    { k: 'pricing', sel: '#route' },
+    { k: 'pricing', sel: '#gains' },
+    { k: 'atlas', sel: '#atlas' },
+    { k: 'brief', sel: '#brief' },
+    { k: 'brief', sel: '#basement' },
+    { k: 'brief', sel: '#credits' }
   ];
 
   var noTr = false;
@@ -194,12 +207,26 @@
       inkPaint();
     }
 
-    // активный раздел
+    /* Активный раздел. Смещения секций кэшируются: getBoundingClientRect на
+       одиннадцати узлах каждый кадр заставляет браузер пересчитывать раскладку
+       шестьдесят раз в секунду — на этом список слежения и уронил частоту
+       вчетверо, когда из шести секций стал одиннадцатью. Пересчёт — только на
+       ресайзе и когда высота документа изменилась (секции раскрываются). */
+    /* scrollHeight сам по себе тоже принудительный пересчёт раскладки, и в
+       кадре ему делать нечего. Высота проверяется раз в полсекунды — секции
+       раскрываются от нажатий, не по кадрам. */
+    spyN++;
+    if (spyY == null || (spyN % 30 === 0 && d.body.scrollHeight !== spyH)) {
+      spyH = d.body.scrollHeight;
+      spyY = [];
+      for (var j0 = 0; j0 < SPY.length; j0++) {
+        var e0 = SPY[j0].el || (SPY[j0].el = $(SPY[j0].sel));
+        spyY.push(e0 ? e0.getBoundingClientRect().top + sy : Infinity);
+      }
+    }
     var line = sy + w.innerHeight * 0.34, act = SPY[0].k;
     for (var j = 0; j < SPY.length; j++) {
-      var el2 = SPY[j].el || (SPY[j].el = $(SPY[j].sel));
-      if (!el2) continue;
-      if (sy + el2.getBoundingClientRect().top <= line) act = SPY[j].k;
+      if (spyY[j] <= line) act = SPY[j].k;
     }
     if (act !== active) { active = act; paintNav(); }
   }
@@ -207,7 +234,7 @@
   if (head) {
     measure();
     B.ticker.add(headerTick, 86);
-    B.onResize(function () { hm = null; inkS = null; measure(); paintNav(); });
+    B.onResize(function () { hm = null; inkS = null; spyY = null; measure(); paintNav(); });
     w.addEventListener('baza:ready', function () { measure(); paintNav(); });
   }
 

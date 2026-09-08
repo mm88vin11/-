@@ -307,3 +307,14 @@ body.menu-open .head__burger i:last-child {transform:translateY(-3.3px) rotate(-
   .lb-water{position:static}
   #introLogo,html.flying #introLogo{transition:none}
 }
+
+/* ═════════════════════════════════════ ЯКОРИ И ФИКСИРОВАННАЯ ШАПКА ═══ */
+/* Шапка висит поверх страницы, поэтому переход по якорю обязан оставить под
+   ней место — иначе заголовок раздела оказывается ровно за капсулами. Так же
+   это было и в боевой сборке. Проверено кликом: без этого правила #services
+   приземлялся на 53 px при нижней кромке шапки на 72. */
+section[id],
+[id^="legal-"],
+#top{
+  scroll-margin-top:clamp(96px,13vh,132px);
+}

@@ -75,6 +75,8 @@ function sprite(cv, map, pal, scale) {
     b.addEventListener('click', function () { bump(cell, b, cv, p); });
   });
 
+  K.invite($$('.blk', host));
+
   function bump(cell, b, cv, p) {
     if (cell.classList.contains('is-done')) return;
     cell.classList.add('is-done');
@@ -92,7 +94,11 @@ function sprite(cv, map, pal, scale) {
     countTo(leakEl, leak);
 
     if (hit === PAIN.length) {
-      setTimeout(function () { sum.classList.add('is-in'); Snd.clear(); }, 620);
+      setTimeout(function () {
+        sum.classList.add('is-in');
+        Snd.clear();
+        setTimeout(function () { K.ensureVisible(sum); }, 260);
+      }, 620);
     }
   }
 
@@ -223,7 +229,7 @@ function sprite(cv, map, pal, scale) {
       var g = GLYPH[Math.random() * GLYPH.length | 0];
       ctx.fillStyle = '#c9ffe0'; ctx.fillText(g, i * size, c.y);
       ctx.fillStyle = 'rgba(93,255,155,.62)'; ctx.fillText(g, i * size, c.y - size);
-      c.y += c.v * speed;
+      c.y += c.v * speed * Clock.dt;
       if (c.y > cv.height + rnd(0, 400)) { c.y = rnd(-600, -20); c.v = rnd(2, 7); }
     }
   }
@@ -245,6 +251,8 @@ function sprite(cv, map, pal, scale) {
       p.addEventListener('pointerleave', function () { p.style.transform = ''; });
     });
   }
+
+  K.invite([blue, red]);
 
   var TXT = 'Вкладка закрыта. Завтра в 9:40 первая заявка снова придёт в личку, и разбирать её будете вы.';
   blue.addEventListener('click', function () {
@@ -306,7 +314,9 @@ function sprite(cv, map, pal, scale) {
   function render() {
     var src = pick.src && pick.src.length ? pick.src : null;
     if (!src || !pick.who || !pick.time || !pick.log) return;
+    var first = !out.classList.contains('is-on');
     out.classList.add('is-on');
+    if (first) setTimeout(function () { K.ensureVisible(out); }, 220);
 
     /* The leak is wherever the answer is worst — that is the node we mark. */
     var slowest = pick.time === 'Минуты' ? 0 : pick.time === 'Часы' ? 2 : 3;
@@ -462,6 +472,10 @@ function sprite(cv, map, pal, scale) {
   });
 
   var timers = [];
+  /* Set the moment someone picks from the shelf. The first recipe is laid out
+     on load and must not scroll the page out from under anybody. */
+  var touched = false;
+
   function pickRecipe(ri) {
     timers.forEach(clearTimeout); timers = [];
     var r = RECIPES[ri];
@@ -486,9 +500,16 @@ function sprite(cv, map, pal, scale) {
       blockCv(outSlot.querySelector('canvas'), r.out);
       outSlot.classList.add('is-on');
       Snd.craft();
+      /* `cards[ri]`, not the loop-local `card`: `var` is function-scoped, so
+         that name resolves to the last recipe built, never the picked one. */
+      if (touched) K.ensureVisible(cards[ri], 12);
     }, 60 + 9 * 55 + 120));
   }
   pickRecipe(0);
+  K.invite($$('.hot', hotbar), 1);
+  $$('.hot', hotbar).forEach(function (h) {
+    h.addEventListener('click', function () { touched = true; }, true);
+  });
 
   /* ——— the terrain silhouette behind it ——— */
   var bg = $('#craftBg');

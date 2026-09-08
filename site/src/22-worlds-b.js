@@ -289,24 +289,36 @@ var Clock = K.Clock, clamp = K.clamp, lerp = K.lerp, rnd = K.rnd, Snd = K.Snd, R
     host.appendChild(b);
   });
 
+  K.invite($$('.scope', host), 1);
+
   var priceEl = $('#ttPrice'), termEl = $('#ttTerm'), teamEl = $('#ttTeam'), sayEl = $('#ttSay');
   var scoreEl = $('#ttScore'), linesEl = $('#ttLines'), levelEl = $('#ttLevel');
+  /* The pinned readout on phones. Same numbers, kept beside the well so a
+     toggle and its consequence are never on different screens. */
+  var miniP = $('#ttMiniPrice'), miniT = $('#ttMiniTerm');
   var shownPrice = 0;
 
   function readout() {
     var picked = SCOPE.filter(function (s) { return on[s.id]; });
     var base = picked.reduce(function (a, s) { return a + s.p; }, 0);
     var weeks = picked.reduce(function (a, s) { return a + s.w; }, 0);
-    /* work overlaps: three tracks in parallel, not three tracks end to end */
-    weeks = picked.length ? Math.max(2, Math.round(weeks * .45)) : 0;
+    /* Tracks run in parallel, and the more of them there are the more overlap
+       there is — a flat 45% of the sum had a full scope coming out at thirteen
+       weeks, which is not a schedule anyone here would sign. Square root keeps
+       the curve honest: one line of work is most of its own estimate, eight
+       lines are nowhere near eight times it. */
+    weeks = picked.length ? Math.max(2, Math.round(Math.sqrt(weeks) * 1.6)) : 0;
     var lo = Math.round(base * .9), hi = Math.round(base * 1.28);
 
     animate(shownPrice, lo, function (v) {
-      priceEl.textContent = picked.length ? v + '–' + Math.round(v * 1.42) : '0';
+      var txt = picked.length ? v + '–' + Math.round(v * 1.42) : '0';
+      priceEl.textContent = txt;
+      if (miniP) miniP.textContent = txt;
     });
     shownPrice = lo;
 
     termEl.textContent = picked.length ? '≈ ' + weeks + ' нед.' : '—';
+    if (miniT) miniT.textContent = picked.length ? 'срок ≈ ' + weeks + ' нед.' : 'выберите работы';
     teamEl.textContent = picked.length ? Math.min(5, Math.max(2, Math.ceil(picked.length / 2) + 1)) + ' чел.' : '—';
 
     score = Math.max(score, base * 10);
@@ -471,11 +483,11 @@ var Clock = K.Clock, clamp = K.clamp, lerp = K.lerp, rnd = K.rnd, Snd = K.Snd, R
     var top = sec.offsetTop, run = sec.offsetHeight * .55;
     var p = clamp((y + W.innerHeight * .8 - top) / Math.max(1, run), 0, 1);
     target = p * 88;
-    mph = lerp(mph, target, RM ? 1 : .09);
+    mph = lerp(mph, target, RM ? 1 : 1 - Math.pow(1 - .09, Clock.dt));
     if (mph > 87.4) mph = 88;
     spv.textContent = String(Math.round(mph));
     drawSpeedo();
-    roff = (roff + .004 + .02 * (mph / 88)) % 1;
+    roff = (roff + (.004 + .02 * (mph / 88)) * Clock.dt) % 1;
     drawRoad();
 
     if (!hit88 && mph >= 87.5) {

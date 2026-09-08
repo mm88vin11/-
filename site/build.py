@@ -33,14 +33,26 @@ logo_eto = uri(ASSETS / "logo_eto.webp")
 logo_baza = uri(ASSETS / "logo_baza.webp")
 logo_lockup = uri(ASSETS / "logo_lockup.webp")
 
-frames = sorted(ASSETS.glob("seq/*.webp"))
-if not frames:
-    sys.exit("no hero frames in assets/seq — run the asset prep first")
-poster = uri(frames[0])
+# Two reels, not one. The shot was cut twice — a 16:9 pass for wide screens
+# and a 9:16 pass for phones — and the runtime picks whichever matches the
+# viewport. Concatenating them (as an earlier build did) simply plays the
+# desktop cut and then the mobile cut, which reads as two videos in a row.
+reels = {}
+for cut in ("d", "m"):
+    fs = sorted((ASSETS / "seq" / cut).glob("*.webp"))
+    if not fs:
+        sys.exit(f"no hero frames in assets/seq/{cut} — run the asset prep first")
+    reels[cut] = fs
+# Frames are inlined byte-for-byte. They are already near-optimally encoded:
+# re-compressing at matching quality comes out the same size or larger, and
+# recompressing lossy WebP only throws detail away.
+poster = uri(reels["d"][0])
+poster_m = uri(reels["m"][0])
 
 body = (body.replace("__LOGO_ETO__", logo_eto)
             .replace("__LOGO_BAZA__", logo_baza)
             .replace("__LOGO_LOCKUP__", logo_lockup)
+            .replace("__POSTER_M__", poster_m)
             .replace("__POSTER__", poster))
 
 fonts = (ASSETS / "fonts.css").read_text(encoding="utf-8")
@@ -55,7 +67,8 @@ grain = (
         b' values="0"/></filter><rect width="180" height="180" filter="url(#n)"'
         b' opacity="0.5"/></svg>').decode())
 
-seq = ",".join('"%s"' % uri(f) for f in frames)
+seq_d = ",".join('"%s"' % uri(f) for f in reels["d"])
+seq_m = ",".join('"%s"' % uri(f) for f in reels["m"])
 
 _fav = (
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">'
@@ -105,12 +118,13 @@ html = f"""<!doctype html>
 <script>{js}</script>
 <!-- The reel lands last. Everything above is already interactive by the time
      the browser starts parsing this array. -->
-<script>window.__SEQ=[{seq}];if(window.__seqReady)window.__seqReady(window.__SEQ);</script>
+<script>window.__SEQ={{d:[{seq_d}],m:[{seq_m}]}};if(window.__seqReady)window.__seqReady(window.__SEQ);</script>
 </body>
 </html>
 """
 
 OUT.write_text(html, encoding="utf-8")
 kb = OUT.stat().st_size / 1024
-print(f"built {OUT}  {kb/1024:.2f} MB  ({len(frames)} frames, "
+print(f"built {OUT}  {kb/1024:.2f} MB  "
+      f"(reel d={len(reels['d'])} m={len(reels['m'])}, "
       f"{len(css)//1024} KB css, {len(js)//1024} KB js)")

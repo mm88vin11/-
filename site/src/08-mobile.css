@@ -1,0 +1,225 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   БАЗА — 08 · the phone
+
+   Loaded last, so it wins. Everything here answers one complaint: on a phone
+   the control, the thing it explains and the result it produces sat screens
+   apart, so using a world meant scrolling up to see what your tap had done
+   and back down to tap again.
+
+   The rule applied throughout: whatever you touch and whatever it changes
+   have to be in the same view. Where that means pinning something, it is
+   pinned; where it means moving the result next to the control, it is moved;
+   where it means cutting a section down, it is cut.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+@media (max-width: 780px) {
+
+  /* ─────────────────────────────────────────────── measure and rhythm ──
+     Display sizes tuned for a 1440px screen leave a 390px one with three
+     words per line and a headline that eats half the fold. */
+  :root { --sec: clamp(56px, 15vw, 92px); --gut: 18px; }
+
+  .h-xl { font-size: clamp(30px, 8.6vw, 40px); line-height: 1.0; letter-spacing: -.038em; max-width: none; }
+  .h-lg { font-size: clamp(25px, 7.4vw, 34px); line-height: 1.08; letter-spacing: -.034em; max-width: none; }
+  .h-md { font-size: clamp(18px, 5vw, 22px); max-width: none; }
+  .lead { font-size: 15px; line-height: 1.5; max-width: none; }
+  .fine { font-size: 12.5px; }
+  em, .em { -webkit-text-stroke-width: 1px; letter-spacing: .022em; }
+
+  .uni__head .lead { margin-top: 12px; }
+  .plate { font-size: 10px; }
+
+  /* Buttons are thumb-sized and full-width where they are the next step. */
+  .btn { min-height: 50px; width: 100%; }
+  .btn--sm { width: auto; }
+  .portal__acts .btn, .brief__acts .btn { width: 100%; }
+
+  /* ─────────────────────────────────────────────────── 01 · МИР 1-1 ──
+     Four blocks in a 2×2, each with its own answer directly beneath it, and
+     the whole scene shortened so the grid and the tally share a screen. */
+  .mario__hud { gap: 16px; font-size: 8px; }
+  .mario__head { margin-top: 18px; }
+  .mario__stage { margin-top: 24px; }
+  .mario__blocks { gap: 10px; }
+  .blkcell .blk { max-width: 116px; }
+  .blk__say { padding: 11px 12px; font-size: 12.5px; line-height: 1.35; border-radius: 10px; }
+  .blk__say b { font-size: 10px; }
+  .mario__sum { margin-top: 26px; padding: 20px; border-radius: 16px; }
+  .mario__ground { margin-top: 40px; height: 56px; }
+  .mario__guy { bottom: 56px; width: 34px; height: 46px; }
+  /* Clouds and hills are scenery; on a narrow screen they are only clutter
+     behind the text they sit under. */
+  .mario__cloud { opacity: .5; }
+
+  /* ─────────────────────────────────────────────────── 02 · МАТРИЦА ──
+     The two pills stack and shrink; the questionnaire tightens so answering
+     it does not take three screens. */
+  .mx__pills { gap: 10px; margin-top: 22px; }
+  .pill { flex: 1 1 100%; max-width: none; padding: 16px; gap: 10px; border-radius: 16px; }
+  .pill b { font-size: 17px; }
+  .pill span { font-size: 13px; }
+  .pill__cap { width: 58px; height: 24px; }
+  .pill__cap i { width: 17px; height: 7px; top: 4px; }
+  .mx__red { margin-top: 26px; }
+  .mx__q { margin-top: 20px; }
+  .chip { padding: 8px 13px; font-size: 13px; }
+  .uni--matrix .chip {
+    color: rgba(200, 255, 220, .86);
+    background: rgba(4, 7, 10, .66);
+  }
+  .uni--matrix .chip[aria-pressed="true"] { color: #04070a; background: var(--w-acc); }
+  .mx__out { margin-top: 22px; padding: 18px; }
+  .mx__flow { gap: 8px; }
+  .mx__node { flex: 1 1 calc(50% - 4px); padding: 11px 12px; }
+  .mx__node b { font-size: 13px; }
+
+  /* ──────────────────────────────────────────────────── 03 · ВЕРСТАК ──
+     Bench, then the shelf you pick from, then what it makes — in that order
+     and close enough together to read as one machine. */
+  .craft__grid { gap: 20px; margin-top: 24px; }
+  .bench { padding: 12px; max-width: none; }
+  .slot { width: clamp(40px, 12vw, 50px); }
+  .slot--out { width: clamp(52px, 15vw, 64px); }
+  .hotbar { margin-top: 12px; }
+  .hot { width: clamp(46px, 13vw, 54px); }
+  .craft__out { min-height: 0; }
+  .craft__card h3 { font-size: 22px; }
+  .craft__card > p { margin-top: 10px; font-size: 14px; }
+  .craft__meta { margin-top: 14px; gap: 8px; }
+  .craft__list { margin-top: 16px; }
+  .craft__list li { font-size: 13.5px; }
+
+  /* ────────────────────────────────────────────────────── 04 · ЛЕНТА ──
+     The handset first, its index under it. */
+  .tok__grid { gap: 22px; margin-top: 22px; }
+  .tok__side { order: 2; }
+  .phone { width: min(280px, 76vw); }
+  .tok__dots { margin-top: 16px; }
+  .tok__dot { padding: 10px 12px; }
+  .tok__dot b { font-size: 13px; }
+
+  /* ─────────────────────────────────────────────────────── 05 · ЦЕНА ──
+     The stack and the running total pin under the header while the list of
+     work scrolls beneath them. Toggling a line and watching the well answer
+     is the whole point of the section, and it only works if both are on
+     screen at once. */
+  .tt__grid { gap: 0; margin-top: 20px; }
+  .tt__stick {
+    position: sticky;
+    top: calc(env(safe-area-inset-top) + 68px);
+    z-index: 6;
+    margin: 0 calc(var(--gut) * -1) 16px;
+    padding: 12px var(--gut) 14px;
+    /* Opaque, not a gradient that fades out halfway: the scope rows scroll
+       directly beneath this and were showing through the readout. */
+    background: #0b0d16;
+    box-shadow: 0 14px 22px -10px rgba(11, 13, 22, .95);
+  }
+  .well__hud { margin-bottom: 8px; font-size: 6.5px; }
+  .tt__stickRow { display: flex; align-items: center; gap: 16px; }
+  .well { width: 92px; margin: 0; padding: 5px; border-radius: 5px; }
+  .tt__mini {
+    display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px;
+    min-width: 0;
+  }
+  .tt__mini b {
+    font-size: 30px; font-weight: 800; letter-spacing: -.045em;
+    font-variant-numeric: tabular-nums; line-height: 1;
+  }
+  .tt__mini span { font-family: var(--f-mono); font-size: 11px; color: var(--w-dim); }
+  .tt__mini i {
+    width: 100%; font-style: normal; font-family: var(--f-mono);
+    font-size: 11px; font-weight: 700; color: var(--w-dim);
+  }
+  .scope { padding: 12px 14px; gap: 11px; grid-template-columns: 22px minmax(0, 1fr) auto; }
+  .scope__box { width: 22px; height: 22px; }
+  .scope b { font-size: 14px; }
+  .scope span { font-size: 12px; }
+  .scope u { font-size: 11.5px; }
+  .tt__sum { margin-top: 18px; padding: 20px; }
+  .tt__price { display: none; }          /* the pinned readout already says it */
+  .tt__bars { gap: 10px; }
+
+  /* ──────────────────────────────────────────────────── 06 · МАРШРУТ ──
+     The dash is tall; the stages are the payoff. Shorten the gap between
+     them so the speedometer is still visible as the cards land. */
+  .circuits { margin-top: 22px; padding: 12px; }
+  .flux__row { margin-top: 18px; gap: 14px; }
+  .speedo { width: 130px; }
+  .flux__say { font-size: 14px; }
+  .stages { margin-top: 24px; gap: 10px; }
+  .stage { padding: 18px; border-radius: 14px; }
+  .stage h3 { font-size: 17px; }
+  .stage p { margin-top: 9px; font-size: 13.5px; }
+  .flux__after { margin-top: 26px; gap: 10px; }
+  .slip { padding: 15px 17px; }
+
+  /* ────────────────────────────────────────────────────── 07 · БОЛОТО ──
+     What you just peeled says its piece directly under the onion, so the
+     tap and its answer are one gesture apart. The full list stays below as
+     the recap. */
+  .swamp__grid { gap: 20px; margin-top: 22px; }
+  .onion { width: min(186px, 46vw); margin-bottom: 12px; }
+  .onion__now {
+    display: block;
+    padding: 15px 17px; border-radius: 15px;
+    background: rgba(180, 216, 74, .12);
+    box-shadow: inset 0 0 0 1px rgba(180, 216, 74, .42);
+  }
+  .onion__now b { display: block; font-size: 15.5px; font-weight: 700; letter-spacing: -.024em; }
+  .onion__now p { margin-top: 6px; font-size: 13.5px; line-height: 1.45; color: var(--w-dim); }
+  .layer { padding: 13px 15px; gap: 12px; grid-template-columns: 26px minmax(0, 1fr); }
+  .layer__n { width: 26px; height: 26px; font-size: 11px; }
+  .layer b { font-size: 14px; }
+  .layer p { font-size: 12.5px; }
+  .sign { font-size: 12px; padding: 9px 16px; }
+
+  /* ─────────────────────────────────────────────────────── 08 · ПОРТАЛ ──
+     The ring and the way through it belong on the same screen. */
+  .ring { width: min(300px, 74vw); margin-top: 20px; }
+  .portal__acts { margin-top: 40px; gap: 14px; }
+  .ring__say { font-size: 12px; }
+
+  /* ─────────────────────────────────────────────── 09 · СВЕТЛЫЙ МИР ──
+     A form is allowed to be long; it just has to be comfortable. */
+  .cities { margin-top: 24px; }
+  .city { font-size: 13px; padding: 8px 13px; }
+  .filter { margin-top: 40px; }
+  .filter__list { gap: 8px; margin-top: 16px; }
+  .filter__list li { padding: 14px 16px; font-size: 13.5px; }
+  .brief { margin-top: 40px; }
+  .brief__box { padding: 20px; border-radius: 20px; }
+  .brief__grid { gap: 26px; }
+  .brief__calc b { font-size: 24px; }
+  .fwd { padding: 20px; }
+
+  /* ────────────────────────────────────────────────────── 10 · ИЗНАНКА ── */
+  .wall { padding: 18px 12px 14px; }
+  .ltr { width: clamp(24px, 8vw, 32px); padding-top: 15px; }
+  .ltr b { font-size: 15px; }
+  .ud__gift { margin-top: 30px; padding: 20px; }
+  .socials { margin-top: 32px; gap: 8px; }
+  .soc { padding: 15px 16px; gap: 12px; }
+
+  /* ──────────────────────────────────────────────────────── 11 · ТИТРЫ ── */
+  .crawl__stage { perspective: 300px; min-height: min(76svh, 560px); }
+  .crawl__deck { width: 90vw; }
+  .foot__row { gap: 14px; }
+  .foot__row .btn { width: 100%; }
+  .foot__say { font-size: 11.5px; }
+}
+
+/* Very narrow phones: the block grid and the crafting table are the two
+   things that run out of room first. */
+@media (max-width: 380px) {
+  .blkcell .blk { max-width: 96px; }
+  .slot { width: 38px; }
+  .hot { width: 42px; }
+  .well { width: 78px; }
+  .tt__mini b { font-size: 26px; }
+}
+
+/* Landscape phones have almost no height to spare, so nothing pins. */
+@media (max-height: 460px) and (orientation: landscape) {
+  .tt__stick { position: static; margin: 0 0 14px; background: none; padding: 0; }
+}

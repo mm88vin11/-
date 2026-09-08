@@ -102,11 +102,14 @@ file, ~5.8 MB, no network at runtime. Open it directly — `file://` works.
 It is a build artefact. The sources are in `site/`:
 
 ```
-site/src/*.css      seven stylesheets, concatenated in filename order
-site/src/10-body.html   the markup
-site/src/2*.js      core runtime + one module per group of worlds
-site/assets/        subset fonts, the wordmark, and the 144-frame hero reel
-site/build.py       inlines all of the above into index.html
+site/src/*.css        stylesheets, concatenated in filename order
+                      (08-mobile.css loads last and owns the phone layout)
+site/src/10-body.html the markup
+site/src/2*.js        core runtime + one module per group of worlds
+site/assets/seq/d     182-frame 16:9 hero reel, for wide screens
+site/assets/seq/m     104-frame 9:16 hero reel, for phones
+site/assets/          subset fonts and the wordmark
+site/build.py         inlines all of the above into index.html
 ```
 
 Rebuild with:
@@ -121,7 +124,16 @@ browser parses five megabytes of base64. The reel is handed to the runtime
 through `window.__seqReady` rather than read from `window.__SEQ` directly,
 because at script-evaluation time it does not exist yet.
 
-Two constraints are worth knowing before editing the CSS:
+The hero shot exists as **two cuts of the same take** — landscape and
+portrait — and the runtime picks whichever matches the viewport. They must
+stay separate: concatenating them plays the desktop cut and then the mobile
+one, which reads as two videos in a row. Frames are inlined byte-for-byte
+because they are already near-optimally encoded; re-compressing at matching
+quality comes out the same size or larger and only throws detail away. The
+runway is derived from the frame count (18px of scroll per frame), so both
+cuts scrub at the same speed.
+
+Three constraints are worth knowing before editing:
 
 - **Nothing vertical is measured in `vh`.** A phone's address bar retracts as
   you scroll and every `vh`-based height changes with it, which is what made
@@ -130,6 +142,9 @@ Two constraints are worth knowing before editing the CSS:
 - **Canvases need an explicit `width`/`height` in CSS.** `position: absolute;
   inset: 0` does not stretch a replaced element — it keeps the intrinsic
   300×150 and the effect ends up in the corner.
+- **Anything that moves per frame multiplies by `Clock.dt`.** Without it the
+  site runs at double speed on a 120Hz phone and stutters whenever a frame
+  runs long, which is most of what "not smooth" turns out to mean.
 
 ## Layout
 

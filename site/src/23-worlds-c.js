@@ -19,6 +19,7 @@ var Clock = K.Clock, clamp = K.clamp, lerp = K.lerp, rnd = K.rnd, Snd = K.Snd, R
   ];
 
   var onion = $('#onion'), list = $('#swampList'), hint = $('#onionHint');
+  var now = $('#onionNow');
 
   /* The onion is drawn as real concentric shells so a peel can take one shell
      away and leave a smaller onion behind — a stack of divs could not. */
@@ -96,7 +97,21 @@ var Clock = K.Clock, clamp = K.clamp, lerp = K.lerp, rnd = K.rnd, Snd = K.Snd, R
     var g = shells[peeled];
     g.classList.add('is-off');
     rows[peeled].classList.add('is-on');
-    rows[peeled].scrollIntoView ? null : null;
+
+    /* Echo the layer immediately below the onion. On a phone the recap list
+       is a screen further down, so without this the tap appears to do
+       nothing but remove a shell. */
+    if (now) {
+      var L = LAYERS[peeled];
+      now.hidden = false;
+      now.querySelector('b').textContent = L.n;
+      now.querySelector('p').textContent = L.p;
+      if (now.animate) {
+        now.animate([{ opacity: 0, transform: 'translateY(8px)' }, { opacity: 1, transform: 'none' }],
+                    { duration: 420, easing: 'cubic-bezier(.16,.84,.24,1)' });
+      }
+      K.ensureVisible(now);
+    }
     peeled++;
     Snd.click();
     hint.textContent = peeled >= N ? '' : 'ещё ' + (N - peeled) + ' ' + plural(N - peeled, ['слой', 'слоя', 'слоёв']);
@@ -188,8 +203,9 @@ var Clock = K.Clock, clamp = K.clamp, lerp = K.lerp, rnd = K.rnd, Snd = K.Snd, R
     /* fireflies */
     for (var f = 0; f < flies.length; f++) {
       var fl = flies[f];
-      fl.a += .012 * fl.s;
-      fl.x += Math.cos(fl.a) * fl.s; fl.y += Math.sin(fl.a * .7) * fl.s * .6;
+      fl.a += .012 * fl.s * Clock.dt;
+      fl.x += Math.cos(fl.a) * fl.s * Clock.dt;
+      fl.y += Math.sin(fl.a * .7) * fl.s * .6 * Clock.dt;
       if (fl.x < 0) fl.x = w; if (fl.x > w) fl.x = 0;
       if (fl.y < 0) fl.y = h; if (fl.y > h) fl.y = 0;
       var al = .35 + .35 * Math.sin(t * .003 + f);
@@ -408,7 +424,8 @@ var Clock = K.Clock, clamp = K.clamp, lerp = K.lerp, rnd = K.rnd, Snd = K.Snd, R
     sctx.globalCompositeOperation = 'lighter';
     for (var i = embersArr.length - 1; i >= 0; i--) {
       var e = embersArr[i];
-      e.x += e.vx; e.y += e.vy; e.vy += .04 * dpr; e.life -= .022;
+      e.x += e.vx * Clock.dt; e.y += e.vy * Clock.dt;
+      e.vy += .04 * dpr * Clock.dt; e.life -= .022 * Clock.dt;
       if (e.life <= 0) { embersArr.splice(i, 1); continue; }
       sctx.fillStyle = 'rgba(255,' + (140 + 90 * e.life | 0) + ',60,' + e.life + ')';
       sctx.beginPath(); sctx.arc(e.x, e.y, e.r * e.life, 0, 7); sctx.fill();

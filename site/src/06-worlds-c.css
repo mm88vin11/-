@@ -70,6 +70,10 @@
 }
 .onion.is-done .onion__hint { opacity: 0; }
 
+/* On a wide screen the recap list sits beside the onion and lights up as you
+   peel, so the echo under the onion would only be saying it twice. */
+.onion__now { display: none; }
+
 /* ——— what each layer reveals ——— */
 .swamp__list { display: grid; gap: 10px; }
 .layer {

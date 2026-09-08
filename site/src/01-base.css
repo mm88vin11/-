@@ -297,3 +297,42 @@ em, .em {
 @media (hover: none) {
   .btn:hover { transform: none; box-shadow: none; }
 }
+
+/* ─────────────────────────────────────────────────────────── the invite ──
+
+   Each world opens with something you are meant to touch, and on a phone it
+   is not always obvious which thing that is. This is the one shared cue: a
+   soft ring that breathes around the primary control until it has been used
+   once, then never again on that world.
+
+   It is deliberately not a tooltip, a bouncing arrow or a "click me" label —
+   the control keeps its own shape and simply looks live.                     */
+
+[data-invite] { position: relative; }
+[data-invite]::after {
+  content: '';
+  position: absolute; inset: -7px;
+  border-radius: inherit;
+  box-shadow: 0 0 0 2px var(--w-acc);
+  opacity: 0;
+  pointer-events: none;
+  animation: invite 2.4s var(--e-soft) infinite;
+}
+[data-invite].is-used::after,
+[data-invite]:hover::after { animation: none; opacity: 0; }
+
+@keyframes invite {
+  0%   { opacity: 0;   transform: scale(.94); }
+  38%  { opacity: .55; transform: scale(1); }
+  100% { opacity: 0;   transform: scale(1.1); }
+}
+
+/* A block is square with sharp corners; a chip is a capsule. The ring copies
+   whichever it is sitting on, so it never looks bolted on. */
+.blk[data-invite]::after { border-radius: 6px; }
+.hot[data-invite]::after { inset: -5px; border-radius: 3px; }
+.scope[data-invite]::after { inset: -3px; }
+
+@media (prefers-reduced-motion: reduce) {
+  [data-invite]::after { animation: none; opacity: 0; }
+}

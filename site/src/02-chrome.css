@@ -10,54 +10,92 @@
    are decoded first (`img.decode()`), and only then does `is-ready` unlock the
    animation. Until that flips there is nothing on screen to be early.        */
 
+/* Three beats, in order, and each waits for the one before it:
+
+   1. converge — the two halves arrive from opposite sides and meet
+   2. fill     — a bright copy of the mark rises through the dim one, its
+                 height driven by how much of the reel has actually decoded
+   3. fly      — once full, the whole mark travels to the header's logo slot
+                 and hands over
+
+   The mark never animates before it has decoded: the previous build ran the
+   entrance while the artwork was still arriving, so it landed after it had
+   already flown.                                                            */
+
 #load {
   position: fixed; inset: 0; z-index: 90;
   display: grid; place-items: center;
   background: var(--ink);
-  transition: opacity 700ms var(--e-out), visibility 0s linear 700ms;
+  transition: opacity 480ms ease;
 }
-#load.is-gone { opacity: 0; visibility: hidden; pointer-events: none; }
+#load.is-gone { opacity: 0; pointer-events: none; }
 
 .load__mark {
   position: relative;
-  width: min(74vw, 460px);
+  width: min(72vw, 420px);
   opacity: 0;
-  transition: opacity 260ms ease;
+  --fill: 0%;
+  transform-origin: 50% 50%;
+  transition: opacity 420ms ease;
+  will-change: transform;
 }
 #load.is-ready .load__mark { opacity: 1; }
 
-.load__part { position: relative; overflow: hidden; display: block; }
-.load__part + .load__part { margin-top: .06em; }
-.load__part img {
-  display: block; width: 100%; height: auto;
-  transform: translate3d(0, 108%, 0);
+/* 3 · the flight */
+#load.is-flying .load__mark {
+  transform: translate3d(var(--fx, 0), var(--fy, 0), 0) scale(var(--fs, .12));
+  transition: transform 880ms cubic-bezier(.62, .02, .2, 1), opacity 300ms ease 620ms;
+  opacity: 0;
 }
-#load.is-ready .load__part img {
-  animation: mark-in 1080ms var(--e-out) forwards;
-}
-#load.is-ready .load__part:nth-child(2) img { animation-delay: 110ms; }
+#load.is-flying { background: transparent; transition: background 500ms ease 260ms; }
 
-@keyframes mark-in { to { transform: translate3d(0, 0, 0); } }
+/* 1 · the halves arrive from opposite sides and meet */
+.load__row {
+  position: relative; display: block;
+  transform: translate3d(var(--dx, 0), 0, 0);
+  opacity: 0;
+}
+.load__row--a { --dx: -38%; }
+.load__row--b { --dx: 38%; margin-top: .05em; }
+#load.is-ready .load__row {
+  animation: mark-meet 820ms var(--e-out) forwards;
+}
 
-/* Progress is the reel preloading, not a fake timer. */
-.load__bar {
-  position: absolute; left: 0; bottom: -26px;
-  height: 2px; width: 100%;
-  background: var(--cream-08);
-  overflow: hidden; border-radius: 2px;
+@keyframes mark-meet {
+  from { transform: translate3d(var(--dx), 0, 0); opacity: 0; }
+  to   { transform: translate3d(0, 0, 0);         opacity: 1; }
 }
-.load__bar i {
-  display: block; height: 100%; width: 100%;
-  background: var(--cream);
-  transform: scaleX(var(--p, 0)); transform-origin: 0 50%;
-  transition: transform 340ms var(--e-out);
+
+/* A hairline that sits on the fill's waterline — it makes the level legible
+   at a glance on a wordmark whose own silhouette is full of holes. */
+.load__mark::after {
+  content: ''; position: absolute; left: -4%; right: -4%;
+  bottom: var(--fill, 0%);
+  height: 1px; background: var(--cream);
+  opacity: 0; transition: opacity 300ms ease;
 }
+#load.is-pouring .load__mark::after { opacity: .5; }
+#load.is-flying .load__mark::after { opacity: 0; }
+
+.load__row img { display: block; width: 100%; height: auto; }
+.load__ghost { opacity: .17; }
+/* 2 · the fill. `inset()` from the bottom, so the bright copy rises. */
+.load__fill {
+  position: absolute; inset: 0;
+  clip-path: inset(calc(100% - var(--fill)) 0 0 0);
+}
+
 .load__pct {
-  position: absolute; right: 0; bottom: -52px;
+  position: absolute;
+  left: 50%; transform: translateX(-50%);
+  bottom: max(28px, 8vh);
   font-family: var(--f-mono); font-size: 11px; font-weight: 700;
-  letter-spacing: .04em; color: var(--cream-32);
+  letter-spacing: .06em; color: var(--cream-32);
   font-variant-numeric: tabular-nums;
+  opacity: 0; transition: opacity 400ms ease;
 }
+#load.is-ready .load__pct { opacity: 1; }
+#load.is-flying .load__pct { opacity: 0; }
 
 /* ──────────────────────────────────────────────────────────────── header ──
 
@@ -101,10 +139,13 @@
 }
 .pod--logo { flex: 0 1 auto; padding-right: 16px; }
 .pod__logo { display: flex; align-items: center; height: 100%; }
+/* Hidden until the loader's mark has finished travelling into this slot —
+   otherwise two copies of the wordmark are on screen at once during the
+   flight, and the arrival reads as a pop rather than a landing. */
 .pod__logo img {
   height: 20px; width: auto;
   opacity: 0;
-  transition: opacity 420ms ease;
+  transition: opacity 300ms ease;
 }
 body.is-live .pod__logo img { opacity: 1; }
 

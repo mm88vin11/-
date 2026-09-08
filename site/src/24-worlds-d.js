@@ -94,7 +94,8 @@ var Clock = K.Clock, clamp = K.clamp, lerp = K.lerp, rnd = K.rnd, Snd = K.Snd, R
     actx.clearRect(0, 0, air.width, air.height);
     for (var i = 0; i < motes.length; i++) {
       var m = motes[i];
-      m.y += m.v; m.x += m.d + Math.sin(m.y * .01) * .2;
+      m.y += m.v * Clock.dt;
+      m.x += (m.d + Math.sin(m.y * .01) * .2) * Clock.dt;
       if (m.y < -10) { m.y = air.height + 10; m.x = Math.random() * air.width; }
       actx.fillStyle = 'rgba(210,228,245,' + m.a + ')';
       actx.beginPath(); actx.arc(m.x, m.y, m.r, 0, 7); actx.fill();
@@ -210,7 +211,7 @@ var Clock = K.Clock, clamp = K.clamp, lerp = K.lerp, rnd = K.rnd, Snd = K.Snd, R
 
   Clock.add(function () {
     if (!half) { measure(); return; }
-    if (!drag) x += vel;
+    if (!drag) x += vel * Clock.dt;
     if (x <= -half) x += half;
     if (x > 0) x -= half;
     run.style.transform = 'translate3d(' + x + 'px,0,0)';

@@ -1,11 +1,19 @@
 <!-- ══════════════════════════════════════════════════════════ intro ═════ -->
 <div id="load" role="status" aria-label="Загрузка">
-  <div class="load__mark">
-    <span class="load__part"><img id="loadEto" src="__LOGO_ETO__" width="880" height="184" alt="" decoding="async"></span>
-    <span class="load__part"><img id="loadBaza" src="__LOGO_BAZA__" width="880" height="153" alt="ЭТО БАЗА" decoding="async"></span>
-    <span class="load__bar"><i id="loadBar"></i></span>
-    <span class="load__pct" id="loadPct">0%</span>
+  <div class="load__mark" id="loadMark">
+    <!-- Each half is drawn twice: a dim outline that is always there, and a
+         bright copy clipped from below. The bright copy is what rises as the
+         reel loads, so the mark fills rather than a bar filling next to it. -->
+    <span class="load__row load__row--a">
+      <img class="load__ghost" src="__LOGO_ETO__" width="880" height="184" alt="" decoding="async">
+      <img class="load__fill"  src="__LOGO_ETO__" width="880" height="184" alt="" decoding="async" aria-hidden="true">
+    </span>
+    <span class="load__row load__row--b">
+      <img class="load__ghost" src="__LOGO_BAZA__" width="880" height="153" alt="ЭТО БАЗА" decoding="async">
+      <img class="load__fill"  src="__LOGO_BAZA__" width="880" height="153" alt="" decoding="async" aria-hidden="true">
+    </span>
   </div>
+  <p class="load__pct" id="loadPct">0%</p>
 </div>
 
 <!-- ══════════════════════════════════════════════════════════ header ════ -->
@@ -63,11 +71,18 @@
 <!-- ══════════════════════════════════════════════════════════ 00 · HERO ══ -->
 <section class="hero" id="hero" aria-label="Разработка × Креатив">
   <div class="hero__pin">
-    <img id="heroPoster" src="__POSTER__" width="1200" height="676"
-         alt="Разработка × Креатив" fetchpriority="high" decoding="async">
+    <!-- Two posters for the two cuts of the same shot: 16:9 for wide screens,
+         9:16 for phones. The one that does not match is dropped by the media
+         query, so neither is ever letterboxed. -->
+    <picture id="heroPoster">
+      <source media="(max-aspect-ratio: 3/4)" srcset="__POSTER_M__">
+      <img src="__POSTER__" width="1600" height="901"
+           alt="Разработка × Креатив" fetchpriority="high" decoding="async">
+    </picture>
     <canvas id="heroC" aria-hidden="true"></canvas>
     <div class="hero__grain" aria-hidden="true"></div>
     <div class="hero__vig" aria-hidden="true"></div>
+    <div class="hero__scrim" aria-hidden="true"></div>
 
     <div class="hero__prog" aria-hidden="true"><i id="heroProg"></i></div>
 
@@ -230,15 +245,24 @@
     </header>
 
     <div class="tt__grid">
-      <div>
+      <!-- On a phone this whole block pins under the header, so the stack and
+           the running total stay on screen while you work the list below.
+           Toggling a line whose effect you cannot see is what made the section
+           feel like guesswork. -->
+      <div class="tt__stick">
         <div class="well__hud">
           <div>СЧЁТ<b id="ttScore">000000</b></div>
           <div>ЛИНИИ<b id="ttLines">0</b></div>
           <div>УРОВЕНЬ<b id="ttLevel">1</b></div>
         </div>
-        <div class="well">
-          <canvas id="ttC"></canvas>
-          <span class="well__flash" id="ttFlash" aria-hidden="true"></span>
+        <div class="tt__stickRow">
+          <div class="well">
+            <canvas id="ttC"></canvas>
+            <span class="well__flash" id="ttFlash" aria-hidden="true"></span>
+          </div>
+          <p class="tt__mini" aria-hidden="true">
+            <b id="ttMiniPrice">0</b><span>тыс&nbsp;₽</span><i id="ttMiniTerm">срок ≈ —</i>
+          </p>
         </div>
       </div>
 
@@ -320,8 +344,12 @@
     </header>
 
     <div class="swamp__grid">
-      <div class="onion" id="onion">
-            <p class="onion__hint" id="onionHint">снимите слой</p>
+      <div class="onion__col">
+        <div class="onion" id="onion">
+          <p class="onion__hint" id="onionHint">снимите слой</p>
+        </div>
+        <!-- what you just uncovered, right under your thumb -->
+        <div class="onion__now" id="onionNow" aria-live="polite" hidden><b></b><p></p></div>
       </div>
       <ul class="swamp__list" id="swampList"></ul>
     </div>

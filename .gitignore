@@ -15,3 +15,4 @@ site/qa/shots/
 site/qa/video/
 site/qa/report-*.json
 site/qa/lighthouse-*.html
+site/qa/report-section.md

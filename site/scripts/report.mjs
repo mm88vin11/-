@@ -121,8 +121,12 @@ if (loader) {
   p(`* **Preloader at CPU ×6:** ${l.frames} frames sampled, median ${l.median} ms, p95 ${l.p95} ms, worst ${l.worst} ms.`);
   p(`  Frames over 33 ms: **${l.dropped}**. Over 50 ms: **${l.stalls50}**. Video: \`site/qa/video/\`.`);
   const f = loader.flip;
-  p(`* **FLIP into the header:** after the flight the mark's box is ${f.markW}px wide against the header logo's ${f.logoW}px —`);
-  p(`  Δwidth ${f.dw}px, Δheight ${f.dh}px, Δx ${f.dx}px, Δy ${f.dy}px. Aspect ${f.markAspect} vs ${f.logoAspect}.`);
+  if (f?.error) {
+    p(`* **FLIP into the header:** not measured — ${f.error}.`);
+  } else if (f) {
+    p(`* **FLIP into the header:** after the flight the mark's box is ${f.markW}px wide against the header logo's ${f.logoW}px —`);
+    p(`  Δwidth ${f.dw}px, Δheight ${f.dh}px, Δx ${f.dx}px, Δy ${f.dy}px. Aspect ${f.markAspect} vs ${f.logoAspect}.`);
+  }
   p(`* **Second visit in the same tab:** live in ${loader.secondVisit.msToLive} ms (the short version, no pour).`);
   const rm = loader.reducedMotion;
   p(`* **prefers-reduced-motion:** flag ${rm.rmFlag === '1' ? 'set' : 'NOT set'}, tier \`${rm.tier}\`, ${rm.risesRevealed}/${rm.risesTotal} reveals shown immediately, seam layer ${rm.seamOn ? 'active' : 'idle'}, ${rm.errors.length} errors.`);

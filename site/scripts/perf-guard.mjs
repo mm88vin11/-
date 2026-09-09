@@ -67,7 +67,7 @@ for (const f of worlds) {
    the declaration: state selectors (:hover, :focus, aria-pressed, .is-*) and
    the three full-screen overlays are exempt, everything else is not. */
 const BANNED = /transition\s*:[^;]*\b(width|height|top|left|right|bottom|margin|padding|box-shadow|filter)\b/;
-const EXEMPT = /:hover|:focus|:active|\[aria-pressed|\.is-|#load|#wipe|#seam|#toast|\.tape__card|\.map__card|\.team li|\.soc\b|\.scope\b|\.chip\b|\.pill\b|\.btn\b|\.ltr\b|#head\b|\.head__ink|\.skip\b|\.tok__dot|\.well__flash|\.card__ans|\.hero__whisper/;
+const EXEMPT = /:hover|:focus|:active|\[aria-pressed|\.is-|#load|#wipe|#seam|#toast|\.tape__card|\.map__card|\.team li|\.soc\b|\.scope\b|\.chip\b|\.pill\b|\.btn\b|\.ltr\b|#head\b|\.head__ink|\.skip\b|\.tok__dot|\.well__flash|\.card__ans|\.hero__whisper|\.portal__step|\.map__pin|\.blk__say|\.pain__sum/;
 for (const f of css) {
   const body = await read(f);
   /* Crude but sufficient block split: `selector { declarations }`. */

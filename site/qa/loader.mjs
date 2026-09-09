@@ -68,12 +68,16 @@ const SAMPLER = `
 {
   const ctx = await browser.newContext({ viewport: { width: 1280, height: 800 } });
   const page = await ctx.newPage();
-  await page.goto(BASE, { waitUntil: 'commit' });
+  /* `commit` fires before the HTML is parsed, so `getElementById` inside the
+     next evaluate returned null and took the whole pass down. The flight is
+     measured against elements, so wait for there to be elements. */
+  await page.goto(BASE, { waitUntil: 'domcontentloaded' });
   /* Sample once the flight class is on, before it finishes. */
   const measured = await page.evaluate(async () => {
     const load = document.getElementById('load');
     const mark = document.getElementById('loadMark');
     const header = document.getElementById('headLogo');
+    if (!mark || !header) return { error: 'loader markup not found' };
     for (let i = 0; i < 400; i++) {
       if (load?.classList.contains('is-flying')) break;
       await new Promise((r) => setTimeout(r, 25));

@@ -360,8 +360,11 @@ html.is-grey .world__bg, html.is-grey #seam { display: none !important; }
 .card__ttl { font-size: 17px; }
 .card__note { font-size: 12px; color: rgb(255 255 255 / .92); }
 .card__by { display: flex; align-items: center; gap: 6px; font-size: 11px; color: rgb(255 255 255 / .8); }
+/* The avatar initial is small white text on the accent, and the accent is a
+   bright pink: 3.68:1, which is under the floor for text this size. A darker
+   pink keeps the brand read and clears 5:1. */
 .card__by i { display: grid; place-items: center; width: 18px; height: 18px; border-radius: var(--r-pill);
-  background: var(--w-acc); color: #fff; font-size: 10px; font-style: normal; font-weight: 800; }
+  background: #d81e46; color: #fff; font-size: 10px; font-style: normal; font-weight: 800; }
 .card--q { align-content: center; text-align: center; gap: var(--s-4); }
 .card--q h3 { font-size: 19px; }
 .card__ans { display: grid; gap: var(--s-2); }

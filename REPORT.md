@@ -25,7 +25,7 @@ Measured, not remembered — `qa/` has the extraction script.
 | CSS | 413 KB in three `<style>` blocks |
 | Build step | none |
 | Caching | impossible — every byte is the document |
-| Animation loops | one shared clock, plus per-effect `requestAnimationFrame` in six worlds |
+| Animation loops | 10 `requestAnimationFrame` call sites. Two are the shared clock; the other eight are private: the loader's pour, the leak counter, the coin's parabola, the tetromino drop, the price tween, and three "run once after layout" deferrals |
 
 The old code was not careless — it already had a shared clock, DPR caps and
 IntersectionObserver gating, and several of its comments are the reason this
@@ -150,38 +150,91 @@ a range.
 
 ---
 
-## 5 · Five bugs the measurement found that review did not
+## 5 · What measuring found that reading did not
 
 These are in the report because they are the argument for measuring at all.
+Every one of them survived writing the code, reading it back, and looking at
+the page.
 
-1. **Every seam painted flat white.** The seam canvas asked for premultiplied
-   alpha and the shaders emit straight alpha. Caught by sampling pixels out of
-   a screenshot rather than by looking at it — at a glance the frame just
-   looked "washed out".
-2. **The wrong seam, in the wrong place.** `content-visibility: auto` means a
-   section that has never been on screen reports its placeholder height, so
-   every offset below it moves the moment it renders. Boundaries measured once
-   at boot were wrong by hundreds of pixels, and the engine cheerfully painted
-   the portal→brief white-out over the middle of the site. Fixed by moving
-   section geometry into `core/layout.ts` behind a ResizeObserver, and by
-   picking the *nearest* boundary rather than the first one in document order.
-3. **Worlds randomly never mounted.** Two IntersectionObservers fire in the same
-   batch — one to preload, one to mount. The preloader set a `loading` boolean;
-   the mounter saw it, awaited a promise that resolved before the import did,
-   found no world and gave up. Now `load()` returns the in-flight promise
-   itself.
-4. **The hero reel was invisible.** `#heroC` is gated on `body.reel-ready`, and
-   nothing had set that class since the rewrite. The poster carried the first
-   screen, so it looked correct and the scrub did nothing.
-5. **A downgraded device got a white sheet over the whole page.** On a runtime
+**From the trace**
+
+1. **The hero reel decoded on the main thread.** 56 long tasks of 110–153 ms
+   and 25 fps on mobile, all of it WebP decode. Frames now go through
+   `createImageBitmap`, which decodes off-thread, inside a window that
+   `close()`s the bitmaps it passes — 91 frames of 1216×684 is otherwise about
+   300 MB of decoded pixels against a 180 MB budget for the whole page. Long
+   tasks after the fix: none.
+2. **Worlds randomly never mounted.** Two IntersectionObservers fire in the
+   same batch — one to preload a chunk, one to mount it. The preloader set a
+   `loading` boolean; the mounter saw it, awaited a promise that resolved
+   before the import did, found no world, and gave up. Symptom: the hero was
+   blank about one load in three. `load()` now returns the in-flight promise.
+
+**From sampling pixels out of screenshots**
+
+3. **Every seam painted flat white.** The seam canvas asked for premultiplied
+   alpha; the shaders emit straight alpha. At a glance the frame looked
+   "washed out"; the pixels were 255,255,255.
+4. **The wrong seam, in the wrong place.** `content-visibility: auto` means a
+   section that has never been on screen reports its `contain-intrinsic-size`
+   placeholder, so every offset below it moves the moment it renders.
+   Boundaries measured once at boot were wrong by hundreds of pixels and the
+   engine painted the portal→brief white-out over the middle of the site.
+   Section geometry now lives in `core/layout.ts` behind a ResizeObserver, and
+   the engine picks the *nearest* boundary rather than the first in document
+   order.
+5. **A downgraded device got a white sheet over everything.** On a runtime
    downgrade the seam engine released its WebGL context and asked the same
    canvas for a 2D one — which returns null, because a canvas only ever has one
-   context type. The released context leaves the canvas white, and it was still
-   visible. The fallback crossfade is now its own element.
+   context type, and a released context leaves the canvas white. The fallback
+   crossfade is now its own element.
+6. **The hero reel was invisible.** `#heroC` is gated on `body.reel-ready` and
+   nothing had set that class since the rewrite. The poster carried the first
+   screen, so it looked right and the scrub did nothing.
 
-None of these are exotic. All five were invisible to reading the code.
+**From the screenshot sweep**
 
----
+7. **The pricing block slid over its own list on phones.** `position: sticky`
+   in a one-column grid: the well and the running total drew straight through
+   the transparent scope rows.
+8. **The primary button in the brief was black on black.** `.btn` set its text
+   to `--c-ink` while its background was `--w-acc`; in the light world both are
+   near-black. Accents now carry a `--w-on-acc` foreground.
+9. **`[hidden]` was losing to `display: grid`.** "Отложено 0" and the game-over
+   line were on screen before either had anything to say.
+10. **The credits crawl had no runway.** The footer's static position is one
+    viewport into a three-viewport section, so it rode up over the pinned
+    stage; and `perspective: 340px` crushed the copy into an unreadable stamp.
+
+**From the accessibility pass**
+
+11. **The inherited viewport locked zoom.** `user-scalable=no, maximum-scale=1`
+    is a WCAG 1.4.4 failure, and it was never what fixed the "page twitches
+    under a finger" complaint — that was `touch-action: manipulation` and not
+    measuring in `vh`, both of which stay. Multi-touch is now cancelled only
+    over the game surfaces.
+12. **Thirteen canvases were in the accessibility tree**, and an `aria-label`
+    sat on a plain `<div>`, which is prohibited. Contrast failures went from 46
+    to 5 to 0 across two passes.
+13. **The contrast checker was itself wrong.** It resolved the background
+    behind an element's *parent*, so every filled button read as
+    cream-on-cream — which is exactly the shape of the black-on-black bug it
+    would then have hidden. It now starts at the element, and lists nodes
+    sitting on a gradient separately instead of guessing at them.
+
+## 5b · Two ideas that measured worse than doing nothing
+
+Recorded so nobody spends an afternoon rediscovering them.
+
+* **Capping the hero canvas at the reel's own width.** The landscape cut is
+  1216px; on a 1440px viewport the canvas rasterises 1440. Painting more pixels
+  than the source contains is obviously waste — and capping it was **25%
+  slower** (30.7 fps against 41.5), because the compositor then scales the
+  layer up on every frame.
+* **Rendering shader layers below 1×.** Same lesson from the other end: a
+  full-screen fragment shader is priced in samples, so 0.7× should be cheaper.
+  It is not, for the same reason. `quality.shaderDpr()` therefore floors at 1
+  and only ever caps the top.
 
 ## 6 · Measurements
 

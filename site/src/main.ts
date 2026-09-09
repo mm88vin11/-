@@ -52,9 +52,14 @@ const LOADERS: Record<WorldSound, () => Promise<{ create: () => import('./core/w
 };
 
 function boot(): void {
-  /* The QA harness pins a tier so the low path is exercised for real. */
-  const forced = new URLSearchParams(location.search).get('tier');
-  if (forced === 'low' || forced === 'mid' || forced === 'high') quality.force(forced, 'forced by query');
+  /* The QA harness selects a tier so the low path is exercised for real.
+     `pin=1` additionally stops the runtime ladder from overruling it, which is
+     what the screenshot sweep wants and what a performance run must not have. */
+  const params = new URLSearchParams(location.search);
+  const forced = params.get('tier');
+  if (forced === 'low' || forced === 'mid' || forced === 'high') {
+    quality.force(forced, 'selected by query', params.get('pin') === '1');
+  }
 
   quality.boot();
   clock.start();

@@ -76,8 +76,12 @@ export const perf = {
       } catch { /* not supported */ }
     }
 
-    clock.add(({ dt }) => {
-      const ms = dt * 1000;
+    /* `raw`, not `dt`: the clock clamps dt to 50 ms so that a backgrounded tab
+       cannot teleport an animation, and counting that clamped value made every
+       stall look like exactly one dropped frame. The budget this page is held
+       to counts frames over 50 ms, so it has to see the real interval. */
+    clock.add(({ raw }) => {
+      const ms = raw * 1000;
       frames++;
       const s = stat(current);
       s.frames++;

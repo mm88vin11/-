@@ -47,7 +47,7 @@ class Credits implements World {
   mount(section: HTMLElement): void {
     const cv = need<HTMLCanvasElement>('#stars', section);
     if (quality.gl) {
-      this.layer = new ShaderLayer({ canvas: cv, frag: FRAG, alpha: false, dpr: quality.shaderDpr() });
+      this.layer = new ShaderLayer({ canvas: cv, frag: FRAG, alpha: false, dpr: () => quality.shaderDpr() });
     }
     if (!this.layer?.ok) { cv.style.display = 'none'; section.style.background = '#010103'; }
 

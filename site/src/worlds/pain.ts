@@ -115,7 +115,7 @@ class Pain implements World {
     const bg = need<HTMLCanvasElement>('#painBg', section);
     if (quality.gl) {
       this.layer = new ShaderLayer({
-        canvas: bg, frag: FRAG, alpha: false, dpr: quality.shaderDpr(),
+        canvas: bg, frag: FRAG, alpha: false, dpr: () => quality.shaderDpr(),
         uniforms: {
           uTorch: () => [this.torch.x, 1 - this.torch.y],
           uWarm: () => (quality.tier === 'low' ? 0.4 : 1),

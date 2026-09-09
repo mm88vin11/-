@@ -76,7 +76,7 @@ async function coldLoad(browser, { tier }) {
 
   await throttle(page, { cpu: 4, net: { latency: 150, down: (9 * 1024 * 1024) / 8, up: (1.5 * 1024 * 1024) / 8 } });
   const t0 = Date.now();
-  await page.goto(`${BASE}?tier=${tier}`, { waitUntil: 'load', timeout: 90_000 });
+  await page.goto(`${BASE}${tier ? `?tier=${tier}` : ''}`, { waitUntil: 'load', timeout: 90_000 });
   const loadMs = Date.now() - t0;
   await nap(6000);
 
@@ -102,7 +102,7 @@ async function coldLoad(browser, { tier }) {
 }
 
 /** Pass 2 — a scripted scroll with the page's own frame accounting running. */
-async function scrollRun(browser, { width, height, cpu, tier, label }) {
+async function scrollRun(browser, { width, height, cpu, tier, pin, label }) {
   const ctx = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: width < 500 ? 2 : 1 });
   const page = await ctx.newPage();
   const errors = [];
@@ -110,7 +110,13 @@ async function scrollRun(browser, { width, height, cpu, tier, label }) {
   page.on('console', (m) => { if (m.type() === 'error') errors.push(m.text()); });
 
   await throttle(page, { cpu });
-  await page.goto(`${BASE}?tier=${tier}`, { waitUntil: 'load', timeout: 90_000 });
+  /* No `tier` means no query string at all: the page decides for itself, which
+     is the only configuration a visitor ever gets and therefore the only one
+     the headline figures may come from. A run that forces `high` on a machine
+     whose own detection would pick `mid` measures a setting the site would
+     never choose — useful as a ceiling, dishonest as a result. */
+  const q = tier ? `?tier=${tier}${pin ? '&pin=1' : ''}` : '';
+  await page.goto(`${BASE}${q}`, { waitUntil: 'load', timeout: 90_000 });
   await nap(5000);
   await page.evaluate(() => { window.__BAZA_PERF; });
   /* Reset the counters so the loader's own frames are not in the scroll stats. */
@@ -132,8 +138,12 @@ async function scrollRun(browser, { width, height, cpu, tier, label }) {
   }
 
   const perf = await page.evaluate(() => window.__BAZA_PERF);
+  /* Which tier the page picked, and whether the ladder took anything away
+     during the run. On an auto run these two numbers are the evidence that
+     adaptive degradation is a working mechanism and not a paragraph. */
+  const chose = await page.evaluate(() => window.__BAZA_TIER ?? null);
   await ctx.close();
-  return { label, width, height, cpu, tier, perf, errors, liveCounts };
+  return { label, width, height, cpu, requested: tier ?? 'auto', pin: !!pin, chose, perf, errors, liveCounts };
 }
 
 /** Pass 3 — every section at every width. */
@@ -148,7 +158,9 @@ async function shots(tier) {
     const height = Math.min(Math.round(width * 1.9), 1200);
     const ctx = await browser.newContext({ viewport: { width, height }, deviceScaleFactor: 1 });
     const page = await ctx.newPage();
-    await page.goto(`${BASE}?tier=${tier}`, { waitUntil: 'load', timeout: 90_000 });
+    /* Pinned for the sweep: these are pictures of the design, and this machine
+       downgrades within seconds of loading. */
+    await page.goto(`${BASE}?tier=${tier}&pin=1`, { waitUntil: 'load', timeout: 90_000 });
     await nap(5000);
     for (const id of SECTIONS) {
       /* The middle of the section, not its top edge: a seam lives on every
@@ -208,28 +220,60 @@ async function shots(tier) {
   return found;
 }
 
+const SHOTS_ONLY = process.argv.includes('--shots-only');
 const out = {};
+
+if (SHOTS_ONLY) {
+  console.log('· screenshots only, 6 widths × 12 sections');
+  out.shots = await shots('high');
+  await writeFile(`qa/report-shots-${PHASE}.json`, JSON.stringify(out, null, 2));
+  console.log(`\nwrote qa/report-shots-${PHASE}.json`);
+  process.exit(0);
+}
+
 let browser = await launch();
 console.log('· cold load, 390×844, CPU ×4, Fast 4G');
-out.cold = await coldLoad(browser, { tier: 'high' });
+out.cold = await coldLoad(browser, { tier: null });
 console.log('  LCP', out.cold.lcp, 'ms · CLS', out.cold.cls, '· total bytes', (out.cold.bytes.total / 1024).toFixed(0), 'KB');
 
 await browser.close();
 
-console.log('· scroll run, 390×844, CPU ×4');
-browser = await launch();
-out.mobile = await scrollRun(browser, { width: 390, height: 844, cpu: 4, tier: 'high', label: 'mobile' });
-await browser.close();
+const sum = (o) => Object.values(o).reduce((a, b) => a + b, 0);
+const avg = (o) => {
+  const v = Object.values(o);
+  return v.length ? (v.reduce((a, b) => a + b, 0) / v.length).toFixed(1) : '0';
+};
+const say = (r) => console.log(
+  `  ${r.label}: tier ${r.chose?.tier ?? '?'}${r.chose?.downgrades ? ` (ladder acted ${r.chose.downgrades}×)` : ''}` +
+  ` · avg ${avg(r.perf.fps)} fps · >33 ${sum(r.perf.over33)} · >50 ${sum(r.perf.over50)}` +
+  ` · long ${r.perf.longTasks.length}`);
 
-console.log('· scroll run, 1440×900, no throttle');
+console.log('· scroll run, 390×844, CPU ×4, tier chosen by the page');
 browser = await launch();
-out.desktop = await scrollRun(browser, { width: 1440, height: 900, cpu: 1, tier: 'high', label: 'desktop' });
+out.mobile = await scrollRun(browser, { width: 390, height: 844, cpu: 4, label: 'mobile' });
 await browser.close();
+say(out.mobile);
+
+console.log('· scroll run, 1440×900, no throttle, tier chosen by the page');
+browser = await launch();
+out.desktop = await scrollRun(browser, { width: 1440, height: 900, cpu: 1, label: 'desktop' });
+await browser.close();
+say(out.desktop);
+
+/* The ceiling, not a result: every effect at full strength with the ladder
+   held off, on a machine with no GPU. It exists to put a number on what
+   adaptive degradation is buying. */
+console.log('· stress run, 1440×900, tier=high pinned (degradation disabled)');
+browser = await launch();
+out.stress = await scrollRun(browser, { width: 1440, height: 900, cpu: 1, tier: 'high', pin: true, label: 'stress' });
+await browser.close();
+say(out.stress);
 
 console.log('· scroll run, 390×844, tier=low (degradation path)');
 browser = await launch();
-out.low = await scrollRun(browser, { width: 390, height: 844, cpu: 4, tier: 'low', label: 'low-tier' });
+out.low = await scrollRun(browser, { width: 390, height: 844, cpu: 4, tier: 'low', pin: true, label: 'low-tier' });
 await browser.close();
+say(out.low);
 
 console.log('· screenshots, 6 widths × 12 sections');
 out.shots = await shots('high');

@@ -83,7 +83,7 @@ class Basement implements World {
     const cv = need<HTMLCanvasElement>('#udAir', section);
     if (quality.gl && !quality.reducedMotion) {
       this.layer = new ShaderLayer({
-        canvas: cv, frag: FRAG, alpha: false, dpr: quality.shaderDpr(),
+        canvas: cv, frag: FRAG, alpha: false, dpr: () => quality.shaderDpr(),
         uniforms: { uSpores: () => (quality.tier === 'high' ? 1 : 0.5) },
       });
     }

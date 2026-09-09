@@ -21,6 +21,13 @@ export interface Tick {
   readonly t: number;
   /** seconds since previous frame */
   readonly dt: number;
+  /* The same interval, unclamped. Animation must never use this — a tab
+     returning from the background would teleport everything across the screen
+     in one frame. The frame accounting must never use anything else: measuring
+     `dt` caps every recorded frame at 50 ms, which turns "frames over 50 ms"
+     into a constant zero and the worst-frame figure into a description of the
+     clamp. */
+  readonly raw: number;
   /** dt normalised so 1 === one frame at 60Hz; multiply drift by this */
   readonly k: number;
   /** window.scrollY, read once per frame */
@@ -53,7 +60,7 @@ const jobs: Job[] = [];
 let sorted = true;
 
 const state = {
-  t: 0, dt: 1 / 60, k: 1, y: 0, vw: 0, vh: 0, moved: false,
+  t: 0, dt: 1 / 60, raw: 1 / 60, k: 1, y: 0, vw: 0, vh: 0, moved: false,
 };
 let prevT = 0;
 let prevY = -1;
@@ -74,6 +81,7 @@ function tick(time: number): void {
 
   const raw = prevT ? (t - prevT) / 1000 : 1 / 60;
   prevT = t;
+  state.raw = raw;
   /* Clamped: a tab returning from the background must not teleport every
      particle across the screen in a single frame. */
   state.dt = Math.min(Math.max(raw, 0.001), 0.05);
@@ -135,6 +143,19 @@ export const clock = {
     sorted = false;
     opts.resize?.(state.vw, state.vh);
     return job;
+  },
+
+  /**
+   * Re-run every job's resize handler without a resize having happened.
+   *
+   * Backing stores are allocated in `resize` and nowhere else, which is the
+   * right rule — until the quality tier changes underneath a world that is
+   * already mounted. Then every canvas on the page is still sized for the tier
+   * the page has just stopped being, and the downgrade buys nothing. This is
+   * how a tier change reaches them.
+   */
+  refit(): void {
+    for (const j of jobs) { j.resize?.(state.vw, state.vh); j.dirty = true; }
   },
 
   remove(job: Job): void {

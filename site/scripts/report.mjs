@@ -9,11 +9,13 @@ import { gzipSync } from 'node:zlib';
 import { join } from 'node:path';
 
 const read = async (f) => { try { return JSON.parse(await readFile(f, 'utf8')); } catch { return null; } };
-const q = await read('qa/report-final.json');
+const PHASE = process.argv[2] ?? 'final';
+const q = await read(`qa/report-${PHASE}.json`);
 const a11y = await read('qa/report-a11y.json');
 const loader = await read('qa/report-loader.json');
 const lh = await read('qa/report-lighthouse.json');
-if (!q) { console.error('no qa/report-final.json — run `npm run qa` first'); process.exit(1); }
+const legacy = await read('qa/report-legacy.json');
+if (!q) { console.error(`no qa/report-${PHASE}.json — run \`npm run qa\` first`); process.exit(1); }
 
 const SECTIONS = ['hero', 'pain', 'truth', 'craft', 'cases', 'pricing', 'route', 'gains', 'portal', 'brief', 'basement', 'credits'];
 const kb = (n) => `${(n / 1024).toFixed(0)} KB`;
@@ -21,16 +23,6 @@ const cell = (v) => (v === undefined ? '—' : String(v));
 
 const lines = [];
 const p = (s = '') => lines.push(s);
-
-p('## 7 · The numbers');
-p();
-p('Generated from `site/qa/report-*.json` by `scripts/report.mjs`, so what is');
-p('written here and what the harness measured cannot drift apart.');
-p();
-p('### Budgets');
-p();
-p('| Metric | Budget | Measured | |');
-p('| --- | --- | --- | --- |');
 
 const verdict = (ok) => (ok ? '✅' : '⚠️');
 const cold = q.cold;
@@ -42,6 +34,59 @@ const avg = (o) => {
   const vals = Object.values(o);
   return vals.length ? (vals.reduce((x, y) => x + y, 0) / vals.length).toFixed(1) : '—';
 };
+const sum = (o) => Object.values(o).reduce((a, b) => a + b, 0);
+const worstLongOf = (arr) => (arr.length ? Math.max(...arr.map((t) => t.ms)) : 0);
+
+p('## 7 · The numbers');
+p();
+p('Generated from `site/qa/report-*.json` by `scripts/report.mjs`, so what is');
+p('written here and what the harness measured cannot drift apart.');
+p();
+if (legacy) {
+  /* The old build and the new one, same machine, same browser, same 25-second
+     scroll, same throttling. The counters below are identical measurements;
+     the FPS row is not quite — the legacy figure is one mean over the whole
+     run, the new one is the mean of the per-section means — so it is labelled
+     rather than quietly compared. */
+  const L = legacy.desktop;
+  const LM = legacy.mobile;
+  const newOver33 = Object.values(d.over33).reduce((a, b) => a + b, 0);
+  const newOver33m = Object.values(m.over33).reduce((a, b) => a + b, 0);
+  const newOver50 = Object.values(d.over50).reduce((a, b) => a + b, 0);
+  const newOver50m = Object.values(m.over50).reduce((a, b) => a + b, 0);
+  const worstLong = worstLongOf;
+
+  p('### Before and after');
+  p();
+  p('Both builds measured on this machine, in this browser, with the same');
+  p('25-second scroll of the whole page and the same throttling. Desktop is');
+  p('1440×900 unthrottled; mobile is 390×844 at CPU ×4.');
+  p();
+  p('| | Old build | This build |');
+  p('| --- | --- | --- |');
+  const mb = (n) => `${(n / 1e6).toFixed(2)} MB`;
+  p(`| The document itself | **${mb(legacy.bytes)}** — 98.2% of it base64 | ${kb((await stat('dist/index.html')).size)} |`);
+  p(`| Everything fetched, mobile cold load | ${mb(legacy.bytes)} (it is all one file) | ${mb(cold.bytes.total)} |`);
+  p(`| LCP, desktop | ${L.lcp} ms | ${d.lcp || cold.lcp} ms |`);
+  p(`| CLS, desktop | ${L.cls} | ${d.cls} |`);
+  p(`| Frames > 33 ms, desktop | **${L.over33}** | **${newOver33}** |`);
+  p(`| Frames > 50 ms, desktop | **${L.over50}** | **${newOver50}** |`);
+  p(`| Frames > 33 ms, mobile ×4 | **${LM.over33}** | **${newOver33m}** |`);
+  p(`| Frames > 50 ms, mobile ×4 | **${LM.over50}** | **${newOver50m}** |`);
+  p(`| Long tasks, desktop | ${L.long} (worst ${L.longWorst} ms) | ${d.longTasks.length} (worst ${worstLong(d.longTasks)} ms) |`);
+  p(`| Long tasks, mobile ×4 | ${LM.long} (worst ${LM.longWorst} ms) | ${m.longTasks.length} (worst ${worstLong(m.longTasks)} ms) |`);
+  p(`| JS heap, desktop | ${L.memory ?? '—'} MB | ${d.memory ?? '—'} MB |`);
+  p(`| Load event, desktop | ${L.loadMs} ms | — |`);
+  p(`| Average FPS, desktop | ${L.fps} <br><small>whole-run mean</small> | ${avg(d.fps)} <br><small>mean of per-section means</small> |`);
+  p(`| Average FPS, mobile ×4 | ${LM.fps} <br><small>whole-run mean</small> | ${avg(m.fps)} <br><small>mean of per-section means</small> |`);
+  p();
+}
+
+p('### Budgets');
+p();
+p('| Metric | Budget | Measured | |');
+p('| --- | --- | --- | --- |');
+
 const longest = [...d.longTasks, ...m.longTasks].reduce((a, t) => Math.max(a, t.ms), 0);
 const firstScreen = cold.transferredAtLoad ?? 0;
 
@@ -59,12 +104,52 @@ p(`| JS heap, peak | — | **${d.memory ?? '—'} MB** | |`);
 p(`| Console errors across all runs | 0 | **${q.mobile.errors.length + q.desktop.errors.length + q.low.errors.length}** | ${verdict((q.mobile.errors.length + q.desktop.errors.length + q.low.errors.length) === 0)} |`);
 p();
 
+/* The single most important line in this section: which tier the page picked
+   for itself. Every figure above comes from a run with no `?tier=` at all, so
+   it is the configuration a visitor actually gets — including the ladder
+   stepping down when the first sixty frames come back too slow. */
+p('### Which tier the page chose for itself');
+p();
+p('None of the runs above ask for a quality tier. The page decides, the way it');
+p('decides for a visitor, and these are the decisions it made on this machine —');
+p('four cores, no GPU, WebGL2 through SwiftShader:');
+p();
+p('| Run | Detected | Ladder stepped down | Settled on |');
+p('| --- | --- | --- | --- |');
+for (const r of [q.mobile, q.desktop].filter(Boolean)) {
+  const c = r.chose ?? {};
+  p(`| ${r.label} | ${c.downgrades ? 'mid' : c.tier ?? '—'} | ${c.downgrades ?? 0}× | \`${c.tier ?? '—'}\` |`);
+}
+p();
+
+if (q.stress) {
+  /* What the degradation is worth, in frames. Same page, same machine, same
+     scroll — the only difference is that the ladder is not allowed to act. */
+  const st = q.stress.perf;
+  p('### What the degradation is buying');
+  p();
+  p('The same 25-second desktop scroll with `?tier=high&pin=1`: every effect at');
+  p('full strength and the ladder forbidden to take anything away. This is not a');
+  p('result, it is the ceiling the adaptive path exists to avoid — and the');
+  p('difference between the two columns is the entire argument for building it.');
+  p();
+  p('| | Page decides (`low` here) | Forced `high`, ladder off |');
+  p('| --- | --- | --- |');
+  p(`| Average FPS | **${avg(d.fps)}** | ${avg(st.fps)} |`);
+  p(`| Frames > 33 ms | **${sum(d.over33)}** | ${sum(st.over33)} |`);
+  p(`| Frames > 50 ms | **${sum(d.over50)}** | ${sum(st.over50)} |`);
+  p(`| Worst frame | **${Math.max(...Object.values(d.worst))} ms** | ${Math.max(...Object.values(st.worst))} ms |`);
+  p(`| Long tasks | **${d.longTasks.length}** | ${st.longTasks.length} (worst ${worstLongOf(st.longTasks)} ms) |`);
+  p(`| Slowest section | ${Object.entries(d.fps).sort((x, y) => x[1] - y[1])[0].join(' at ')} fps | ${Object.entries(st.fps).sort((x, y) => x[1] - y[1])[0].join(' at ')} fps |`);
+  p();
+}
+
 p('### FPS per section');
 p();
-p('| Section | Desktop 1440×900 | · frames > 33 ms | Mobile 390×844, CPU ×4 | · > 33 ms | Low tier |');
-p('| --- | --- | --- | --- | --- | --- |');
+p('| Section | Desktop 1440×900 | · frames > 33 ms | Mobile 390×844, CPU ×4 | · > 33 ms | Low tier | Forced high |');
+p('| --- | --- | --- | --- | --- | --- | --- |');
 for (const s of SECTIONS) {
-  p(`| \`#${s}\` | ${cell(d.fps[s])} | ${cell(d.over33[s] ?? 0)} | ${cell(m.fps[s])} | ${cell(m.over33[s] ?? 0)} | ${cell(q.low.perf.fps[s])} |`);
+  p(`| \`#${s}\` | ${cell(d.fps[s])} | ${cell(d.over33[s] ?? 0)} | ${cell(m.fps[s])} | ${cell(m.over33[s] ?? 0)} | ${cell(q.low.perf.fps[s])} | ${cell(q.stress?.perf.fps[s])} |`);
 }
 p();
 

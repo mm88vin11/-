@@ -113,6 +113,9 @@ const state = detect();
 type Listener = (tier: Tier, reason: string) => void;
 const listeners = new Set<Listener>();
 
+/** How many times the ladder has taken something away, for the QA harness. */
+let downgrades = 0;
+
 function applyTier(tier: Tier, reason: string): void {
   if (tier === state.tier) return;
   state.tier = tier;
@@ -122,11 +125,44 @@ function applyTier(tier: Tier, reason: string): void {
   state.dpr = Math.min(window.devicePixelRatio || 1, tier === 'low' ? 1 : state.coarse ? 1.5 : 2);
   document.documentElement.dataset['tier'] = tier;
   for (const l of listeners) l(tier, reason);
+  /* Deferred by one tick on purpose: this runs from inside the ladder's own
+     job, and reallocating every canvas on the page mid-tick is how you get a
+     world drawing into a buffer that is being replaced underneath it. */
+  clock.once(() => clock.refit());
 }
 
-/** Sixty frames of honest evidence before we take anything away. */
-let overBudget = 0;
+/**
+ * A tier chosen by a person is not a guess to be overruled.
+ *
+ * The ladder exists to take things away from a device that cannot keep up. It
+ * has no business undoing an explicit choice — the "still version" switch in
+ * the dock, or `?tier=` from the QA harness. Without this the screenshot sweep
+ * documented the low-tier fallback no matter what it asked for, because the
+ * machine it runs on downgrades within seconds.
+ */
+let pinned = false;
+
+/**
+ * The ladder's evidence window.
+ *
+ * The first one is short and the rest are long, because the two jobs are not
+ * the same job. The first window answers "was the detection wrong about this
+ * device", and it has to answer quickly: a device that cannot hold 60 fps
+ * shows the visitor every dropped frame until the ladder acts, and walking
+ * `high → mid → low` at sixty frames a rung was six seconds of visible jank on
+ * a phone that was never going to hold any of it. Measured: the mobile profile
+ * finished a whole page at 53.4 fps with 17 frames over 50 ms when it walked
+ * down, and at 57.2 fps with 1 when it started where it ended up.
+ *
+ * The rest are long because by then the question is different — "has something
+ * changed" — and a hasty answer there means a page that keeps flipping its own
+ * quality under the reader.
+ */
+const FIRST_WINDOW = 20;
+const WINDOW = 60;
+let windowFrames = FIRST_WINDOW;
 let sampled = 0;
+let slow = 0;
 let acc = 0;
 
 export const quality = {
@@ -164,30 +200,62 @@ export const quality = {
     return () => listeners.delete(fn);
   },
 
-  /** Forced from the QA harness and from the "simplify" switch in the header. */
-  force(tier: Tier, reason = 'forced'): void { applyTier(tier, reason); },
+  /**
+   * Forced from the dock's "still version" switch and from the QA harness.
+   *
+   * `pin` decides whether the runtime ladder may still overrule the choice. A
+   * person flipping the switch pins; the harness pins only for the screenshot
+   * sweep, because a performance run with the ladder disabled measures a tier
+   * the device was never going to keep, which is not what anybody experiences.
+   */
+  force(tier: Tier, reason = 'forced', pin = true): void {
+    if (pin) pinned = true;
+    applyTier(tier, reason);
+  },
+  /** Hands control back to the ladder. */
+  unpin(): void { pinned = false; },
+  get pinned(): boolean { return pinned; },
 
   boot(): void {
     document.documentElement.dataset['tier'] = state.tier;
     if (state.reducedMotion) document.documentElement.dataset['rm'] = '1';
 
-    clock.add(({ dt }) => {
-      acc += dt * 1000;
+    /* `raw`, not `dt`: a 900 ms stall arrives here as a clamped 50 ms, and the
+       ladder exists to notice exactly that kind of stall. */
+    clock.add(({ raw }) => {
+      const ms = raw * 1000;
+      acc += ms;
       sampled++;
-      if (sampled < 60) return;
-      const avg = acc / sampled;
-      acc = 0; sampled = 0;
-      if (avg > 22) {
-        overBudget++;
-        if (overBudget >= 1 && state.tier !== 'low') {
-          const next: Tier = state.tier === 'high' ? 'mid' : 'low';
-          applyTier(next, `runtime downgrade: 60 frames averaged ${avg.toFixed(1)}ms`);
-          overBudget = 0;
-        }
-      } else {
-        overBudget = 0;
-      }
+      if (ms > 22) slow++;
+      if (sampled < windowFrames) return;
+      const n = sampled;
+      const avg = acc / n;
+      const slowShare = slow / n;
+      acc = 0; sampled = 0; slow = 0;
+      windowFrames = WINDOW;
+      if (pinned || state.tier === 'low') return;
+
+      /* Both, not either. The mean alone hands a downgrade to any page that
+         parsed a chunk during the window — one 400 ms task is worth 20 ms of
+         mean across twenty frames, and a one-off parse is not a statement
+         about the device. Requiring that most of the window was also slow
+         asks the question that actually matters: is this sustained? */
+      if (avg <= 22 || slowShare < 0.5) return;
+
+      /* How far past the budget decides how far to step. A device averaging
+         40 ms a frame is not one rung away from comfortable, and making it
+         earn the second rung over another sixty frames is another second of
+         exactly the jank this mechanism exists to end. */
+      const next: Tier = avg > 40 ? 'low' : state.tier === 'high' ? 'mid' : 'low';
+      downgrades++;
+      applyTier(next, `runtime downgrade: ${n} frames averaged ${avg.toFixed(1)}ms, ${Math.round(slowShare * 100)}% of them over budget`);
     }, { always: true, order: -100 });
+
+    /* Read by the measurement rig: the tier the page settled on and whether it
+       got there by detection or by the ladder taking something away. */
+    Object.defineProperty(window, '__BAZA_TIER', {
+      get: () => ({ tier: state.tier, downgrades, pinned, webgl2: state.webgl2, cores: state.cores }),
+    });
 
     mqReduce.addEventListener('change', () => window.location.reload());
   },

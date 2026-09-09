@@ -92,7 +92,7 @@ class Truth implements World {
 
     if (quality.gl && !quality.reducedMotion) {
       this.layer = new ShaderLayer({
-        canvas: cv, frag: FRAG, dpr: quality.shaderDpr(),
+        canvas: cv, frag: FRAG, dpr: () => quality.shaderDpr(),
         uniforms: {
           uMouse: () => [this.mouse.x, this.mouse.y],
           uSpeed: () => this.speed,

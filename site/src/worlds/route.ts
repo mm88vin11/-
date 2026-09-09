@@ -390,6 +390,10 @@ class Route implements World {
     if (!this.renderer || !this.cam) return;
     const w = window.innerWidth;
     const h = window.innerHeight;
+    /* Re-read, not remembered: the ladder can step the tier down long after
+       this renderer was built, and a pixel ratio frozen at mount means the
+       downgrade changes the settings and not the cost. */
+    this.renderer.setPixelRatio(Math.min(quality.dpr, quality.coarse ? 1.5 : 2));
     this.renderer.setSize(w, h, false);
     this.cam.aspect = w / h;
     this.cam.updateProjectionMatrix();

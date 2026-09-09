@@ -222,6 +222,30 @@ the page.
     would then have hidden. It now starts at the element, and lists nodes
     sitting on a gradient separately instead of guessing at them.
 
+**From reading the harness instead of its output**
+
+14. **"Frames over 50 ms: 0" was an artefact of the clock.** The ticker clamps
+    its delta to 50 ms so a tab returning from the background cannot teleport
+    every particle across the screen in one step — and the frame accounting was
+    reading that clamped value. Every stall, however long, was recorded as one
+    50 ms frame. So the worst-frame column was a description of the clamp, the
+    over-50 counter could not go above zero by construction, and the one budget
+    in the brief that counts 50 ms frames was unfalsifiable. The clock now
+    carries the real interval alongside the clamped one; animation uses the
+    clamp, the counters and the degradation ladder use the truth. The number
+    that had been "0 by definition" is 2 for a whole desktop page.
+15. **Every performance run was forcing a quality tier the site would never
+    choose.** The harness loaded `?tier=high` so the full picture would be on
+    screen — which meant the headline figures came from a configuration the
+    page's own detection rejects on this hardware, with the ladder fighting it
+    the whole way. That is where the ugly numbers came from: 20 fps in `#pain`,
+    78 long tasks, one of them 2451 ms. Profiling that run puts 2572 ms of a
+    6.5-second window in V8's `(program)` bucket — native time, no JavaScript
+    frame — which on a GPU-less container means SwiftShader rasterising three
+    full-screen fragment shaders at 1440×900. Not a regression: the cost of
+    refusing to degrade. The runs the report quotes now pass no `?tier=` at
+    all, and the forced-high run is kept as a separate, labelled ceiling.
+
 ## 5b · Two ideas that measured worse than doing nothing
 
 Recorded so nobody spends an afternoon rediscovering them.
@@ -239,8 +263,26 @@ Recorded so nobody spends an afternoon rediscovering them.
 ## 6 · Measurements
 
 See the next section for the numbers, and read this paragraph before quoting
-them. **This container has no GPU.** Chromium runs SwiftShader, so every WebGL
-operation is rasterised on the CPU, and the mobile profile then throttles that
-by another 4×. It is a harsh test to pass and a dishonest number to present as
-a phone. The desktop figures below are the ones that mean the most, and even
-they are a floor rather than a forecast.
+them.
+
+**This container has no GPU.** Chromium runs SwiftShader, so every WebGL call
+and every full-screen canvas blit is rasterised on the CPU, and the mobile
+profile then throttles that by another 4×. It is a harsh test to pass and a
+dishonest number to present as a phone. Treat the absolute figures as a floor,
+not a forecast — particularly for the two sections that paint a full screen of
+pixels per frame, which is the one operation a GPU does for nothing.
+
+**Nothing below asks for a quality tier.** The page decides for itself, as it
+would for a visitor: it detects `mid` from four cores, and the runtime ladder
+steps it down to `low` within the first sixty frames because this machine's
+frames come back too slow. That decision *is* the product — "пользователь не
+должен видеть лаги, он должен видеть чуть более простую картинку" — so
+measuring around it would have been measuring a site nobody visits. The forced
+`high` run is reported separately, as the ceiling the mechanism exists to
+avoid.
+
+**The comparison, though, is fair.** The old build was measured on this same
+machine, in this same browser, with the same 25-second scroll and the same
+throttling (`qa/legacy.mjs` serves the original 13.5 MB file and instruments it
+with the same observers). Both halves of the before/after table were handicapped
+identically, so the deltas mean what they say even where the absolutes do not.

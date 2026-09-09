@@ -86,7 +86,7 @@ class Gains implements World {
     const cv = need<HTMLCanvasElement>('#fogC', section);
     if (quality.gl && !quality.reducedMotion) {
       this.layer = new ShaderLayer({
-        canvas: cv, frag: FRAG, alpha: false, dpr: quality.shaderDpr(),
+        canvas: cv, frag: FRAG, alpha: false, dpr: () => quality.shaderDpr(),
         uniforms: {
           uMouse: () => [this.mouse.x, this.mouse.y],
           uOpen: () => this.open,

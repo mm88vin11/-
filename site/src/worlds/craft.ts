@@ -309,6 +309,9 @@ class Craft implements World {
   }
 
   private layout(): void {
+    /* Re-read on every layout: a tier the ladder changed after mount has to
+       reach the renderer, or the downgrade costs the same as the upgrade. */
+    this.renderer?.setPixelRatio(Math.min(quality.dpr, 2));
     if (!this.renderer || !this.camera || !this.glCanvas) return;
     const host = this.glCanvas.parentElement!;
     const r = host.getBoundingClientRect();

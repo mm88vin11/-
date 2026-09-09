@@ -17,7 +17,11 @@ export interface ShaderLayerOpts {
   /** custom uniforms, sampled every draw */
   readonly uniforms?: Record<string, () => number | number[]>;
   readonly alpha?: boolean;
-  readonly dpr?: number;
+  /**
+   * A number freezes at mount; a function is re-read on every size check, so a
+   * layer built at one tier follows the page down to the next one.
+   */
+  readonly dpr?: number | (() => number);
 }
 
 const VERT = `#version 300 es
@@ -34,7 +38,7 @@ export class ShaderLayer {
   private locs = new Map<string, WebGLUniformLocation | null>();
   private readonly cv: HTMLCanvasElement;
   private readonly uni: Record<string, () => number | number[]>;
-  private dpr: number;
+  private dpr: number | (() => number);
   private w = 0;
   private h = 0;
 
@@ -80,8 +84,9 @@ export class ShaderLayer {
     const gl = this.gl;
     if (!gl) return false;
     const r = this.cv.getBoundingClientRect();
-    const w = Math.max(1, Math.round(r.width * this.dpr));
-    const h = Math.max(1, Math.round(r.height * this.dpr));
+    const dpr = typeof this.dpr === 'function' ? this.dpr() : this.dpr;
+    const w = Math.max(1, Math.round(r.width * dpr));
+    const h = Math.max(1, Math.round(r.height * dpr));
     if (w === this.w && h === this.h) return true;
     this.w = w; this.h = h;
     this.cv.width = w; this.cv.height = h;

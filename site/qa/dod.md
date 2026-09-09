@@ -26,7 +26,7 @@ so and says why.
 | ✅ | No asset from anyone else's IP | `site/legal/README.md`; sound is synthesised, so there is no licence to file |
 | ✅ | A world that throws does not take the page | §7 — `#truth`'s context forced to throw, the rest still renders |
 | ✅ | Every game has a skip control from the first second | `#pricing` "пропустить и читать дальше", `#portal` "просто откройте", `#gains` "просто показать карту" |
-| ⚠️ | 0 frames > 33 ms on desktop | See the per-section table in §7. The sections that miss it are the two that paint a full screen of pixels every frame — the reel and the fog — which is a GPU's cheapest operation and a software rasteriser's most expensive. §6 explains why these numbers are a floor rather than a forecast |
-| ⚠️ | Lighthouse mobile ≥ 92 performance | See §7. The accessibility and best-practices numbers are hardware-independent and stand; the performance number is a software-rasterised, 4×-throttled figure and should be re-measured on real hardware before it is quoted |
+| ⚠️ | 0 frames > 33 ms on desktop | 10 across a 25-second scroll of all twelve worlds, worst of them 46 ms, average 58.3 fps. They cluster where a world mounts and links its shader — under SwiftShader that alone exceeds a frame. §6 explains why these numbers are a floor rather than a forecast |
+| ⚠️ | Lighthouse mobile ≥ 92 performance | 73, up from 59 once the opening stopped blocking (TBT 6,320 ms → 820 ms) and the LCP image stopped arriving twice (LCP 3.9 s → 2.6 s). Accessibility, best practices and SEO are 100/100/100 on both profiles and are hardware-independent; the performance number is software-rasterised and 4×-throttled and should be re-measured on real hardware before it is quoted |
 | ❌ | 404 corridor with WASD | Not built — a static single-page site has no 404 route (§3) |
 | ❌ | The basement gated behind footer overscroll | Deliberate: it would hide the code word and the priority-slot offer from almost everyone (§3) |

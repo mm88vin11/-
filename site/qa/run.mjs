@@ -89,9 +89,22 @@ async function coldLoad(browser, { tier }) {
       fcp: first ? Math.round(first.startTime) : null,
       domInteractive: nav ? Math.round(nav.domInteractive) : null,
       longTasks: p.longTasks,
+      /* `p.lcp` comes from the page's own PerformanceObserver, which is the
+         only place the number exists: LCP entries are delivered to observers
+         and are not retained in the entry buffer, so `getEntriesByName` and
+         `getEntriesByType` both come back empty here. Reading them meant this
+         silently fell back to a flat 4-second window and called eleven reel
+         frames, every font and matter.js part of the first screen. */
       transferredAtLoad: performance.getEntriesByType('resource')
-        .filter((r) => r.responseEnd <= (performance.getEntriesByName('largest-contentful-paint')[0]?.startTime ?? 4000))
+        .filter((r) => r.responseEnd <= p.lcp)
         .reduce((a, r) => a + (r.transferSize || r.encodedBodySize || 0), 0),
+      firstScreen: performance.getEntriesByType('resource')
+        .filter((r) => r.responseEnd <= p.lcp)
+        .map((r) => ({ n: r.name.split('/').pop(), b: r.transferSize || r.encodedBodySize || 0 }))
+        .sort((a, b) => b.b - a.b),
+      /* The document itself is a navigation entry, not a resource entry, and
+         leaving it out understates the first screen by the whole of index.html. */
+      documentBytes: performance.getEntriesByType('navigation')[0]?.transferSize ?? 0,
     };
   });
   lcpTime = m.lcp;
@@ -221,7 +234,24 @@ async function shots(tier) {
 }
 
 const SHOTS_ONLY = process.argv.includes('--shots-only');
+/* Re-measures the cold pass alone and merges it into the phase's existing
+   JSON, for when the harness changed and the build did not. */
+const COLD_ONLY = process.argv.includes('--cold-only');
 const out = {};
+
+if (COLD_ONLY) {
+  const { readFile } = await import('node:fs/promises');
+  const prev = JSON.parse(await readFile(`qa/report-${PHASE}.json`, 'utf8'));
+  const browser = await launch();
+  console.log('· cold load only, 390×844, CPU ×4, Fast 4G');
+  prev.cold = await coldLoad(browser, { tier: null });
+  await browser.close();
+  console.log('  LCP', prev.cold.lcp, 'ms · CLS', prev.cold.cls,
+    '· first screen', ((prev.cold.transferredAtLoad + prev.cold.documentBytes) / 1024).toFixed(0), 'KB',
+    '· total', (prev.cold.bytes.total / 1024).toFixed(0), 'KB');
+  await writeFile(`qa/report-${PHASE}.json`, JSON.stringify(prev, null, 2));
+  process.exit(0);
+}
 
 if (SHOTS_ONLY) {
   console.log('· screenshots only, 6 widths × 12 sections');

@@ -35,8 +35,14 @@
 <link rel="preload" as="font" type="font/woff2" href="/src/assets/fonts/manrope-800-cyrillic.woff2" crossorigin>
 <link rel="preload" as="font" type="font/woff2" href="/src/assets/fonts/manrope-500-cyrillic.woff2" crossorigin>
 <!-- The LCP element. Fetched at the same priority as the stylesheet. -->
-<link rel="preload" as="image" href="/src/assets/img/poster-wide.webp" fetchpriority="high" media="(min-aspect-ratio: 3/4)">
-<link rel="preload" as="image" href="/src/assets/img/poster-tall.webp" fetchpriority="high" media="(max-aspect-ratio: 3/4)">
+<!-- AVIF, because that is what the <picture> below actually resolves to.
+     Preloading the WebP meant the LCP image was fetched twice in two formats —
+     44 KB on the critical path where 22 KB was needed — and the copy carrying
+     fetchpriority="high" was the one the browser then threw away. A browser
+     without AVIF skips these (that is what `type` is for) and takes the WebP
+     from the <picture>: slower for it, correct for everyone. -->
+<link rel="preload" as="image" type="image/avif" href="/src/assets/img/poster-wide.avif" fetchpriority="high" media="(min-aspect-ratio: 3/4)">
+<link rel="preload" as="image" type="image/avif" href="/src/assets/img/poster-tall.avif" fetchpriority="high" media="(max-aspect-ratio: 3/4)">
 </head>
 
 <body>

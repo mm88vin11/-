@@ -96,6 +96,12 @@ choice is between an effect and 60 fps, take the 60 fps and find a cheaper way.*
    least readable, in the one section that carries a code word people need.
 9. **The fog's second octave is top-tier only.** It was the most expensive
    shader on the page.
+10. **The reel primes a cushion, not a window.** It used to decode thirty
+    frames as fast as its lanes allowed the moment it mounted — while nobody
+    was scrolling and nothing beyond frame 0 was on screen. It now primes what
+    the first screen needs plus enough to absorb a flick, and earns the rest of
+    its lookahead once the scrub actually moves, by which point the decodes are
+    spread across the scroll instead of stacked against the load.
 
 ---
 
@@ -271,6 +277,42 @@ the page.
     full-screen fragment shaders at 1440×900. Not a regression: the cost of
     refusing to degrade. The runs the report quotes now pass no `?tier=` at
     all, and the forced-high run is kept as a separate, labelled ceiling.
+16. **The whole of the blocking time was the opening, and the opening was
+    ignoring the ladder.** The cold-load pass showed 57 long tasks between
+    1.5 s and 6.1 s on a page standing still with nothing but the hero live.
+    Resetting the counters and watching the same page for the next five
+    seconds: 60.0 fps, worst frame 19 ms, no long tasks at all. So it was not
+    the site — it was the preloader, which opens optimistically because it runs
+    before anything is known about the device, and then kept a full-screen
+    two-octave noise field alive long after the ladder had decided the machine
+    could not hold it. It drops the field at `low` now; the radial gradient
+    behind the canvas was already there so nothing flashes before the shader
+    compiles, so this costs a texture rather than a picture.
+17. **The ladder measured its first window in frames, which is backwards.** The
+    slower the device, the longer it took to notice it was slow — at 4.4 fps,
+    twenty frames is four and a half seconds of running at full strength on a
+    machine that had already proved it could not. The first window now closes
+    on whichever comes first, twenty frames or 400 ms, with a floor of four
+    frames so one chunk-parse frame cannot spend a tier on its own. And because
+    deciding on four frames is unfair to a fast machine whose *startup* was
+    slow, a tier taken away by that early call is remembered and handed back if
+    a later full window comes back comfortably fast — once, and only for that
+    call. Cold load, same machine: hero long tasks 57 → 9, their total 4269 ms
+    → 660 ms, frame rate through the opening 25.2 → 49.0 fps.
+18. **The LCP image was fetched twice, in two formats.** The `<link
+    rel="preload">` named the WebP; the `<picture>` beneath it resolves to
+    AVIF on anything built this decade. So 44 KB went down the critical path
+    where 22 KB was needed, and the copy carrying `fetchpriority="high"` was
+    the one the browser then discarded. The preloads name AVIF now and carry a
+    `type`, which is what lets a browser without AVIF skip them and take the
+    WebP from the `<picture>`. First screen 170 KB → 148 KB.
+19. **"First screen: 483 KB" was the harness measuring four seconds.** It
+    filtered resources by `getEntriesByName('largest-contentful-paint')`, which
+    returns nothing — LCP entries are delivered to observers and never retained
+    in the entry buffer — so the `?? 4000` fallback took over and counted
+    eleven reel frames, every font on the site and matter.js as part of the
+    first screen. Against the page's own observed LCP the figure is 148 KB, and
+    §7 now lists the resources it is made of rather than asking to be believed.
 
 ## 5b · Two ideas that measured worse than doing nothing
 

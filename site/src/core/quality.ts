@@ -1,0 +1,194 @@
+/**
+ * What this device can actually afford.
+ *
+ * Every world reads `quality.tier` at mount and adapts: particle counts, DPR,
+ * whether a WebGL layer is created at all. The tier is not fixed — if the page
+ * spends sixty consecutive frames above 22 ms it steps down and says so in the
+ * perf log. The visitor is allowed to see a simpler picture. They are not
+ * allowed to see a stuttering one.
+ */
+import { clock } from './ticker';
+
+export type Tier = 'high' | 'mid' | 'low';
+
+interface QualityState {
+  tier: Tier;
+  /** the tier detected at boot, before any runtime downgrade */
+  readonly booted: Tier;
+  readonly reducedMotion: boolean;
+  readonly coarse: boolean;
+  readonly saveData: boolean;
+  readonly webgl2: boolean;
+  readonly cores: number;
+  readonly memory: number;
+  /** ms taken by the boot micro-benchmark; -1 when it could not run */
+  readonly bench: number;
+  /** device pixel ratio ceiling for canvas backing stores */
+  dpr: number;
+  /** 0..1 multiplier for particle populations */
+  particles: number;
+  /** post effects allowed at all */
+  post: boolean;
+  /** WebGL worlds allowed at all */
+  gl: boolean;
+}
+
+const mqReduce = window.matchMedia('(prefers-reduced-motion: reduce)');
+const mqCoarse = window.matchMedia('(pointer: coarse)');
+
+function probeWebGL(): { ok: boolean; ms: number } {
+  const cv = document.createElement('canvas');
+  cv.width = cv.height = 256;
+  const gl = cv.getContext('webgl2', { antialias: false, depth: false, powerPreference: 'high-performance' });
+  if (!gl) return { ok: false, ms: -1 };
+
+  /* A deliberately dull fragment shader run over 256×256 a few times. It is not
+     a benchmark of anything real — it is a way to tell a 2019 phone from a
+     desktop without asking the user agent, which lies. */
+  const vs = gl.createShader(gl.VERTEX_SHADER)!;
+  gl.shaderSource(vs, `#version 300 es
+in vec2 p; void main(){ gl_Position = vec4(p,0.,1.); }`);
+  gl.compileShader(vs);
+  const fs = gl.createShader(gl.FRAGMENT_SHADER)!;
+  gl.shaderSource(fs, `#version 300 es
+precision highp float; out vec4 o;
+void main(){
+  vec2 u = gl_FragCoord.xy * 0.01;
+  float a = 0.;
+  for (int i = 0; i < 48; i++) { a += sin(u.x * float(i) * 0.7) * cos(u.y * float(i) * 0.5); }
+  o = vec4(vec3(a * 0.02 + 0.5), 1.);
+}`);
+  gl.compileShader(fs);
+  const pr = gl.createProgram()!;
+  gl.attachShader(pr, vs); gl.attachShader(pr, fs); gl.linkProgram(pr);
+  if (!gl.getProgramParameter(pr, gl.LINK_STATUS)) return { ok: true, ms: -1 };
+  gl.useProgram(pr);
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1, -1, 3, -1, -1, 3]), gl.STATIC_DRAW);
+  const loc = gl.getAttribLocation(pr, 'p');
+  gl.enableVertexAttribArray(loc);
+  gl.vertexAttribPointer(loc, 2, gl.FLOAT, false, 0, 0);
+
+  const t0 = performance.now();
+  for (let i = 0; i < 24; i++) gl.drawArrays(gl.TRIANGLES, 0, 3);
+  gl.finish();
+  const ms = performance.now() - t0;
+
+  gl.deleteProgram(pr); gl.deleteShader(vs); gl.deleteShader(fs); gl.deleteBuffer(buf);
+  const lose = gl.getExtension('WEBGL_lose_context');
+  lose?.loseContext();
+  return { ok: true, ms };
+}
+
+function detect(): QualityState {
+  const cores = navigator.hardwareConcurrency || 2;
+  const memory = (navigator as Navigator & { deviceMemory?: number }).deviceMemory ?? 4;
+  const conn = (navigator as Navigator & { connection?: { saveData?: boolean } }).connection;
+  const saveData = conn?.saveData === true;
+  const reducedMotion = mqReduce.matches;
+  const coarse = mqCoarse.matches;
+
+  const probe = probeWebGL();
+  let tier: Tier;
+
+  if (!probe.ok || saveData || cores <= 2 || memory <= 1) tier = 'low';
+  else if (cores <= 4 || memory <= 4 || (probe.ms >= 0 && probe.ms > 26)) tier = 'mid';
+  else tier = 'high';
+
+  /* Reduced motion is not a slow device — it is a preference. The worlds still
+     render, they just stop moving on their own. */
+  const dprCap = coarse ? 1.5 : 2;
+  return {
+    tier, booted: tier, reducedMotion, coarse, saveData,
+    webgl2: probe.ok, cores, memory, bench: probe.ms,
+    dpr: Math.min(window.devicePixelRatio || 1, tier === 'low' ? 1 : dprCap),
+    particles: tier === 'high' ? 1 : tier === 'mid' ? 0.5 : 0,
+    post: tier === 'high' && !reducedMotion,
+    gl: probe.ok && tier !== 'low',
+  };
+}
+
+const state = detect();
+type Listener = (tier: Tier, reason: string) => void;
+const listeners = new Set<Listener>();
+
+function applyTier(tier: Tier, reason: string): void {
+  if (tier === state.tier) return;
+  state.tier = tier;
+  state.particles = tier === 'high' ? 1 : tier === 'mid' ? 0.5 : 0;
+  state.post = tier === 'high' && !state.reducedMotion;
+  state.gl = state.webgl2 && tier !== 'low';
+  state.dpr = Math.min(window.devicePixelRatio || 1, tier === 'low' ? 1 : state.coarse ? 1.5 : 2);
+  document.documentElement.dataset['tier'] = tier;
+  for (const l of listeners) l(tier, reason);
+}
+
+/** Sixty frames of honest evidence before we take anything away. */
+let overBudget = 0;
+let sampled = 0;
+let acc = 0;
+
+export const quality = {
+  get tier(): Tier { return state.tier; },
+  get state(): Readonly<QualityState> { return state; },
+  get reducedMotion(): boolean { return state.reducedMotion; },
+  get coarse(): boolean { return state.coarse; },
+  get dpr(): number { return state.dpr; },
+  get particles(): number { return state.particles; },
+  get post(): boolean { return state.post; },
+  get gl(): boolean { return state.gl; },
+
+  /** particle populations, rounded, never below 0 */
+  count(base: number): number { return Math.max(0, Math.round(base * state.particles)); },
+
+  /**
+   * Backing-store scale for a full-screen shader layer.
+   *
+   * A background gradient does not need one sample per device pixel, and a
+   * full-screen fragment shader is priced in exactly those samples. What it
+   * must not do is drop *below* 1×: a layer rendered smaller than its box has
+   * to be scaled up by the compositor every frame, and that costs more than
+   * the samples it saves. Measured both ways — see the note in hero.ts, which
+   * is the same lesson from the other direction.
+   */
+  shaderDpr(): number {
+    const dpr = window.devicePixelRatio || 1;
+    if (state.tier === 'high') return Math.min(dpr, 1.5);
+    if (state.tier === 'mid') return Math.min(dpr, 1);
+    return Math.min(dpr, 1);
+  },
+
+  onChange(fn: Listener): () => void {
+    listeners.add(fn);
+    return () => listeners.delete(fn);
+  },
+
+  /** Forced from the QA harness and from the "simplify" switch in the header. */
+  force(tier: Tier, reason = 'forced'): void { applyTier(tier, reason); },
+
+  boot(): void {
+    document.documentElement.dataset['tier'] = state.tier;
+    if (state.reducedMotion) document.documentElement.dataset['rm'] = '1';
+
+    clock.add(({ dt }) => {
+      acc += dt * 1000;
+      sampled++;
+      if (sampled < 60) return;
+      const avg = acc / sampled;
+      acc = 0; sampled = 0;
+      if (avg > 22) {
+        overBudget++;
+        if (overBudget >= 1 && state.tier !== 'low') {
+          const next: Tier = state.tier === 'high' ? 'mid' : 'low';
+          applyTier(next, `runtime downgrade: 60 frames averaged ${avg.toFixed(1)}ms`);
+          overBudget = 0;
+        }
+      } else {
+        overBudget = 0;
+      }
+    }, { always: true, order: -100 });
+
+    mqReduce.addEventListener('change', () => window.location.reload());
+  },
+};

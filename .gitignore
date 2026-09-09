@@ -6,3 +6,12 @@
 
 # Node
 node_modules/
+
+# Build output and QA artefacts (regenerate with `npm run build` / `npm run qa`)
+site/dist/
+site/dist-single/
+site/dist-debug*/
+site/qa/shots/
+site/qa/video/
+site/qa/report-*.json
+site/qa/lighthouse-*.html

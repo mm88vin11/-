@@ -1,8 +1,23 @@
-# Claude Code environment: skills + MCP servers
+# БАЗА — site, plus the Claude Code environment that builds it
 
-This repository carries a Claude Code setup: **10 skills** under `.claude/skills/`
-and the **21st.dev MCP server** in `.mcp.json`. Everything here is project-scoped,
-so it loads automatically for anyone who opens this repo in Claude Code.
+Two things live here.
+
+**`site/`** — the production rebuild of `lllbaza.ru`. Vite + TypeScript, one
+animation clock, twelve worlds, eleven shader seams. It replaces a single
+13.5 MB HTML file that inlined 286 WebP frames as base64. Start at
+[`site/README.md`](site/README.md); the measured before/after is in
+[`REPORT.md`](REPORT.md).
+
+```bash
+cd site && npm install && npm run dev
+npm run build   # deploy target
+npm run guard   # the performance contract, as a program
+npm run qa      # traces, per-section FPS, 72 screenshots
+```
+
+**The Claude Code setup** — **12 skills** under `.claude/skills/` and the
+**21st.dev MCP server** in `.mcp.json`. Everything is project-scoped, so it
+loads automatically for anyone who opens this repo in Claude Code.
 
 ## Setup
 
@@ -84,6 +99,8 @@ Motion's contributor loop, so review its steps before pointing it at this repo.
 | Skill | What it covers |
 | --- | --- |
 | `motion` | Reference for the Motion animation library itself (v13.2.0) — the React API, the vanilla JS API, transitions and springs, performance, and migration from Framer Motion |
+| `perf-guard` | The performance contract for `site/`: hard budgets, the one-clock rule, disposal, the tier ladder, and how to verify. `site/npm run guard` is its executable half |
+| `world-spec` | The design system for `site/`: token architecture, the type-per-world mapping, the eleven-seam catalogue, the visual-defect checklist, and the copy rules that must not be broken |
 
 `motion` is a reference skill, not a vendored one: its API surface was extracted
 from the v13.2.0 source (entry points, exported symbols, option types, and the
@@ -97,7 +114,9 @@ by hand — the export surface is the source of truth.
 ## Layout
 
 ```
-.claude/skills/     10 skills
+site/               the БАЗА site — Vite + TypeScript, see site/README.md
+REPORT.md           the rebuild: metrics before and after, what was cut and why
+.claude/skills/     12 skills
 .mcp.json           21st.dev MCP server (key via ${TWENTYFIRST_API_KEY})
 .env.example        template for the key
 CLAUDE.md           repo conventions

@@ -1,0 +1,57 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   04 · THE LOADER
+   A dark field, a mark that arrives from depth, and a real load poured into it.
+   Nothing here is decorative: the level in the mark is the number underneath.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+#load {
+  position: fixed; inset: 0; z-index: var(--z-load);
+  display: grid; place-content: center; justify-items: center; gap: var(--s-6);
+  /* Never white, never flat black. The shader paints over this; the colour is
+     here so there is no flash of anything before it compiles. */
+  background: radial-gradient(120% 90% at 50% 42%, #14161c 0%, #0a0b0f 55%, #06070a 100%);
+  /* The exit is a circular reveal, not a fade: the hero is already standing
+     behind this, at the first frame of its own animation. */
+  clip-path: circle(150% at 50% 50%);
+  transition: clip-path 1000ms var(--e-out);
+}
+#load.is-gone { clip-path: circle(0% at 50% 50%); pointer-events: none; }
+#load[hidden] { display: none; }
+
+#loadBg { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+.load__mark {
+  position: relative; z-index: 1;
+  width: min(62vw, 420px);
+  /* 640 × 245 — the two rows stacked with no gap, so the aspect matches the
+     header mark to a fraction of a percent and the FLIP lands without a jump. */
+  aspect-ratio: 640 / 245;
+  opacity: 0;
+  transform: scale(1.6);
+  filter: blur(12px);
+  will-change: transform, opacity, filter;
+}
+.load__mark canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+
+.load__pct {
+  position: relative; z-index: 1;
+  font-family: var(--f-mono); font-size: var(--t-mono);
+  letter-spacing: .18em; color: rgb(242 235 221 / .42);
+  font-variant-numeric: tabular-nums;
+  opacity: 0;
+  transition: opacity var(--d-base) var(--e-out);
+}
+#load.is-pouring .load__pct { opacity: 1; }
+
+/* The flight is one transform on one element, measured against the real header
+   mark. `--fx/--fy/--fs` are written by script from two getBoundingClientRect
+   reads taken in the same frame. */
+#load.is-flying .load__mark {
+  transform: translate3d(var(--fx, 0), var(--fy, 0), 0) scale(var(--fs, 1));
+  transition: transform 900ms cubic-bezier(.72, 0, .18, 1);
+}
+#load.is-flying .load__pct { opacity: 0; transition-duration: 200ms; }
+
+/* Second visit in the same tab: no pour, no flight, 800 ms and out of the way. */
+#load.is-quick { transition-duration: 500ms; }
+#load.is-quick .load__mark { transition: opacity 400ms var(--e-out), transform 400ms var(--e-out); }

@@ -1,0 +1,236 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   03 · CHROME
+   Header, menu, controls, toast, the metrics tape. Everything that is on top
+   of the worlds rather than inside one.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ——— header ———————————————————————————————————————————————————————————— */
+#head {
+  position: fixed; inset: 0 0 auto; z-index: var(--z-head);
+  padding: var(--s-3) 0;
+  transition: background var(--d-base) var(--e-out), backdrop-filter var(--d-base) var(--e-out);
+}
+/* The bar only grows a backdrop once you have left the hero. A blurred strip
+   over the opening shot is a cost with nothing behind it to justify it. */
+body.is-scrolled #head {
+  background: rgb(10 10 10 / .72);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border-bottom: 1px solid var(--hair);
+}
+.head__row {
+  width: min(100% - var(--gut) * 2, var(--maxw)); margin-inline: auto;
+  display: flex; align-items: center; gap: var(--s-4);
+}
+.head__spacer { flex: 1; }
+.pod__logo { display: block; }
+.pod__logo img { width: clamp(104px, 11vw, 150px); height: auto; }
+/* Hidden until the loader mark has flown into its place — the flight ends by
+   swapping a measured transform for the real element, so both must never show. */
+body:not(.is-live) .pod__logo img { opacity: 0; }
+
+.head__nav { position: relative; display: none; gap: var(--s-1); }
+@media (min-width: 1080px) { .head__nav { display: flex; } }
+.head__nav a {
+  position: relative; z-index: 1;
+  padding: var(--s-2) var(--s-4);
+  font-size: var(--t-sm); font-weight: 700; color: var(--faint);
+  border-radius: var(--r-pill);
+  transition: color var(--d-fast) var(--e-out);
+}
+.head__nav a:hover, .head__nav a.is-on { color: var(--fg); }
+.head__ink {
+  position: absolute; inset: 0 auto 0 0; width: 0;
+  background: rgb(242 235 221 / var(--a-08));
+  border-radius: var(--r-pill);
+  opacity: 0;
+  transition: transform var(--d-base) var(--e-out), width var(--d-base) var(--e-out), opacity var(--d-fast);
+}
+.head__nav.has-ink .head__ink { opacity: 1; }
+
+.head__acts { display: flex; align-items: center; gap: var(--s-2); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: var(--s-2);
+  padding: var(--s-4) var(--s-6);
+  background: var(--w-acc, var(--acc)); color: var(--c-ink);
+  border-radius: var(--r-pill);
+  font-weight: 800; font-size: var(--t-sm);
+  transition: transform var(--d-fast) var(--e-out), filter var(--d-fast) var(--e-out);
+}
+.btn:hover { transform: translateY(-2px); filter: brightness(1.06); }
+.btn:active { transform: translateY(0); }
+.btn--sm { padding: var(--s-3) var(--s-5); font-size: var(--t-xs); }
+.btn--ghost {
+  background: transparent; color: var(--w-fg, var(--fg));
+  box-shadow: inset 0 0 0 1px var(--w-line, var(--line));
+}
+.btn--ghost:hover { box-shadow: inset 0 0 0 1px var(--w-acc, var(--acc)); }
+.head__cta { display: none; }
+@media (min-width: 720px) { .head__cta { display: inline-flex; } }
+
+.icobtn {
+  display: grid; place-items: center; width: 42px; height: 42px;
+  border-radius: var(--r-pill); box-shadow: inset 0 0 0 1px var(--line);
+}
+.burger { display: grid; gap: 5px; align-content: center; justify-items: center; }
+@media (min-width: 1080px) { .burger { display: none; } }
+.burger i { display: block; width: 17px; height: 2px; background: var(--fg); border-radius: 2px;
+  transition: transform var(--d-fast) var(--e-out), opacity var(--d-fast); }
+body.menu-open .burger i:first-child { transform: translateY(3.5px) rotate(45deg); }
+body.menu-open .burger i:last-child  { transform: translateY(-3.5px) rotate(-45deg); }
+
+/* ——— menu sheet ————————————————————————————————————————————————————————— */
+#menu {
+  position: fixed; inset: 0; z-index: var(--z-menu);
+  display: grid; align-content: center; gap: var(--s-8);
+  padding: max(96px, 14vh) var(--gut) var(--s-16);
+  background: rgb(6 7 10 / .96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  opacity: 0; visibility: hidden;
+  transition: opacity var(--d-base) var(--e-out), visibility var(--d-base);
+}
+body.menu-open #menu { opacity: 1; visibility: visible; }
+.menu__list { display: grid; gap: var(--s-1); }
+.menu__list a {
+  display: flex; align-items: baseline; gap: var(--s-4);
+  padding: var(--s-3) 0;
+  font-size: clamp(1.7rem, 7vw, 2.6rem); font-weight: 800; letter-spacing: -.02em;
+  border-bottom: 1px solid var(--hair);
+  opacity: 0; transform: translate3d(0, 18px, 0);
+  transition: opacity var(--d-base) var(--e-out), transform var(--d-base) var(--e-out), color var(--d-fast);
+}
+body.menu-open .menu__list a { opacity: 1; transform: none; }
+.menu__list a:nth-child(1) { transition-delay: 40ms }
+.menu__list a:nth-child(2) { transition-delay: 70ms }
+.menu__list a:nth-child(3) { transition-delay: 100ms }
+.menu__list a:nth-child(4) { transition-delay: 130ms }
+.menu__list a:nth-child(5) { transition-delay: 160ms }
+.menu__list a:nth-child(6) { transition-delay: 190ms }
+.menu__list a:nth-child(7) { transition-delay: 220ms }
+.menu__list a:nth-child(8) { transition-delay: 250ms }
+.menu__list a:nth-child(9) { transition-delay: 280ms }
+.menu__list a span { font-family: var(--f-mono); font-size: var(--t-mono); color: var(--faint); }
+.menu__list a:hover { color: var(--c-gold); }
+.menu__foot { display: flex; flex-wrap: wrap; gap: var(--s-3); }
+
+/* ——— floating controls ————————————————————————————————————————————————— */
+.dock {
+  position: fixed; right: var(--gut); bottom: calc(var(--barh) + var(--s-4));
+  z-index: var(--z-ui);
+  display: grid; gap: var(--s-2); justify-items: end;
+}
+.dock button {
+  display: grid; place-items: center; width: 44px; height: 44px;
+  border-radius: var(--r-pill);
+  background: rgb(10 10 10 / .7); color: var(--fg);
+  box-shadow: inset 0 0 0 1px var(--line);
+  backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px);
+  transition: transform var(--d-fast) var(--e-out), color var(--d-fast);
+}
+.dock button:hover { transform: translateY(-2px); }
+.dock button[aria-pressed='true'] { color: var(--c-gold); box-shadow: inset 0 0 0 1px var(--c-gold); }
+#snd .off, #snd[aria-pressed='true'] .on { display: none; }
+#snd[aria-pressed='true'] .off { display: block; }
+#calm[aria-pressed='true'] { color: var(--c-ice); box-shadow: inset 0 0 0 1px var(--c-ice); }
+
+/* ——— toast ————————————————————————————————————————————————————————————— */
+#toast {
+  position: fixed; left: 50%; bottom: calc(var(--barh) + var(--s-12));
+  z-index: var(--z-overlay);
+  max-width: min(92vw, 460px);
+  padding: var(--s-3) var(--s-5);
+  background: var(--c-cream); color: var(--c-ink);
+  border-radius: var(--r-pill);
+  font-size: var(--t-sm); font-weight: 700; text-align: center;
+  opacity: 0;
+  transform: translate3d(-50%, 14px, 0);
+  transition: opacity var(--d-base) var(--e-out), transform var(--d-base) var(--e-out);
+  pointer-events: none;
+}
+#toast.is-on { opacity: 1; transform: translate3d(-50%, 0, 0); }
+
+/* ——— metrics tape ——————————————————————————————————————————————————————— */
+#tape {
+  position: fixed; inset: auto 0 0; z-index: var(--z-ui);
+  display: flex; align-items: center; gap: var(--s-3);
+  height: 44px; padding-inline: var(--s-3);
+  background: rgb(6 7 10 / .82);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+  border-top: 1px solid var(--hair);
+  font-size: var(--t-xs);
+  transform: translate3d(0, 100%, 0);
+  transition: transform var(--d-slow) var(--e-out);
+}
+body.is-live #tape { transform: none; }
+.tape__q {
+  flex: none; width: 22px; height: 22px; border-radius: var(--r-pill);
+  box-shadow: inset 0 0 0 1px var(--line); color: var(--faint);
+  font-size: 11px; font-weight: 800;
+}
+.tape__k { flex: none; color: var(--faint); display: none; }
+@media (min-width: 720px) { .tape__k { display: block; } }
+.tape__mask { flex: 1; overflow: hidden; -webkit-mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); mask-image: linear-gradient(90deg, transparent, #000 4%, #000 96%, transparent); cursor: grab; }
+.tape__mask.is-drag { cursor: grabbing; }
+.tape__run { display: flex; gap: var(--s-6); width: max-content; will-change: transform; }
+.tape__m { display: inline-flex; align-items: center; gap: var(--s-2); white-space: nowrap; }
+.tape__mk { color: var(--faint); }
+.tape__mv { display: inline-flex; align-items: center; gap: 4px; font-weight: 800; font-variant-numeric: tabular-nums; }
+.tape__mv svg { width: 8px; height: 7px; }
+.tape__m--up .tape__mv { color: var(--c-green); }
+.tape__m--down .tape__mv { color: var(--c-ice); }
+.tape__card {
+  position: fixed; right: var(--gut); bottom: 56px; z-index: var(--z-overlay);
+  width: min(92vw, 380px); padding: var(--s-5);
+  background: var(--c-cream); color: var(--c-ink);
+  border-radius: var(--r-md); box-shadow: var(--sh-3);
+  opacity: 0; visibility: hidden; transform: translate3d(0, 10px, 0);
+  transition: opacity var(--d-base) var(--e-out), transform var(--d-base) var(--e-out), visibility var(--d-base);
+}
+.tape__card.is-open { opacity: 1; visibility: visible; transform: none; }
+.tape__card h4 { margin-bottom: var(--s-2); font-size: var(--t-md); }
+.tape__card p { font-size: var(--t-sm); line-height: 1.5; }
+.tape__x { position: absolute; top: var(--s-3); right: var(--s-3); color: rgb(10 10 10 / .5); }
+body.is-live { --barh: 44px; }
+
+/* ——— shared world primitives ————————————————————————————————————————————— */
+.chips { display: flex; flex-wrap: wrap; gap: var(--s-2); }
+.chip {
+  padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-pill);
+  box-shadow: inset 0 0 0 1px var(--w-line, var(--line));
+  font-size: var(--t-sm); font-weight: 700; color: var(--w-dim, var(--dim));
+  transition: color var(--d-fast), box-shadow var(--d-fast), background var(--d-fast), transform var(--d-fast) var(--e-out);
+}
+.chip:hover { transform: translateY(-1px); color: var(--w-fg, var(--fg)); }
+.chip[aria-pressed='true'] {
+  background: var(--w-acc, var(--acc)); color: var(--c-ink);
+  box-shadow: inset 0 0 0 1px var(--w-acc, var(--acc));
+}
+
+/* The opening move, retired on first contact. A ring that keeps pulsing after
+   it has been understood is noise. */
+[data-invite] { position: relative; }
+[data-invite]::after {
+  content: ''; position: absolute; inset: -5px;
+  border-radius: inherit;
+  box-shadow: 0 0 0 2px var(--w-acc, var(--acc));
+  opacity: 0;
+  animation: invite 2.6s var(--e-soft) infinite;
+  pointer-events: none;
+}
+[data-invite].is-used::after { animation: none; opacity: 0; }
+@keyframes invite {
+  0%, 70%, 100% { opacity: 0; transform: scale(1); }
+  20% { opacity: .55; transform: scale(1); }
+  55% { opacity: 0; transform: scale(1.08); }
+}
+
+/* Skip is available from the first second in every game. Never a dare. */
+.skipgame {
+  display: inline-flex; align-items: center; gap: var(--s-2);
+  font-size: var(--t-xs); color: var(--w-dim, var(--dim));
+  text-decoration: underline; text-underline-offset: 4px;
+}
+.skipgame:hover { color: var(--w-fg, var(--fg)); }

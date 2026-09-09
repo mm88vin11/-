@@ -1,0 +1,22 @@
+import { chromium } from 'playwright';
+const CHROME='/opt/pw-browsers/chromium-1194/chrome-linux/chrome';
+const BASE = process.env.QA_URL ?? 'http://localhost:4176/';
+const nap = (ms)=>new Promise(r=>setTimeout(r,ms));
+const b = await chromium.launch({ executablePath: CHROME, args:['--no-sandbox','--use-gl=swiftshader','--enable-unsafe-swiftshader'] });
+const ctx = await b.newContext({ viewport:{width:1440,height:900} });
+const page = await ctx.newPage();
+if (process.env.NOCAP==='1') await page.addInitScript(()=>{window.__HERO_CAP=false;});
+const cdp = await ctx.newCDPSession(page);
+await cdp.send('Emulation.setCPUThrottlingRate',{rate:Number(process.env.CPU??1)});
+await page.goto(BASE+'?tier=high',{waitUntil:'load',timeout:90000});
+await nap(5000);
+await page.evaluate(()=>window.__BAZA_RESET?.());
+const total = await page.evaluate(()=>document.body.scrollHeight-window.innerHeight);
+for (let i=0;i<=120;i++){ await page.evaluate(v=>window.scrollTo(0,v), Math.round(total*i/120)); await nap(100); }
+const p = await page.evaluate(()=>window.__BAZA_PERF);
+console.log('fps  ', Object.entries(p.fps).map(([k,v])=>k+':'+v).join(' '));
+console.log('>33  ', Object.entries(p.over33).map(([k,v])=>k+':'+v).join(' '));
+console.log('>50  ', Object.entries(p.over50).map(([k,v])=>k+':'+v).join(' '));
+console.log('long ', p.longTasks.length, p.longTasks.slice(0,6).map(t=>t.name+':'+t.ms).join(' '));
+console.log('mem  ', p.memory, 'MB | tier', p.tier);
+await b.close();

@@ -1,0 +1,177 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   01 · TOKENS
+   Three layers, in this order: primitives → semantics → per-world surfaces.
+   A world may only reach for a semantic or its own surface variables. A
+   literal colour or duration inside a world file is a bug the guard flags.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ——— fonts ——————————————————————————————————————————————————————————————
+   Four families for twelve worlds. The brief named nine display faces; none of
+   Monument Extended, General Sans, Editorial New, Chakra Petch, Space Grotesk
+   or Anton ships Cyrillic, and this site is entirely in Russian, so choosing
+   them would mean every heading falling back mid-word. The four below all
+   carry a Cyrillic subset, come to 189 KB against a 220 KB budget, and are
+   pulled apart by weight, tracking and case rather than by family count.
+   Two faces are preloaded from the document head; the rest arrive as needed. */
+
+@font-face { font-family: 'Manrope'; font-style: normal; font-weight: 500; font-display: swap;
+  src: url('../assets/fonts/manrope-500-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: 'Manrope'; font-style: normal; font-weight: 500; font-display: swap;
+  src: url('../assets/fonts/manrope-500-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Manrope'; font-style: normal; font-weight: 700; font-display: swap;
+  src: url('../assets/fonts/manrope-700-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: 'Manrope'; font-style: normal; font-weight: 700; font-display: swap;
+  src: url('../assets/fonts/manrope-700-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Manrope'; font-style: normal; font-weight: 800; font-display: swap;
+  src: url('../assets/fonts/manrope-800-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: 'Manrope'; font-style: normal; font-weight: 800; font-display: swap;
+  src: url('../assets/fonts/manrope-800-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD; }
+
+@font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 400; font-display: swap;
+  src: url('../assets/fonts/jetbrains-mono-400-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: 'JetBrains Mono'; font-style: normal; font-weight: 400; font-display: swap;
+  src: url('../assets/fonts/jetbrains-mono-400-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD; }
+
+@font-face { font-family: 'Press Start 2P'; font-style: normal; font-weight: 400; font-display: swap;
+  src: url('../assets/fonts/press-start-2p-400-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: 'Press Start 2P'; font-style: normal; font-weight: 400; font-display: swap;
+  src: url('../assets/fonts/press-start-2p-400-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD; }
+
+@font-face { font-family: 'Russo One'; font-style: normal; font-weight: 400; font-display: swap;
+  src: url('../assets/fonts/russo-one-400-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+@font-face { font-family: 'Russo One'; font-style: normal; font-weight: 400; font-display: swap;
+  src: url('../assets/fonts/russo-one-400-latin.woff2') format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+2000-206F, U+20AC, U+2122, U+2212, U+FEFF, U+FFFD; }
+
+:root {
+  /* ——— layer 1 · primitives ——————————————————————————————————————————— */
+  --c-ink:      #0a0a0a;
+  --c-ink-2:    #06070a;
+  --c-cream:    #f2ebdd;
+  --c-white:    #ffffff;
+
+  --c-gold:     #f8d548;
+  --c-green:    #5dff9b;
+  --c-blue:     #5fb0f2;
+  --c-amber:    #ff8a1f;
+  --c-red:      #ff3b30;
+  --c-violet:   #c96be8;
+  --c-teal:     #4ad6c0;
+  --c-moss:     #8ac44a;
+  --c-ice:      #7ec2f5;
+
+  /* Alpha ladders, so nothing hand-rolls rgba() at the call site. */
+  --a-90: .9;  --a-72: .72; --a-52: .52; --a-32: .32; --a-18: .18;
+  --a-12: .12; --a-08: .08; --a-05: .05;
+
+  /* Type scale: a fifth-based modular scale expressed in clamp(), so the
+     ratio holds at every width instead of being re-guessed per breakpoint. */
+  --t-xxl:  clamp(2.75rem, 1.6rem + 5.6vw, 7rem);
+  --t-xl:   clamp(2.1rem,  1.3rem + 3.9vw, 4.75rem);
+  --t-lg:   clamp(1.6rem,  1.15rem + 2.1vw, 3rem);
+  --t-md:   clamp(1.24rem, 1.05rem + 0.9vw, 1.85rem);
+  --t-base: clamp(1rem,    0.96rem + 0.22vw, 1.14rem);
+  --t-sm:   clamp(.875rem, .85rem + 0.12vw, .95rem);
+  --t-xs:   clamp(.75rem,  .73rem + 0.1vw, .8rem);
+  --t-mono: clamp(.68rem,  .66rem + 0.1vw, .76rem);
+
+  --lh-tight: 0.98;
+  --lh-head:  1.06;
+  --lh-body:  1.58;
+
+  /* Spacing: step 4. Nothing between the rungs. */
+  --s-1: 4px;  --s-2: 8px;   --s-3: 12px;  --s-4: 16px;  --s-5: 20px;
+  --s-6: 24px; --s-8: 32px;  --s-10: 40px; --s-12: 48px; --s-16: 64px;
+  --s-20: 80px; --s-24: 96px;
+  --gut:  clamp(18px, 3.2vw, 44px);
+  --maxw: 1320px;
+  --sec:  clamp(84px, 7.4vw, 168px);
+
+  /* Radii. Nested radius = outer − padding; the guard has a note about it. */
+  --r-xs: 6px; --r-sm: 10px; --r-md: 16px; --r-lg: 22px; --r-xl: 32px; --r-pill: 999px;
+
+  /* Durations and curves, named for intent rather than for length. */
+  --d-fast: 180ms;
+  --d-base: 420ms;
+  --d-slow: 900ms;
+  --e-out:  cubic-bezier(.16, 1, .3, 1);
+  --e-in:   cubic-bezier(.7, 0, .84, 0);
+  --e-soft: cubic-bezier(.33, 1, .68, 1);
+  --e-back: cubic-bezier(.34, 1.4, .64, 1);
+
+  /* One named stacking scale. Every z-index on the site comes from here. */
+  --z-world:   1;
+  --z-seam:    20;
+  --z-ui:      50;
+  --z-menu:    90;
+  --z-head:    100;
+  --z-overlay: 500;
+  --z-load:    999;
+  --z-skip:    1000;
+
+  /* ——— layer 2 · semantics ————————————————————————————————————————————— */
+  --f-sans:  'Manrope', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --f-mono:  'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --f-pixel: 'Press Start 2P', 'JetBrains Mono', monospace;
+  --f-chunk: 'Russo One', 'Arial Black', Impact, sans-serif;
+
+  --bg:    var(--c-ink);
+  --fg:    var(--c-cream);
+  --dim:   rgb(242 235 221 / var(--a-72));
+  --faint: rgb(242 235 221 / var(--a-52));
+  --line:  rgb(242 235 221 / var(--a-12));
+  --hair:  rgb(242 235 221 / var(--a-08));
+  --acc:   var(--c-cream);
+
+  /* Shadows are tinted with the world's own ground, never with black: a black
+     shadow over a coloured dark surface reads as dirt. Each world overrides
+     --shadow-tint; the recipe stays here. */
+  --shadow-tint: 6 7 10;
+  --sh-1: 0 2px 6px rgb(var(--shadow-tint) / .5);
+  --sh-2: 0 10px 30px rgb(var(--shadow-tint) / .55);
+  --sh-3: 0 26px 70px rgb(var(--shadow-tint) / .6);
+  /* Glow is a pseudo-element gradient on phones (see .glow); this is desktop. */
+  --glow: 0 0 40px -8px rgb(255 255 255 / .16);
+
+
+  /* The only inline asset on the site: 300 bytes of SVG turbulence, url-encoded
+     rather than base64 (base64 is 33% larger and unreadable in review). It is a
+     texture used by three worlds; as a file it would be three round trips for
+     less than a TCP window of data. */
+  --grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E");
+
+  --vh: 1vh;
+  --barh: 0px;
+
+  color-scheme: dark;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+/* ——— layer 3 · per-world surfaces —————————————————————————————————————
+   Every section sets these five and nothing else. The seam engine reads the
+   same values from LOOKS in TypeScript, so a colour lives in exactly one
+   place per world in each language. */
+.uni {
+  --w-bg:   var(--bg);
+  --w-fg:   var(--fg);
+  --w-dim:  var(--dim);
+  --w-line: var(--line);
+  --w-acc:  var(--acc);
+}
+
+/* Tier and preference switches. `low` is not "broken" — it is the same site
+   with the moving parts stilled. */
+:root[data-tier='low'] { --d-slow: 420ms; --d-base: 260ms; }
+:root[data-rm='1']     { --d-fast: 1ms; --d-base: 200ms; --d-slow: 200ms; }

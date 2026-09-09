@@ -1,0 +1,52 @@
+{
+  "reel": {
+    "d": {
+      "frames": 91,
+      "width": 1216,
+      "aspect": 1.7758,
+      "bytes": 1693146
+    },
+    "m": {
+      "frames": 52,
+      "width": 704,
+      "aspect": 0.5633,
+      "bytes": 816454
+    }
+  },
+  "img": {
+    "posterWide": {
+      "name": "poster-wide",
+      "w": 1440,
+      "h": 811,
+      "webp": 16206,
+      "avif": 14958
+    },
+    "posterTall": {
+      "name": "poster-tall",
+      "w": 810,
+      "h": 1438,
+      "webp": 22774,
+      "avif": 21963
+    }
+  },
+  "marks": {
+    "logo": {
+      "name": "logo",
+      "w": 560,
+      "h": 214,
+      "bytes": 23684
+    },
+    "eto": {
+      "name": "mark-eto",
+      "w": 880,
+      "h": 184,
+      "bytes": 23170
+    },
+    "baza": {
+      "name": "mark-baza",
+      "w": 880,
+      "h": 153,
+      "bytes": 22332
+    }
+  }
+}

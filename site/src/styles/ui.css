@@ -53,7 +53,7 @@ body:not(.is-live) .pod__logo img { opacity: 0; }
 .btn {
   display: inline-flex; align-items: center; gap: var(--s-2);
   padding: var(--s-4) var(--s-6);
-  background: var(--w-acc, var(--acc)); color: var(--c-ink);
+  background: var(--w-acc, var(--acc)); color: var(--w-on-acc, var(--on-acc));
   border-radius: var(--r-pill);
   font-weight: 800; font-size: var(--t-sm);
   transition: transform var(--d-fast) var(--e-out), filter var(--d-fast) var(--e-out);
@@ -205,7 +205,7 @@ body.is-live { --barh: 44px; }
 }
 .chip:hover { transform: translateY(-1px); color: var(--w-fg, var(--fg)); }
 .chip[aria-pressed='true'] {
-  background: var(--w-acc, var(--acc)); color: var(--c-ink);
+  background: var(--w-acc, var(--acc)); color: var(--w-on-acc, var(--on-acc));
   box-shadow: inset 0 0 0 1px var(--w-acc, var(--acc));
 }
 

@@ -313,17 +313,24 @@ class Hero implements World {
 
   private paint(f = this.frameAt(this.smooth)): void {
     if (!this.srcs.length) return;
-    /* Nothing moved and nothing new decoded: the cheapest frame is the one we
-       do not draw. */
-    if (Math.abs(f - this.lastF) < 0.004 && this.smooth <= 0.86) return;
     const i = Math.floor(f);
     const frac = f - i;
-    const a = this.nearest(i);
-    if (!a) return;
     /* The crossfade is skipped where it cannot be seen — at the very start and
        end of a frame's span — and entirely on the low tier, where one draw of a
        full-screen bitmap is already the section's whole budget. */
     const blend = quality.tier !== 'low' && frac > 0.1 && frac < 0.9;
+
+    /* Without a crossfade the picture only changes when the integer frame
+       does, so redrawing on every sub-frame step is repainting the same image.
+       With one, the blend weight is what changed, so a small step still
+       matters. Two different questions, two different thresholds. */
+    const unchanged = blend
+      ? Math.abs(f - this.lastF) < 0.004
+      : Math.floor(this.lastF) === i && this.lastF >= 0;
+    if (unchanged && this.smooth <= 0.86) return;
+
+    const a = this.nearest(i);
+    if (!a) return;
     const b = blend ? this.nearest(i + 1) : null;
 
     const { width: cw, height: ch } = this.cv;

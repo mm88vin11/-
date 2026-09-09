@@ -63,13 +63,20 @@ function boot(): void {
 
   const loader = startLoader();
 
-  /* Pinch and double-tap zoom, off. The meta tag covers Chrome; Safari has
-     ignored it since iOS 10, so the gestures are cancelled here. */
+  /* Multi-touch is cancelled over the game surfaces only — the portal ring,
+     the message flood, the bench, the feed. Everywhere else a pinch is a
+     visitor zooming in to read, and taking that away is an accessibility
+     failure rather than a polish detail. The double-tap delay is handled by
+     `touch-action: manipulation` in the stylesheet, not here. */
+  const PLAYABLE = '.ring, .flood__stage, .bench__3, .hotbar, .feed, .well';
   for (const t of ['gesturestart', 'gesturechange', 'gestureend']) {
-    document.addEventListener(t, (e) => e.preventDefault(), { passive: false });
+    document.addEventListener(t, (e) => {
+      if ((e.target as HTMLElement | null)?.closest?.(PLAYABLE)) e.preventDefault();
+    }, { passive: false });
   }
   document.addEventListener('touchmove', (e) => {
-    if ((e as TouchEvent).touches.length > 1) e.preventDefault();
+    const te = e as TouchEvent;
+    if (te.touches.length > 1 && (te.target as HTMLElement | null)?.closest?.(PLAYABLE)) e.preventDefault();
   }, { passive: false });
 
   scroll.boot();

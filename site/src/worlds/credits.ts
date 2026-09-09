@@ -77,16 +77,19 @@ class Credits implements World {
     let top = 0;
     let run = 1;
     let deckH = 800;
+    const runway = section.querySelector<HTMLElement>('.crawl__runway');
     const measure = (): void => {
       top = section.offsetTop;
-      run = section.offsetHeight + window.innerHeight;
+      run = (runway?.offsetHeight ?? section.offsetHeight) - window.innerHeight;
       deckH = deck.offsetHeight || 800;
     };
     clock.once(measure);
 
     this.job = clock.add(({ y, vh, t }) => {
-      const p = clamp((y + vh - top) / Math.max(1, run), 0, 1);
-      deck.style.setProperty('--cy', `${-p * (deckH + vh * 0.9)}px`);
+      const p = clamp((y - top) / Math.max(1, run), 0, 1);
+      /* Starts below the fold and leaves over the top, the way a crawl does —
+         rather than starting already centred, which is where it was. */
+      deck.style.setProperty('--cy', `${vh * 0.62 - p * (deckH + vh * 1.1)}px`);
       pre.classList.toggle('is-in', p > 0.02 && p < 0.3);
       post.classList.toggle('is-in', p > 0.86);
       this.layer?.draw(t / 1000);

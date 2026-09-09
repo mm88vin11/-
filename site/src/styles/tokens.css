@@ -133,6 +133,10 @@
   --line:  rgb(242 235 221 / var(--a-12));
   --hair:  rgb(242 235 221 / var(--a-08));
   --acc:   var(--c-cream);
+  /* What text sits on the accent. Every world has an accent; not every world
+     has a dark one, and assuming it gave the light world a black button with
+     black text on it. */
+  --on-acc: var(--c-ink);
 
   /* Shadows are tinted with the world's own ground, never with black: a black
      shadow over a coloured dark surface reads as dirt. Each world overrides
@@ -164,11 +168,12 @@
    same values from LOOKS in TypeScript, so a colour lives in exactly one
    place per world in each language. */
 .uni {
-  --w-bg:   var(--bg);
-  --w-fg:   var(--fg);
-  --w-dim:  var(--dim);
-  --w-line: var(--line);
-  --w-acc:  var(--acc);
+  --w-bg:     var(--bg);
+  --w-fg:     var(--fg);
+  --w-dim:    var(--dim);
+  --w-line:   var(--line);
+  --w-acc:    var(--acc);
+  --w-on-acc: var(--on-acc);
 }
 
 /* Tier and preference switches. `low` is not "broken" — it is the same site

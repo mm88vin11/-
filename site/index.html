@@ -2,12 +2,14 @@
 <html lang="ru" class="no-js">
 <head>
 <meta charset="utf-8">
-<!-- The zoom lock is deliberate and it is three things at once:
-     `user-scalable=no` + `maximum-scale=1` stop Chrome/Android pinching;
-     `touch-action: manipulation` in the stylesheet removes the double-tap
-     delay that made every tap look like a twitch; and the gesture events are
-     cancelled in script because Safari has ignored this meta since iOS 10. -->
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<!-- Pinch zoom is allowed, deliberately.
+     The previous build locked it with `user-scalable=no, maximum-scale=1`,
+     which is a WCAG 1.4.4 failure and, on inspection, was never what fixed the
+     "page twitches under a finger" problem: that was `touch-action:
+     manipulation` removing the double-tap delay, plus nothing being measured
+     in `vh`. Both of those are still here. Multi-touch is cancelled only over
+     the game surfaces, where a pinch would fight the gesture. -->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>БАЗА — сайты, CRM и боты для бизнеса, который держится на владельце</title>
 <meta name="description" content="Делаем сайты, автоматизацию и ИИ-ботов, чтобы бизнес продавал без вашего участия. Разбор, вилка бюджета и сроки — в первом же ответе.">
 <meta name="theme-color" content="#0a0a0a">
@@ -46,7 +48,7 @@
 <div id="load" role="status" aria-label="Загрузка">
   <canvas id="loadBg" aria-hidden="true"></canvas>
   <div class="load__mark" id="loadMark" aria-hidden="true">
-    <canvas id="loadLiquid"></canvas>
+    <canvas id="loadLiquid" aria-hidden="true"></canvas>
   </div>
   <p class="load__pct" id="loadPct">0%</p>
 </div>
@@ -160,7 +162,7 @@
       <!-- The struck blocks fall into this glass with real physics. It is the
            same glass the pricing section fills later, and that rhyme is the
            point: the leak and the estimate are the same stack. -->
-      <div class="pain__glass" id="painGlass" aria-hidden="true"><canvas id="painGlassC"></canvas></div>
+      <div class="pain__glass" id="painGlass" aria-hidden="true"><canvas id="painGlassC" aria-hidden="true"></canvas></div>
     </div>
 
     <div class="pain__sum" id="mSum" aria-live="polite">
@@ -231,7 +233,7 @@
             <svg class="bench__arrow" width="30" height="20" viewBox="0 0 30 20" fill="none" aria-hidden="true">
               <path d="M0 8h18V3l11 7-11 7v-5H0z" fill="currentColor"/>
             </svg>
-            <div class="slot slot--out" id="benchOut"><canvas id="benchOutC" width="128" height="128"></canvas></div>
+            <div class="slot slot--out" id="benchOut"><canvas id="benchOutC" width="128" height="128" aria-hidden="true"></canvas></div>
           </div>
           <p class="bench__hint" id="benchHint">возьмите предмет с панели</p>
         </div>
@@ -274,7 +276,7 @@
         <div class="phone__screen">
           <span class="phone__notch" aria-hidden="true"></span>
           <div class="feed__bars" id="feedBars" aria-hidden="true"></div>
-          <div class="feed" id="feed" tabindex="0" aria-label="Лента кейсов: стрелки вверх и вниз листают"></div>
+          <div class="feed" id="feed" role="region" tabindex="0" aria-label="Лента кейсов: стрелки вверх и вниз листают"></div>
           <div class="rail" id="feedRail" aria-hidden="true"></div>
           <div class="feed__sound" aria-hidden="true">
             <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3v10.6a4 4 0 1 0 2 3.4V7h4V3z"/></svg>
@@ -306,7 +308,7 @@
         </div>
         <div class="tt__stickRow">
           <div class="well">
-            <canvas id="ttC"></canvas>
+            <canvas id="ttC" aria-hidden="true"></canvas>
             <span class="well__flash" id="ttFlash" aria-hidden="true"></span>
           </div>
           <p class="tt__mini" aria-hidden="true">
@@ -630,9 +632,15 @@
 <!-- ════════════════════════════════════════════════════ 11 · ТИТРЫ ══════ -->
 <section class="uni uni--crawl" id="credits" data-world="credits" aria-labelledby="credH">
   <h2 class="vh" id="credH">Титры</h2>
-  <canvas class="world__bg" id="stars" aria-hidden="true"></canvas>
 
+  <!-- The runway is the scroll distance; the stage sticks inside it. Without
+       the wrapper the footer, which follows in flow, rides up over the pinned
+       stage — the stage's static position is only one viewport down. The star
+       field lives inside the stage so its buffer is one viewport, not the
+       three-and-a-bit the section is tall. -->
+  <div class="crawl__runway">
   <div class="crawl__stage">
+    <canvas class="world__bg" id="stars" aria-hidden="true"></canvas>
     <p class="crawl__pre" id="crawlPre">Здесь заканчивается сайт и начинается ваш вторник.</p>
     <div class="crawl__deck" id="crawlDeck">
       <h3>Эпизод VI<br>ВОЗВРАЩЕНИЕ ВЫХОДНОГО</h3>
@@ -663,6 +671,7 @@
       <h3 style="margin-top:1.4em">ЭТО БАЗА</h3>
     </div>
     <p class="crawl__post" id="crawlPost">Мы берём четыре проекта в месяц, потому что пятый делается хуже.</p>
+  </div>
   </div>
 
   <div class="foot">

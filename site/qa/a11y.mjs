@@ -54,20 +54,31 @@ const out = {};
       return { rgb: parts.slice(0, 3), a: parts.length > 3 ? parts[3] : 1 };
     };
     const over = (fg, bg) => fg.rgb.map((v, i) => v * fg.a + bg[i] * (1 - fg.a));
+    /* Start at the element itself, not its parent: a button paints its own
+       background behind its own label, and skipping it reported every filled
+       button as cream-on-cream. */
     const bgOf = (el) => {
       for (let n = el; n; n = n.parentElement) {
-        const c = parse(getComputedStyle(n).backgroundColor);
+        const cs = getComputedStyle(n);
+        const c = parse(cs.backgroundColor);
         if (c && c.a > 0.92) return c.rgb;
-        if (c && c.a > 0) {
-          const under = bgOf(n.parentElement ?? document.body);
-          return over(c, under);
-        }
+        if (c && c.a > 0) return over(c, bgOf(n.parentElement ?? document.body));
       }
       return [10, 10, 10];
+    };
+    /* An ancestor painting a gradient or an image is a background this script
+       cannot resolve to one colour. Those nodes are listed separately rather
+       than guessed at, because a guess here is worse than an admission. */
+    const painted = (el) => {
+      for (let n = el; n; n = n.parentElement) {
+        if (getComputedStyle(n).backgroundImage !== 'none') return true;
+      }
+      return false;
     };
     const ratio = (a, b) => { const l1 = lum(a), l2 = lum(b); const hi = Math.max(l1, l2), lo = Math.min(l1, l2); return (hi + 0.05) / (lo + 0.05); };
 
     const bad = [];
+    const unresolved = [];
     let checked = 0;
     for (const el of document.querySelectorAll('p, h1, h2, h3, h4, li, a, button, span, b, u, i, label, small, time')) {
       const text = (el.textContent ?? '').trim();
@@ -78,7 +89,13 @@ const out = {};
       if (!r.width || !r.height) continue;
       const fg = parse(cs.color);
       if (!fg) continue;
-      const bg = bgOf(el.parentElement ?? el);
+      const sel = `${el.tagName.toLowerCase()}.${(el.className || '').toString().split(' ')[0]}`;
+      if (painted(el)) {
+        unresolved.push({ sel, text: text.slice(0, 40),
+                          section: el.closest('section')?.id ?? 'chrome' });
+        continue;
+      }
+      const bg = bgOf(el);
       const eff = over(fg, bg);
       const size = parseFloat(cs.fontSize);
       const large = size >= 24 || (size >= 18.66 && +cs.fontWeight >= 700);
@@ -89,12 +106,11 @@ const out = {};
         bad.push({
           section: el.closest('section')?.id ?? el.closest('header,footer,aside,nav')?.id ?? 'chrome',
           text: text.slice(0, 44), ratio: +got.toFixed(2), need,
-          color: cs.color, size: Math.round(size),
-          sel: `${el.tagName.toLowerCase()}.${(el.className || '').toString().split(' ')[0]}`,
+          color: cs.color, size: Math.round(size), sel,
         });
       }
     }
-    return { checked, failures: bad };
+    return { checked, failures: bad, unresolved };
   });
 
   out.media = await page.evaluate(() => ({
@@ -114,7 +130,7 @@ const out = {};
   await nap(400);
   const visited = [];
   let ringless = 0;
-  for (let i = 0; i < 90; i++) {
+  for (let i = 0; i < 170; i++) {
     await page.keyboard.press('Tab');
     const step = await page.evaluate(() => {
       const el = document.activeElement;
@@ -175,7 +191,8 @@ const out = {};
 await browser.close();
 await writeFile('qa/report-a11y.json', JSON.stringify(out, null, 2));
 
-console.log(`contrast: checked ${out.contrast.checked} text nodes, ${out.contrast.failures.length} below threshold`);
+console.log(`contrast: checked ${out.contrast.checked} text nodes, ${out.contrast.failures.length} below threshold, ` +
+            `${out.contrast.unresolved.length} on a gradient this script cannot resolve`);
 for (const f of out.contrast.failures.slice(0, 20)) {
   console.log(`   ${f.ratio}:1 (need ${f.need}) · ${f.section} · ${f.sel} · "${f.text}"`);
 }

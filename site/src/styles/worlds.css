@@ -390,7 +390,22 @@ html.is-grey .world__bg, html.is-grey #seam { display: none !important; }
 .uni--tetris .h-lg, .tt__price { font-family: var(--f-chunk); font-variant-numeric: tabular-nums; }
 .tt__grid { display: grid; gap: var(--s-10); grid-template-columns: 1fr; }
 @media (min-width: 900px) { .tt__grid { grid-template-columns: 300px 1fr; gap: var(--s-16); } }
-.tt__stick { position: sticky; top: 76px; align-self: start; z-index: 2; }
+/* Pinned only where there is a second column to pin beside. In one column the
+   sticky block slid over the list it was meant to explain — the well and the
+   running total drew straight through the transparent scope rows. Intent was
+   right (a toggle and its consequence should share a screen); the execution
+   was not, so on a phone the stack sits above the list in normal flow and the
+   compact readout travels with it. */
+.tt__stick {
+  position: static;
+  align-self: start;
+  z-index: 2;
+  margin-bottom: var(--s-6);
+  background: var(--w-bg);
+}
+@media (min-width: 900px) {
+  .tt__stick { position: sticky; top: 76px; margin-bottom: 0; background: none; }
+}
 .well__hud {
   display: flex; gap: var(--s-4); margin-bottom: var(--s-3);
   font-family: var(--f-mono); font-size: var(--t-mono); color: var(--w-dim);
@@ -638,8 +653,9 @@ html.is-grey .world__bg, html.is-grey #seam { display: none !important; }
 .ring__pct { position: absolute; inset: auto 0 2%; text-align: center;
   font-family: var(--f-mono); font-size: var(--t-mono); color: var(--w-dim); }
 .portal__acts { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: var(--s-4); margin-top: var(--s-8); }
-.portal__step { opacity: .4; pointer-events: none; transition: opacity var(--d-base); }
-.uni--portal.ring-open .portal__step { opacity: 1; pointer-events: auto; }
+.portal__step { opacity: .34; filter: saturate(.55); pointer-events: none;
+  transition: opacity var(--d-base), filter var(--d-base); }
+.uni--portal.ring-open .portal__step { opacity: 1; filter: none; pointer-events: auto; }
 .ring__tries { margin-top: var(--s-4); text-align: center; font-size: var(--t-sm); color: var(--w-dim); }
 
 /* ─────────────────────────────────────────────────── 09 · светлый мир ─── */
@@ -649,6 +665,7 @@ html.is-grey .world__bg, html.is-grey #seam { display: none !important; }
   --w-dim: rgb(10 10 10 / .66);
   --w-line: rgb(10 10 10 / .14);
   --w-acc: #0a0a0a;
+  --w-on-acc: #f2ebdd;
   --shadow-tint: 150 138 116;
 }
 .light__sun { position: absolute; inset: 0; z-index: 0; pointer-events: none;
@@ -726,7 +743,7 @@ html.is-grey .world__bg, html.is-grey #seam { display: none !important; }
 .wall__wire { position: absolute; inset: 0; z-index: 0; pointer-events: none; }
 .wall__row { position: relative; z-index: 1; display: flex; flex-wrap: wrap; gap: var(--s-4) var(--s-5); }
 .ltr { position: relative; display: grid; place-items: center; width: 30px; padding-top: 16px; }
-.ltr b { font-family: var(--f-mono); font-size: var(--t-sm); color: rgb(207 220 232 / .3); transition: color var(--d-base); }
+.ltr b { font-family: var(--f-mono); font-size: var(--t-sm); color: rgb(207 220 232 / .62); transition: color var(--d-base); }
 .ltr::before {
   content: ''; position: absolute; top: 0; left: 50%; transform: translateX(-50%);
   width: 11px; height: 15px; border-radius: 50% 50% 40% 40%;
@@ -767,14 +784,20 @@ html.is-grey .world__bg, html.is-grey #seam { display: none !important; }
   --w-bg: #010103;
   --w-acc: #ffe81f;
   --shadow-tint: 0 0 2;
-  padding: 0; height: 320svh;
+  padding: 0;
   content-visibility: visible;
 }
+.crawl__runway { height: 320svh; }
 .crawl__stage {
   position: sticky; top: 0; height: 100svh; overflow: hidden;
   display: grid; place-items: center;
-  perspective: 340px;
+  /* 340px crushed the deck into an unreadable stamp. 900 keeps the recession
+     without making the copy a texture. */
+  perspective: 900px;
+  perspective-origin: 50% 0%;
 }
+.uni--crawl .world__bg { z-index: 0; }
+.crawl__stage > :not(.world__bg) { position: relative; z-index: 1; }
 .crawl__pre {
   position: absolute; top: 22%; left: 50%; transform: translateX(-50%);
   width: min(90vw, 640px); text-align: center;
@@ -783,17 +806,17 @@ html.is-grey .world__bg, html.is-grey #seam { display: none !important; }
 }
 .crawl__pre.is-in { opacity: 1; }
 .crawl__deck {
-  width: min(84vw, 720px);
-  transform: rotateX(24deg) translate3d(0, var(--cy, 0), 0);
+  width: min(88vw, 760px);
+  transform: rotateX(17deg) translate3d(0, var(--cy, 0), 0);
   transform-origin: 50% 100%;
   color: var(--w-acc);
   text-align: center;
   font-weight: 700;
   will-change: transform;
 }
-.crawl__deck h3 { font-family: var(--f-chunk); font-size: clamp(1.4rem, 4vw, 2.4rem); margin-bottom: .7em; }
-.crawl__deck h4 { font-family: var(--f-chunk); font-size: clamp(1rem, 2.4vw, 1.4rem); margin: 1.4em 0 .5em; }
-.crawl__deck p, .crawl__deck li { font-size: clamp(.95rem, 2vw, 1.2rem); line-height: 1.5; margin-bottom: .7em; }
+.crawl__deck h3 { font-family: var(--f-chunk); font-size: clamp(1.7rem, 5vw, 3rem); margin-bottom: .7em; }
+.crawl__deck h4 { font-family: var(--f-chunk); font-size: clamp(1.15rem, 3vw, 1.7rem); margin: 1.4em 0 .5em; }
+.crawl__deck p, .crawl__deck li { font-size: clamp(1.05rem, 2.4vw, 1.45rem); line-height: 1.55; margin-bottom: .7em; }
 .crawl__post {
   position: absolute; bottom: 14%; left: 50%; transform: translateX(-50%);
   width: min(90vw, 620px); text-align: center;

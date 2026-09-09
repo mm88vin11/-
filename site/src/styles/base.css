@@ -33,6 +33,11 @@ body {
 body.is-locked, html.is-locked { overflow: hidden; }
 
 img, video, canvas, svg { display: block; max-width: 100%; }
+
+/* `hidden` has to beat a later `display` rule, or an element the script hid is
+   still on screen. This is what left "Отложено 0" and the game-over line
+   showing before either had anything to say. */
+[hidden] { display: none !important; }
 /* Every raster element declares its box. Zero CLS is a budget line, not a hope. */
 img, video { height: auto; }
 
@@ -44,7 +49,7 @@ h1, h2, h3, h4 { margin: 0; font-weight: 800; line-height: var(--lh-head); lette
 p { margin: 0; }
 ul, ol { margin: 0; padding: 0; list-style: none; }
 
-::selection { background: var(--w-acc, var(--acc)); color: var(--c-ink); }
+::selection { background: var(--w-acc, var(--acc)); color: var(--w-on-acc, var(--on-acc)); }
 
 /* ——— focus ————————————————————————————————————————————————————————————
    Visible, and part of the design. Never `outline: none` without a replacement

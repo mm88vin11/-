@@ -15,7 +15,8 @@
     "qa:a11y": "node qa/a11y.mjs",
     "qa:loader": "node qa/loader.mjs",
     "qa:lh": "node qa/lighthouse.mjs",
-    "qa:all": "node qa/run.mjs && node qa/a11y.mjs && node qa/loader.mjs && node qa/lighthouse.mjs"
+    "qa:all": "node qa/run.mjs && node qa/a11y.mjs && node qa/loader.mjs && node qa/lighthouse.mjs",
+    "assets:single": "node scripts/build-single-reel.mjs"
   },
   "dependencies": {
     "gsap": "^3.15.0",

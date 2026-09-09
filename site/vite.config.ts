@@ -59,7 +59,9 @@ export default defineConfig({
     target: 'es2020',
     assetsInlineLimit: single ? 100_000_000 : 0,
     cssCodeSplit: !single,
-    sourcemap: false,
+    /* 'hidden': maps are emitted for debugging a production incident but no
+       `sourceMappingURL` comment ships, so nothing is fetched by a visitor. */
+    sourcemap: single ? false : 'hidden',
     minify: 'terser',
     terserOptions: { compress: { passes: 2, drop_console: process.env.KEEPLOG !== '1' }, format: { comments: false } },
     reportCompressedSize: true,

@@ -165,7 +165,7 @@ class Pain implements World {
     PAIN.forEach((p) => {
       const cell = el('div', 'blkcell');
       cell.innerHTML =
-        `<button class="blk" type="button" aria-label="Блок: ${esc(p.k)}"><canvas width="128" height="128"></canvas></button>` +
+        `<button class="blk" type="button" aria-label="Блок: ${esc(p.k)}"><canvas width="128" height="128" aria-hidden="true"></canvas></button>` +
         `<p class="blk__say"><b>${esc(p.k)}</b>${esc(p.say)}</p>`;
       host.appendChild(cell);
       const btn = cell.querySelector<HTMLButtonElement>('.blk')!;

@@ -292,6 +292,20 @@ class Portal implements World {
     c.clearRect(0, 0, w, h);
 
     if (!this.opened) {
+      /* Before anything is traced the ring is an empty square of nothing, and
+         "обведите круг" is asking for a gesture with no target. A faint dashed
+         guide shows the size and shape being asked for, and fades out as soon
+         as the first arc is drawn. */
+      if (this.covered === 0) {
+        c.save();
+        c.setLineDash([6 * this.dpr, 10 * this.dpr]);
+        c.lineWidth = 1.5 * this.dpr;
+        c.strokeStyle = `rgba(255,154,60,${0.16 + 0.06 * Math.sin(t * 0.002)})`;
+        c.beginPath();
+        c.arc(this.cx, this.cy, this.R, 0, Math.PI * 2);
+        c.stroke();
+        c.restore();
+      }
       c.lineWidth = 3 * this.dpr;
       c.lineCap = 'round';
       for (let b = 0; b < BUCKETS; b++) {

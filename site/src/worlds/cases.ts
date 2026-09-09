@@ -56,7 +56,7 @@ class Cases implements World {
     CASES.forEach((cs, i) => {
       const card = el('article', 'card');
       card.innerHTML =
-        `<div class="card__art"><canvas></canvas></div>` +
+        `<div class="card__art"><canvas aria-hidden="true"></canvas></div>` +
         `<p class="card__tag">${esc(cs.tag)}</p>` +
         `<p class="card__num">${esc(cs.num)} <small>${esc(cs.unit)}</small></p>` +
         `<h3 class="card__ttl">${esc(cs.ttl)}</h3>` +

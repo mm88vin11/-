@@ -77,8 +77,6 @@ export class ShaderLayer {
     this.ok = true;
   }
 
-  setDpr(dpr: number): void { this.dpr = dpr; this.w = 0; }
-
   /** Resizes the drawing buffer when the box changed. Cheap to call per frame. */
   private size(): boolean {
     const gl = this.gl;

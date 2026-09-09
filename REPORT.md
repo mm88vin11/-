@@ -140,13 +140,39 @@ later. Pausing releases GPU memory — `ShaderLayer.destroy()`,
 `forceContextLoss()`, canvas backing stores down to 1×1. At most three worlds
 are ever live; the trace checks it.
 
-**Quality is a ladder.** Tier from cores, memory, WebGL2 and a 200 ms shader
-benchmark at boot, dropping a step if sixty consecutive frames average over
-22 ms. Low tier means no WebGL at all, and all eleven seams collapse into one
-250 ms crossfade that was written before the seams were.
+**Quality is a ladder, and the ladder reaches the worlds.** Tier from cores,
+memory, WebGL2 and a 200 ms shader benchmark at boot. A short first window then
+asks whether that guess was wrong and a long one asks whether anything has
+changed since; a step down needs both a mean over 22 ms and most of the frames
+in the window over it, so a single chunk-parse cannot fake one, and a mean far
+enough past budget skips a rung rather than making the device earn the second
+one over another second of jank. Low tier means no WebGL at all, and all eleven
+seams collapse into one 250 ms crossfade that was written before the seams were.
+
+The part that took measuring to find: a tier change has to reach canvases that
+already exist. Backing stores are allocated in resize handlers and nowhere
+else, which is the right rule right up until the tier changes under a mounted
+world — so a tier change now schedules `clock.refit()`, shader layers take
+their DPR as a function rather than a number, and the three.js renderers
+re-read the pixel ratio when they resize. Without that the downgrade changed
+every setting and none of the cost.
 
 **Copy is data.** Every sentence is in `src/data/content.ts`. The price stayed
 a range.
+
+**The rules are executable, not advisory.** `scripts/perf-guard.mjs` is the
+half of the performance contract a machine can check — one rAF, the world
+contract, GPU disposal, transform/opacity-only in scroll-linked animation, no
+layout reads inside a tick, the named z-scale, the deduplicated font budget, no
+base64, a declared box on every image, built weight — and it currently reports
+0 failures and 0 warnings. The half a machine cannot check is written down for
+the next person instead: `.claude/skills/perf-guard/` (the contract) and
+`.claude/skills/world-spec/` (the design system), plus three agents in
+`.claude/agents/` — `perf-auditor` measures against the budgets and is
+forbidden to report impressions, `visual-qa` looks at every width and samples
+pixels rather than trusting a thumbnail, `world-builder` builds a section to
+the world contract. Each of them encodes a specific defect from this rebuild's
+history, so they are worth reading even by someone who never invokes them.
 
 ---
 

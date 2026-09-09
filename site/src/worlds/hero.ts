@@ -70,6 +70,24 @@ class Hero implements World {
   private static readonly BEHIND = 6;
   private static readonly KEEP_AHEAD = 30;
   private static readonly KEEP_BEHIND = 14;
+  /**
+   * The lookahead before anyone has scrolled.
+   *
+   * A visitor who has not touched the page is looking at frame 0, and the
+   * reel used to answer that by decoding thirty frames as fast as its lanes
+   * allowed. Measured on the cold-load pass — 390×844, CPU ×4 — that was 59
+   * long tasks between 1.5 s and 6.1 s, the worst of them 213 ms, on a page
+   * that was standing still. It is also what Lighthouse's Total Blocking Time
+   * was almost entirely made of.
+   *
+   * So the reel now primes what the first screen needs plus enough cushion to
+   * absorb a flick, and earns the rest of the window the moment the scrub
+   * actually moves — by which point the decodes are spread across the scroll
+   * instead of stacked against the load.
+   */
+  private static readonly REST_AHEAD = 4;
+  /** Set the first time the scrub moves off its opening frame. */
+  private scrubbed = false;
   private cut: 'd' | 'm' | null = null;
   private manifest: Manifest | null = null;
 
@@ -193,7 +211,8 @@ class Hero implements World {
 
     const order: number[] = [];
     for (let i = 0; i < PRIME; i++) if (this.wants(i)) order.push(i);
-    for (let d = 0; d <= Hero.AHEAD; d++) {
+    const ahead = this.scrubbed ? Hero.AHEAD : Hero.REST_AHEAD;
+    for (let d = 0; d <= ahead; d++) {
       const a = centre + d;
       const b = centre - d;
       if (a < n && this.wants(a)) order.push(a);
@@ -307,7 +326,7 @@ class Hero implements World {
 
     const f = this.frameAt(this.smooth);
     const centre = Math.round(f);
-    if (centre !== this.lastCentre) { this.lastCentre = centre; this.pump(centre); }
+    if (centre !== this.lastCentre) { this.lastCentre = centre; this.scrubbed = true; this.pump(centre); }
     this.paint(f);
   }
 

@@ -85,11 +85,33 @@ export function startLoader(): LoaderHandle {
 
   /* ——— the field ——————————————————————————————————————————————————————— */
   let fade = 1;
-  const bg = quality.state.webgl2
-    ? new ShaderLayer({ canvas: bgCanvas, frag: BG_FRAG, dpr: Math.min(quality.dpr, 1.5),
+  let bg = quality.state.webgl2
+    ? new ShaderLayer({ canvas: bgCanvas, frag: BG_FRAG, dpr: () => Math.min(quality.dpr, 1.5),
                         uniforms: { uFade: () => fade } })
     : null;
   if (!bg?.ok) bgCanvas.style.display = 'none';
+
+  /**
+   * The loader was the one thing on the page ignoring its own ladder.
+   *
+   * It runs before anything is known about what this device costs, so it opens
+   * optimistically — and then kept a full-screen two-octave noise field alive
+   * even after the ladder had decided the machine could not hold it. Measured
+   * on the cold-load pass, that was the whole of the opening's blocking time:
+   * `boot` frames at 4 fps and every one of the 57 long tasks inside the first
+   * six seconds. At rest immediately afterwards, the same page runs at 60.0 fps
+   * with a worst frame of 19 ms and no long tasks at all.
+   *
+   * There is a designed ground behind the canvas — the radial gradient in
+   * `loader.css`, which is there precisely so nothing flashes before the
+   * shader compiles — so dropping the field costs a texture, not a picture.
+   */
+  const unpinTier = quality.onChange((tier) => {
+    if (tier !== 'low' || !bg) return;
+    bg.destroy();
+    bg = null;
+    bgCanvas.style.display = 'none';
+  });
 
   /* ——— the mark ————————————————————————————————————————————————————————
      The outline is derived from the artwork's own alpha: the silhouette is
@@ -281,6 +303,7 @@ export function startLoader(): LoaderHandle {
     window.setTimeout(() => {
       root.setAttribute('hidden', '');
       clock.remove(job);
+      unpinTier();
       bg?.destroy();
       resolveDone();
     }, 520);

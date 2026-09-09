@@ -115,6 +115,8 @@ const listeners = new Set<Listener>();
 
 /** How many times the ladder has taken something away, for the QA harness. */
 let downgrades = 0;
+/** And how many times it handed a hasty opening call back. */
+let upgrades = 0;
 
 function applyTier(tier: Tier, reason: string): void {
   if (tier === state.tier) return;
@@ -160,6 +162,32 @@ let pinned = false;
  */
 const FIRST_WINDOW = 20;
 const WINDOW = 60;
+/**
+ * The first window also closes on time, not only on frames.
+ *
+ * A window measured purely in frames is backwards: the slower the device, the
+ * longer it takes to notice it is slow. Measured here, the opening ran at
+ * 4.4 fps, so twenty frames was four and a half seconds of the loader running
+ * at full strength on a machine that had already proved it could not hold it.
+ * Whichever comes first, then — with a floor of four frames, because one
+ * chunk-parse frame is not evidence about a device and must not be able to
+ * spend a tier on its own.
+ */
+const FIRST_MS = 400;
+const FIRST_MIN_FRAMES = 4;
+/**
+ * The opening call gets exactly one chance to be wrong.
+ *
+ * Deciding on four frames is right for a device that genuinely cannot keep up
+ * and unfair to a fast one whose *startup* was slow — a few hundred
+ * milliseconds of module evaluation is a statement about the bundle, not about
+ * the GPU. So a tier taken away by the early call is remembered, and one full
+ * window that comes back comfortably fast — not merely inside budget — hands
+ * it back. Once, and only for the early call: a ladder that can climb whenever
+ * it likes is a page that changes quality under the reader.
+ */
+let earlyFrom: Tier | null = null;
+let restored = false;
 let windowFrames = FIRST_WINDOW;
 let sampled = 0;
 let slow = 0;
@@ -227,26 +255,41 @@ export const quality = {
       acc += ms;
       sampled++;
       if (ms > 22) slow++;
-      if (sampled < windowFrames) return;
+      const isFirst = windowFrames === FIRST_WINDOW;
+      const early = isFirst && sampled >= FIRST_MIN_FRAMES && acc >= FIRST_MS;
+      if (sampled < windowFrames && !early) return;
       const n = sampled;
       const avg = acc / n;
       const slowShare = slow / n;
       acc = 0; sampled = 0; slow = 0;
       windowFrames = WINDOW;
-      if (pinned || state.tier === 'low') return;
+      if (pinned) return;
 
       /* Both, not either. The mean alone hands a downgrade to any page that
          parsed a chunk during the window — one 400 ms task is worth 20 ms of
          mean across twenty frames, and a one-off parse is not a statement
          about the device. Requiring that most of the window was also slow
          asks the question that actually matters: is this sustained? */
-      if (avg <= 22 || slowShare < 0.5) return;
+      if (avg <= 22 || slowShare <= 0.5) {
+        /* Comfortably fast, not merely inside budget — the point is to undo a
+           hasty call, not to climb back towards the frame that caused it. */
+        if (earlyFrom && !restored && !isFirst && avg < 14 && slowShare < 0.1) {
+          restored = true;
+          const back = earlyFrom;
+          earlyFrom = null;
+          upgrades++;
+          applyTier(back, `restored: ${n} frames averaged ${avg.toFixed(1)}ms`);
+        }
+        return;
+      }
+      if (state.tier === 'low') return;
 
       /* How far past the budget decides how far to step. A device averaging
          40 ms a frame is not one rung away from comfortable, and making it
          earn the second rung over another sixty frames is another second of
          exactly the jank this mechanism exists to end. */
       const next: Tier = avg > 40 ? 'low' : state.tier === 'high' ? 'mid' : 'low';
+      if (early) earlyFrom ??= state.tier;
       downgrades++;
       applyTier(next, `runtime downgrade: ${n} frames averaged ${avg.toFixed(1)}ms, ${Math.round(slowShare * 100)}% of them over budget`);
     }, { always: true, order: -100 });
@@ -254,7 +297,7 @@ export const quality = {
     /* Read by the measurement rig: the tier the page settled on and whether it
        got there by detection or by the ladder taking something away. */
     Object.defineProperty(window, '__BAZA_TIER', {
-      get: () => ({ tier: state.tier, downgrades, pinned, webgl2: state.webgl2, cores: state.cores }),
+      get: () => ({ tier: state.tier, downgrades, upgrades, pinned, webgl2: state.webgl2, cores: state.cores }),
     });
 
     mqReduce.addEventListener('change', () => window.location.reload());

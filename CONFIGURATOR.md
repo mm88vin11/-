@@ -6,6 +6,27 @@ rather than the entry to the conversation. The anchor is unchanged (`#brief`), s
 every existing link — header CTA, menu, service cards, pricing block — still lands
 in the right place.
 
+## The shape of it
+
+The section is built as an instrument, not as a form. Top to bottom:
+
+| Part | What it is |
+| --- | --- |
+| Top bar | back button, step title, info button — the frame of an app screen |
+| Assembly stage | a `<canvas>` hero: the project core and six modules around it. Picking a direction flies its module to the core, draws a link, and sends pulses down it. Drawn in `stgDraw`, ticked from the page's own rAF loop — there is no second loop. |
+| Title + price | the selected build named like a trim level, with the range and term under it |
+| Steps | 1 direction tiles → 2 tabs + option cards → 3 settings rows → 4 the lead form |
+| Action bar | fixed to the bottom while the section is in view: build chip, the primary button carrying the live lower bound, and a chevron that raises the full spec |
+
+Nothing about it is a stretched desktop or a blown-up phone: at ≥1081px the stage
+and the title sit side by side and options lay out as a grid; below that the
+stage stacks over the title and options become a snap-scrolling rail.
+
+Glyphs are generated, not drawn by hand or shipped as files: `ART` holds each
+direction as a list of primitives and `cfgVals` renders it into a `data:` SVG for
+`background-image`. The same list feeds the canvas modules, so a tile and its
+module on the stage can never drift apart.
+
 **Nothing about prices lives in the markup.** Everything below is edited in one
 block near the top of the component class in `index.html`, marked:
 
@@ -14,6 +35,9 @@ block near the top of the component class in `index.html`, marked:
 ║  КОНФИГУРАТОР ПРОЕКТА — ВСЯ ЭКОНОМИКА В ОДНОМ МЕСТЕ                  ║
 ╚══════════════════════════════════════════════════════════════════════╝
 ```
+
+(The block above it, `ГРАФИКА КОНФИГУРАТОРА`, holds the glyphs; the one below,
+`СТЕНД СБОРКИ`, the canvas hero.)
 
 Search the file for `CFGD = [` to jump straight to it. Change a number there and
 the range, the term, the team, the summary panel, the shared link, the exported
@@ -67,7 +91,10 @@ recommendation and the lead payload read those old category names. Use one of
 
 ## Option types
 
-Four control types, picked by what the data actually is — not for variety:
+Four control types, picked by what the data actually is — not for variety. Each
+renders as a card with a line icon, a name, a business-benefit line, and a
+control at the bottom: a `+ / включено` pill, a value pill that cycles with page
+dots under it, a row of set buttons, or a counter that doubles as a slider.
 
 ```js
 // toggle — on/off

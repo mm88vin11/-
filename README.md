@@ -100,9 +100,12 @@ by hand — the export surface is the source of truth.
 the React runtime, the component template, the logic and every asset are inlined,
 so it opens from disk with no build step and no network.
 
-The `#brief` section is a **project configurator** — pick directions, spec them
-out, choose the working mode, and the summary panel prices the build live. It
-replaced the old two-step lead form; the form is still there, as the final step.
+The `#brief` section is a **project configurator** built as an instrument rather
+than a form: an app-style top bar, a live `<canvas>` assembly stage where each
+picked direction flies into the project core, direction tiles, option cards with
+`+` pills and counters, settings rows, and an action bar fixed to the bottom that
+always carries the price. It replaced the old two-step lead form; the form is
+still there, as the final step.
 Prices, services and copy live in one declarative block — see
 [`CONFIGURATOR.md`](CONFIGURATOR.md) for how to edit them without a developer.
 

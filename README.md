@@ -94,9 +94,29 @@ read only when a task needs it.
 To refresh it against a newer Motion, re-derive from the tag rather than editing
 by hand — the export surface is the source of truth.
 
+## The landing page
+
+`index.html` is the single-file **lllbaza.ru** landing page. It is self-contained:
+the React runtime, the component template, the logic and every asset are inlined,
+so it opens from disk with no build step and no network.
+
+The `#brief` section is a **project configurator** — pick directions, spec them
+out, choose the working mode, and the summary panel prices the build live. It
+replaced the old two-step lead form; the form is still there, as the final step.
+Prices, services and copy live in one declarative block — see
+[`CONFIGURATOR.md`](CONFIGURATOR.md) for how to edit them without a developer.
+
+Sanity-check a price change from the browser console:
+
+```js
+__baza.cfgSelfTest()   // [] means the calculator agrees with itself
+```
+
 ## Layout
 
 ```
+index.html          single-file landing page (configurator lives in #brief)
+CONFIGURATOR.md     how to edit services and prices
 .claude/skills/     10 skills
 .mcp.json           21st.dev MCP server (key via ${TWENTYFIRST_API_KEY})
 .env.example        template for the key
